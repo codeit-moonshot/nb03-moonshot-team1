@@ -1,0 +1,48 @@
+import { config as load } from 'dotenv';
+import { z } from 'zod';
+
+load();
+
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+
+  PORT: z.coerce.number().int().positive().default(3000),
+  FE_PORT: z.coerce.number().int().positive().optional(),
+
+  DATABASE_URL: z.string().url(),
+  DATABASE_URL_DEV: z.string().url().optional(),
+
+  BASE_URL: z.string().url(),
+  BASE_URL_DEV: z.string().url().optional(),
+
+  CORS_ORIGIN: z.string().default(''), // 콤마 구분자
+  SESSION_SECRET: z.string().min(10), // 세션/CSRF 쿠키 서명
+  JWT_SECRET: z.string().min(10), // 토큰 인증
+
+  UPLOAD_ROOT: z.string().default('./uploads'),
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('❌ Invalid environment variables:');
+  parsed.error.issues.forEach((i) => {
+    console.error(`- ${i.path.join('.')}: ${i.message}`);
+  });
+  throw new Error('Invalid environment variables');
+}
+
+// 파싱된 값
+const env = parsed.data;
+
+/**
+ * CORS 오리진 배열 파생 값
+ * - 'http://a.com,https://b.com' -> ['http://a.com', 'https://b.com']
+ */
+export const CORS_ORIGINS = env.CORS_ORIGIN
+  ? env.CORS_ORIGIN.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  : [];
+
+export default env;
