@@ -101,7 +101,7 @@ app.use(
 /**
  * CSRF 보호
  */
-app.use(csurf({ cookie: true }));
+// app.use(csurf({ cookie: true }));
 
 /**
  * 정적 파일 (MIME 강제)

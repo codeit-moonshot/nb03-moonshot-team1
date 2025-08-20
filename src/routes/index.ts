@@ -4,10 +4,10 @@
 
 import { Router } from 'express';
 
-import exampleRoutes from '@/modules/_example/router';
+import tasksRouter from '@/modules/tasks/router';
 
 const router = Router();
 
-router.use('/example', exampleRoutes);
+router.use('/task', tasksRouter);
 
 export default router;
