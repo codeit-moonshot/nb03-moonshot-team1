@@ -37,7 +37,7 @@ model User {
   email     String   @unique
   name      String
   password  String?          // 소셜 가입자는 null 가능
-  imageUrl  String?
+  profileImage  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
