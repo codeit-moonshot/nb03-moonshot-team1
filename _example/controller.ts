@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
-import * as productService from './service';
+import * as productService from './service.js';
 import { isTargetLiked } from '../services/likeService.js';
-import { CreateProductDto, ListProductsQueryDto, UpdateProductDto } from './dto/product.dto';
+import { CreateProductDto, ListProductsQueryDto, UpdateProductDto } from './dto/product.dto.js';
 
 /**
  * @function createProducts

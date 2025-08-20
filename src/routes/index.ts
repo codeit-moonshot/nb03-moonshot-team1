@@ -4,10 +4,10 @@
 
 import { Router } from 'express';
 
-import exampleRoutes from '@/modules/_example/router';
+import authRouter from '@/modules/auth/router';
 
 const router = Router();
 
-router.use('/example', exampleRoutes);
+router.use('/auth', authRouter);
 
 export default router;

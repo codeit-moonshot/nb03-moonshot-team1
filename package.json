@@ -5,7 +5,6 @@
   "main": "dist/server.js",
   "author": "Codeit NB03 Team 1",
   "license": "MIT",
-  "type": "module",
   "private": true,
   "repository": {
     "type": "git",
