@@ -1,7 +1,7 @@
-import ApiError from "@/errors/ApiError";
-import authRepo from "@/modules/auth/repo";
+import ApiError from "#errors/ApiError";
+import authRepo from "#modules/auth/repo";
 import { RegisterDto } from "./dto/register.dto";
-import { hashPassword, isPasswordValid } from "@/utils/passwordUtil";
+import { hashPassword, isPasswordValid } from "#utils/passwordUtils";
 
 
 

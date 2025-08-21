@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { DecodedToken } from './dto/token.dto';
+import type { DecodedToken } from '#modules/auth/dto/token.dto';
 import ApiError from '#errors/ApiError';
 
 const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
