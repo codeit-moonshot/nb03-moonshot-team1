@@ -5,9 +5,11 @@
 import { Router } from 'express';
 
 //import exampleRoutes from '../_example/router';
+import subtaskRoutes from '../modules/subtasks/router';
 
 const router = Router();
 
 //router.use('/example', exampleRoutes);
+router.use('/tasks/:taskId/subtasks', subtaskRoutes);
 
 export default router;

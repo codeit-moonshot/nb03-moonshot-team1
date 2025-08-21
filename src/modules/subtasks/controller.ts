@@ -1,0 +1,59 @@
+import type { RequestHandler } from 'express';
+
+/**
+ * @function createSubtask
+ * @description 하위 할 일을 생성합니다.
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {201} 생성된 하위 할 일 반환
+ */
+export const createSubtask: RequestHandler = (req, res) => {
+  res.send('Hello World!');
+};
+
+/**
+ * @function getSubtaskList
+ * @description 하위 할 일 목록을 조회합니다.
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {200} 하위 할 일 목록 반환
+ */
+export const getSubtaskList: RequestHandler = (req, res) => {
+  res.send('getSubtaskList');
+};
+
+/**
+ * @function updateSubtask
+ * @description 하위 할 일의 정보를 수정합니다.
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {200} 수정된 하위 할 일 반환
+ * @throws {400} 잘못된 ID
+ * @throws {403} 권한 없음
+ * @throws {404} 하위 할 일을 찾을 수 없는 경우
+ */
+export const updateSubtask: RequestHandler = (req, res) => {
+  res.send('updateSubtask');
+};
+
+/**
+ * @function deleteSubtask
+ * @description 하위 할 일을 삭제합니다.
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {204} 삭제 성공
+ * @throws {400} 잘못된 ID
+ * @throws {403} 권한 없음
+ * @throws {404} 하위 할 일을 찾을 수 없는 경우
+ */
+export const deleteSubtask: RequestHandler = (req, res) => {
+  res.send('deleteSubtask');
+};
