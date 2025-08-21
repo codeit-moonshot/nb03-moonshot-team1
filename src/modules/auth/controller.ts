@@ -4,7 +4,7 @@ import { RegisterDto } from '#modules/auth/dto/register.dto';
 
 const register: RequestHandler = async (req, res, next) => {
   const registerDto: RegisterDto = {
-    email: req.body.email,
+    email: (req.body.email).toLowerCase(),
     name: req.body.name,
     password: req.body.password,
     profileImage: req.body.profileImage ?? null
