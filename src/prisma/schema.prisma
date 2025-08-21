@@ -40,7 +40,7 @@ enum InvitationStatus {
 
 model User {
   id           Int       @id @default(autoincrement())
-  email        String    @unique @db.Citext
+  email        String    @unique
   name         String
   password     String? // 소셜 가입자는 null 가능
   profileImage String?
