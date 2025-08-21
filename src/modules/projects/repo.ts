@@ -1,16 +1,17 @@
 import prisma from '#prisma/prisma';
+import { InvitationDto } from './project.dto';
 
-export const create = async (projectId: Number, email: String, token: String):
+export const create = async (data: InvitationDto):
 Promise<{ id: number}> => {
   return await prisma.invitation.create({
     data: {
       project: {
         connect: {
-          id: projectId
+          id: data.projectId
         }
       },
-      email,
-      token
+      email: data.targetEmail,
+      token: data.invitationToken
     },
     select: { id: true }
   });

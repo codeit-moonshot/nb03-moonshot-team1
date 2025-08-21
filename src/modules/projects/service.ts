@@ -2,12 +2,13 @@ import ApiError from "#errors/ApiError";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import { create } from './repo';
+import { InvitationDto } from './project.dto';
 
 dotenv.config();
 
-export const sendInvitation = async (projectId: Number, targetEmail: String): Promise<void> => {
+export const sendInvitation = async (data: InvitationDto): Promise<void> => {
   const invitationToken = 'some Token';
-  const invitationId = await create(projectId, targetEmail, invitationToken);
+  const invitationId = await create({...data , invitationToken});
 
   // 추후 분리해야 할듯
   const smtpTransport = nodemailer.createTransport({

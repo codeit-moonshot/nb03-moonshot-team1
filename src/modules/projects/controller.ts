@@ -1,5 +1,7 @@
 import type { RequestHandler } from 'express';
 import { sendInvitation } from './service';
+import { InvitationDto } from './project.dto';
+
 /**
  * @function createInvitation
  * @description 프로젝트 초대 생성
@@ -11,9 +13,11 @@ import { sendInvitation } from './service';
  */
 
 export const createInvitation: RequestHandler = async (req, res) => {
-  const { projectId } = req.params;
-  const { targetEmail } = req.body.email;
+  const invitationDto: InvitationDto = {
+    projectId: Number(req.params.projectId),
+    targetEmail: req.body.email
+  }
 
-  await sendInvitation(Number(projectId), targetEmail);
-  console.log(`초대 : ${targetEmail}`);
+  await sendInvitation(invitationDto);
+  console.log(`초대 : ${invitationDto.targetEmail}`);
 }
