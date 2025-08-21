@@ -134,7 +134,6 @@ npm run start:all
 - helmet 적용 (CSP 포함)
 - httpOnly, secure, sameSite 쿠키
 - express-session + cookie-parser 기반 세션
-- csurf 기반 CSRF 보호
 - express-rate-limit 요청 제한
 - CORS 화이트리스트 기반 허용
 - 정적 파일 MIME 강제 설정
@@ -161,7 +160,7 @@ npm run start:all
   "lint:fix": "eslint \\"src/**/*.ts\\" --fix",
   "format": "prettier --write .",
 
-  "build": "tsc -p tsconfig.json",
+  "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
   "start": "node dist/server.js",
   "start:be": "cross-env NODE_ENV=production pm2 start dist/server.js --name moonshot-be",
   "start:fe": "cross-env NODE_ENV=production pm2 start npm --name moonshot-fe -- run start --prefix frontend",
