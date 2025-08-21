@@ -17,7 +17,7 @@ const schema = z.object({
 
   CORS_ORIGIN: z.string().default(''), // 콤마 구분자
   SESSION_SECRET: z.string().min(10), // 세션/CSRF 쿠키 서명
-  JWT_SECRET: z.string().min(10), // 토큰 인증
+  ACCESS_TOKEN_SECRET: z.string().min(10), // 토큰 인증
 
   UPLOAD_ROOT: z.string().default('./uploads'),
 });
@@ -41,8 +41,8 @@ const env = parsed.data;
  */
 export const CORS_ORIGINS = env.CORS_ORIGIN
   ? env.CORS_ORIGIN.split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+    .map((s) => s.trim())
+    .filter(Boolean)
   : [];
 
 export default env;

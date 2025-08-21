@@ -12,7 +12,7 @@ const register = async (data: RegisterDto) => {
   }
   const hashedPassword = await hashPassword(data.password);
   const createdUser = await authRepo.createAuth({ ...data, password: hashedPassword });
-  const { password, ...user } = createdUser;
+  const { password, deletedAt, ...user } = createdUser;
   return user;
 };
 
