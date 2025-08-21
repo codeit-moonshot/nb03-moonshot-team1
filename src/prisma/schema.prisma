@@ -55,8 +55,6 @@ model User {
   comments        Comment[]
   invitationsSent Invitation[]    @relation("ProjectInvitationsByUser")
   socialAccounts  SocialAccount[]
-
-  refreshTokenVersion Int @default(0)
 }
 
 model SocialAccount {
