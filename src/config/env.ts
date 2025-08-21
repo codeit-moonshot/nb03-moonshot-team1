@@ -4,22 +4,26 @@ import { z } from 'zod';
 load();
 
 const schema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-
-  PORT: z.coerce.number().int().positive().default(3000),
-  FE_PORT: z.coerce.number().int().positive().optional(),
-
+  // DATABASE
   DATABASE_URL: z.string().url(),
   DATABASE_URL_DEV: z.string().url().optional(),
 
+  // PORT
+  PORT: z.coerce.number().int().positive().default(3000),
+  FE_PORT: z.coerce.number().int().positive().optional(),
+
+  // BASE URL
   BASE_URL: z.string().url(),
   BASE_URL_DEV: z.string().url().optional(),
 
+  // RUNTIME
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   CORS_ORIGIN: z.string().default(''), // 콤마 구분자
-  SESSION_SECRET: z.string().min(10), // 세션/CSRF 쿠키 서명
-  ACCESS_TOKEN_SECRET: z.string().min(10), // 토큰 인증
-
+  SESSION_SECRET: z.string().min(10),
+  ACCESS_TOKEN_SECRET: z.string().min(10),
+  REFRESH_TOKEN_SECRET: z.string().min(10),
   UPLOAD_ROOT: z.string().default('./uploads'),
+  PASSWORD_PEPPER: z.string().min(10),
 });
 
 const parsed = schema.safeParse(process.env);
