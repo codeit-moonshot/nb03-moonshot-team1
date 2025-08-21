@@ -30,7 +30,7 @@ export const requireAuth: RequestHandler = (req, _res, next) => {
   if (!token) return next(ApiError.unauthorized('No token'));
 
   try {
-    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload;
     req.user = payload;
     next();
   } catch {
