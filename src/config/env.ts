@@ -23,6 +23,12 @@ const schema = z.object({
   ACCESS_TOKEN_SECRET: z.string().min(10),
   REFRESH_TOKEN_SECRET: z.string().min(10),
   UPLOAD_ROOT: z.string().default('./uploads'),
+
+  MAILSERVICE: z.enum(['google', 'naver']).default('google'),
+  HOSTMAIL: z.string(),
+  MAILPORT: z.number().int().positive().default(465), // 일반적으로 465 또는 587
+  SMTP_USER: z.string().email(),
+  SMTP_PASS: z.string().min(8), // SMTP 비밀번호
   PASSWORD_PEPPER: z.string().min(10),
 });
 
@@ -45,8 +51,8 @@ const env = parsed.data;
  */
 export const CORS_ORIGINS = env.CORS_ORIGIN
   ? env.CORS_ORIGIN.split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+    .map((s) => s.trim())
+    .filter(Boolean)
   : [];
 
 export default env;

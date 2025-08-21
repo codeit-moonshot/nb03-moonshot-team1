@@ -4,11 +4,13 @@
 
 import { Router } from 'express';
 
+import authRouter from '#modules/auth/router';
 //import exampleRoutes from '../_example/router';
 import subtaskRoutes from '../modules/subtasks/router';
 
 const router = Router();
 
+router.use('/auth', authRouter);
 //router.use('/example', exampleRoutes);
 router.use('/tasks/:taskId/subtasks', subtaskRoutes);
 
