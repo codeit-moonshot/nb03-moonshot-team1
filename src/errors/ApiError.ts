@@ -19,8 +19,8 @@ export type ErrorCode =
  * @example
  * // 컨트롤러 예시
  * import { RequestHandler } from 'express';
- * import ApiError from '@/errors/ApiError';
- * import prisma from '@/prisma/prisma';
+ * import ApiError from '#errors/ApiError';
+ * import prisma from '#prisma/prisma';
  *
  * export const getProject: RequestHandler = async (req, res, next) => {
  *   const projectId = Number(req.params.projectId);

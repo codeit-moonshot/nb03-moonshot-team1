@@ -1,7 +1,7 @@
 import http from 'http';
 import app from './app';
-import env from '@/config/env';
-import prisma from '@/prisma/prisma';
+import env from '#config/env';
+import prisma from '#prisma/prisma';
 
 const PORT = env.PORT || 3000;
 

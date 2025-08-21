@@ -16,8 +16,8 @@ import { RequestHandler } from 'express';
  *
  * // router.ts
  * import { Router } from 'express';
- * import { asyncHandler } from '@/utils/asyncHandler';
- * import { requireAuth } from '@/middlewares/requireAuth';
+ * import { asyncHandler } from '#utils/asyncHandler';
+ * import { requireAuth } from '#middlewares/requireAuth';
  * import * as controller from './controller';
  *
  * const router = Router();
