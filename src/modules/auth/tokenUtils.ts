@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { DecodedToken } from './dto/token.dto';
+import type { DecodedToken } from '#modules/auth/dto/token.dto';
 import ApiError from '#errors/ApiError';
 
 const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -25,7 +25,7 @@ export const verifyAccessToken = (token: string): DecodedToken => {
 
 export const generateRefreshToken = (user: { id: number }): string => {
   try {
-    return jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
+    return jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '14d' });
   } catch (err) {
     throw new ApiError(500, 'Refresh token generation failed');
   }

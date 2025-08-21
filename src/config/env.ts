@@ -45,8 +45,8 @@ const env = parsed.data;
  */
 export const CORS_ORIGINS = env.CORS_ORIGIN
   ? env.CORS_ORIGIN.split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+    .map((s) => s.trim())
+    .filter(Boolean)
   : [];
 
 export default env;
