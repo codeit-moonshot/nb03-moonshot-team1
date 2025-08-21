@@ -7,9 +7,9 @@ const findUserByEmail = async (email: string) => {
   });
 };
 
-const createAuth = async (registerDto: RegisterDto) => {
+const createAuth = async (data: RegisterDto) => {
   return prisma.user.create({
-    data: registerDto
+    data,
   });
 };
 
