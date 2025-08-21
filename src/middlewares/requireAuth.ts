@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import ApiError from '@/errors/ApiError';
-import env from '@/config/env';
+import ApiError from '#errors/ApiError';
+import env from '#config/env';
 
 interface JwtPayload {
   id: number;
@@ -17,7 +17,7 @@ const getBearer = (h?: string) => (h?.startsWith('Bearer ') ? h.slice(7) : undef
  * @type {RequestHandler}
  * @example
  * import { Router } from 'express';
- * import { requireAuth } from '@/middlewares/requireAuth';
+ * import { requireAuth } from '#middlewares/requireAuth';
  *
  * const router = Router();
  * router.get('/me', requireAuth, (req, res) => {
