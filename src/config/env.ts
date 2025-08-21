@@ -20,6 +20,12 @@ const schema = z.object({
   JWT_SECRET: z.string().min(10), // 토큰 인증
 
   UPLOAD_ROOT: z.string().default('./uploads'),
+
+  MAILSERVICE: z.enum(['google', 'naver']).default('google'),
+  HOSTMAIL: z.string(),
+  MAILPORT: z.number().int().positive().default(465), // 일반적으로 465 또는 587
+  SMTP_USER: z.string().email(),
+  SMTP_PASS: z.string().min(8), // SMTP 비밀번호
 });
 
 const parsed = schema.safeParse(process.env);
