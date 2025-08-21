@@ -6,7 +6,7 @@ import { hashPassword, isPasswordValid } from "#utils/passwordUtils";
 
 
 const register = async (data: RegisterDto) => {
-  const existingUser = await authRepo.findByEmail(data.email);
+  const existingUser = await authRepo.findUserByEmail(data.email);
   if (existingUser) {
     throw ApiError.conflict("이미 사용 중인 이메일입니다.");
   }
