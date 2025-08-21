@@ -1,4 +1,4 @@
-import prisma from '@/prisma/prisma';
+import prisma from '#prisma/prisma';
 import { ProjectRole, TaskStatus } from '@prisma/client';
 
 const main = async (): Promise<void> => {

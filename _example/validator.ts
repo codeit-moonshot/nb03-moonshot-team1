@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { RequestHandler } from 'express';
-import ApiError from '@/errors/ApiError';
+import ApiError from '#errors/ApiError';
 
 const productCreateSchema = z.object({
   name: z.string().min(1, '상품 이름을 작성해 주세요.'),

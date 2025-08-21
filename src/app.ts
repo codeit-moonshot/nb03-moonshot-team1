@@ -13,14 +13,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import csurf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 
-import routes from '@/routes';
-import { errorHandler } from '@/middlewares/errorHandler';
-import ApiError from '@/errors/ApiError';
-import env, { CORS_ORIGINS } from '@/config/env';
+import routes from '#routes/index';
+import { errorHandler } from '#middlewares/errorHandler';
+import ApiError from '#errors/ApiError';
+import env, { CORS_ORIGINS } from '#config/env';
 
 const app: Application = express();
 
@@ -97,11 +96,6 @@ app.use(
     },
   })
 );
-
-/**
- * CSRF 보호
- */
-//app.use(csurf({ cookie: true }));
 
 /**
  * 정적 파일 (MIME 강제)

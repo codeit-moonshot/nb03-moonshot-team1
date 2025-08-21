@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
-import prisma from '@/prisma/prisma';
-import ApiError from '@/errors/ApiError';
+import prisma from '#prisma/prisma';
+import ApiError from '#errors/ApiError';
 
 /**
  * 프로젝트 소유자 권한 미들웨어
@@ -9,8 +9,8 @@ import ApiError from '@/errors/ApiError';
  * @type {RequestHandler}
  * @example
  * import { Router } from 'express';
- * import { requireAuth } from '@/middlewares/requireAuth';
- * import { requireOwner } from '@/middlewares/requireOwner';
+ * import { requireAuth } from '#middlewares/requireAuth';
+ * import { requireOwner } from '#middlewares/requireOwner';
  *
  * const router = Router();
  * router.patch('/:projectId', requireAuth, requireOwner, async (req, res) => {

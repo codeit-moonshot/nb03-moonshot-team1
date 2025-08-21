@@ -22,7 +22,7 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write .",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/server.js",
     "start:be": "cross-env NODE_ENV=production pm2 start dist/server.js --name moonshot-be",
     "start:fe": "cross-env NODE_ENV=production pm2 start npm --name moonshot-fe -- run start --prefix frontend",
@@ -70,9 +70,21 @@
     "prettier": "^3.6.2",
     "prisma": "^6.14.0",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.40.0"
+  },
+  "imports": {
+    "#config/*": "./src/config/*",
+    "#constants/*": "./src/constants/*",
+    "#errors/*": "./src/errors/*",
+    "#modules/*": "./src/modules/*",
+    "#middlewares/*": "./src/middlewares/*",
+    "#prisma/*": "./src/prisma/*",
+    "#routes/*": "./src/routes/*",
+    "#uploads/*": "./uploads/*",
+    "#utils/*": "./src/utils/*"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"

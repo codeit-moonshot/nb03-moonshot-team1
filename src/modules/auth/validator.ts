@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { RequestHandler } from 'express';
-import { authCreateSchema } from '@/modules/auth/dto/register.dto';
-import ApiError from '@/errors/ApiError';
+import { authCreateSchema } from '#modules/auth/dto/register.dto';
+import ApiError from '#errors/ApiError';
 
 const validateAuthRegister: RequestHandler = async (req, res, next) => {
   try {

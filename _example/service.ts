@@ -1,4 +1,4 @@
-import ApiError from '@/errors/ApiError';
+import ApiError from '#errors/ApiError';
 import { CreateProductDto, UpdateProductDto, PublicProduct } from './dto/product.dto';
 import { findMany, findById, create, update, remove } from './repo';
 
