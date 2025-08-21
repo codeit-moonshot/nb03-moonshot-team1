@@ -1,4 +1,4 @@
-import prisma from '@/prisma/prisma';
+import prisma from '#prisma/prisma';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 
 export const findMany = (offset = 0, limit = 10, search = '', sort: 'asc' | 'desc' = 'desc') =>
