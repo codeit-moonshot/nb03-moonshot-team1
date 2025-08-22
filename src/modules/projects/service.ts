@@ -1,15 +1,15 @@
 import ApiError from "#errors/ApiError";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-import { create } from './repo';
-import { InvitationDto } from './project.dto';
+import projectRepo from './repo';
+import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
 
 dotenv.config();
 
-export const sendInvitation = async (data: InvitationDto): Promise<void> => {
+const sendInvitation = async (data: InvitationDto): Promise<void> => {
   const invitationToken = 'some Token5';
   // db 저장부터 메일 발송까지 트랜잭션이 필요해보임
-  const invitationId = await create({ ...data, invitationToken });
+  const invitationId = await projectRepo.create({ ...data, invitationToken });
   // 추후 분리해야 할듯
   const smtpTransport = nodemailer.createTransport({
     host: process.env.HOSTMAIL,
@@ -47,4 +47,19 @@ export const sendInvitation = async (data: InvitationDto): Promise<void> => {
     }
     console.log('메일 전송 성공: ', info.response);
   });
+}
+
+const excludeMember = async (data: ExcludeMemberDto) => {
+  if(data.targetUserId < 1) throw ApiError.badRequest('유효하지 않은 사용자 ID입니다.');
+
+  const member = await projectRepo.findById({ projectId: data.projectId, userId: data.targetUserId });
+  if(!member) throw ApiError.notFound('프로젝트 멤버가 아닙니다.');
+  if(member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
+  
+  await projectRepo.remove(data);
+}
+
+export default {
+  sendInvitation,
+  excludeMember
 }

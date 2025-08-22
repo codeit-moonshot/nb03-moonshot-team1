@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
-import { sendInvitation } from './service';
-import { InvitationDto } from './project.dto';
+import projectService from './service';
+import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
 
 /**
  * @function createInvitation
@@ -12,7 +12,7 @@ import { InvitationDto } from './project.dto';
  * @returns {201} 반환 없음
  */
 
-export const createInvitation: RequestHandler = async (req, res) => {
+const createInvitation: RequestHandler = async (req, res) => {
   const invitationToken = 'some Token';
   const invitationDto: InvitationDto = {
     projectId: Number(req.params.projectId),
@@ -22,6 +22,24 @@ export const createInvitation: RequestHandler = async (req, res) => {
     inviter: 1
   }
 
-  await sendInvitation(invitationDto);
+  await projectService.sendInvitation(invitationDto);
   console.log(`초대 : ${invitationDto.targetEmail}`);
+}
+
+const excludeMember: RequestHandler = async (req, res) => {
+  const projectId = Number(req.params.projectId);
+  const targetUserId = Number(req.params.userId);
+
+  const excludeMemberDto: ExcludeMemberDto = {
+    projectId,
+    targetUserId
+  }
+
+  await projectService.excludeMember(excludeMemberDto);
+  res.sendStatus(204);
+}
+
+export default {
+  createInvitation,
+  excludeMember
 }

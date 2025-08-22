@@ -20,4 +20,8 @@ export const invitationSchema = z.object({
   inviter: z.number().min(1).optional()
 });
 
+export type ExcludeMemberDto = {
+  projectId: number;
+  targetUserId: number;
+}
 export type InvitationDto = z.infer<typeof invitationSchema>;
