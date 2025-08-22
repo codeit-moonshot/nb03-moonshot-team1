@@ -27,13 +27,13 @@ const getBearer = (h?: string) => (h?.startsWith('Bearer ') ? h.slice(7) : undef
  */
 export const requireAuth: RequestHandler = (req, _res, next) => {
   const token = getBearer(req.headers.authorization);
-  if (!token) return next(ApiError.unauthorized('No token'));
+  if (!token) return next(ApiError.unauthorized('❌ Token이 없습니다.'));
 
   try {
     const payload = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload;
     req.user = payload;
     next();
   } catch {
-    next(ApiError.unauthorized('Invalid token'));
+    next(ApiError.unauthorized('❌ Token이 유효하지 않습니다.'));
   }
 };
