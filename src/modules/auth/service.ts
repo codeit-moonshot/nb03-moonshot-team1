@@ -1,13 +1,14 @@
-import authRepo from "#modules/auth/repo";
-import { hashPassword, isPasswordValid } from "#utils/passwordUtils";
-import token from "#modules/auth/tokenUtils";
-import ApiError from "#errors/ApiError";
-import { RegisterDto } from "#modules/auth/dto/register.dto";
-import { LoginDto } from "#modules/auth/dto/login.dto";
+import authRepo from '#modules/auth/repo';
+import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
+import token from '#modules/auth/tokenUtils';
+import ApiError from '#errors/ApiError';
+import { RegisterDto } from '#modules/auth/dto/register.dto';
+import { LoginDto } from '#modules/auth/dto/login.dto';
+import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
 
 const register = async (data: RegisterDto) => {
   const existingUser = await authRepo.findUserByEmail(data.email);
-  if (existingUser) throw ApiError.conflict("이미 사용 중인 이메일입니다.");
+  if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');
 
   const hashedPassword = await hashPassword(data.password);
   const createdUser = await authRepo.createAuth({ ...data, password: hashedPassword });
@@ -16,7 +17,7 @@ const register = async (data: RegisterDto) => {
 };
 
 const login = async (data: LoginDto) => {
-  const message = "이메일 또는 비밀번호가 잘못되었습니다.";
+  const message = '이메일 또는 비밀번호가 잘못되었습니다.';
   const getUser = await authRepo.findUserByEmail(data.email);
   if (!getUser) throw ApiError.unauthorized(message);
 
@@ -24,12 +25,25 @@ const login = async (data: LoginDto) => {
   const isValidPassword = await isPasswordValid(data.password, password);
   if (!isValidPassword) throw ApiError.unauthorized(message);
 
-  const accessToken = token.generateAccessToken(getUser);
-  const refreshToken = token.generateRefreshToken(getUser);
+  const accessToken = token.generateAccessToken({ id: getUser.id });
+  const refreshToken = token.generateRefreshToken({ id: getUser.id });
   return { accessToken, refreshToken };
+};
+
+const refresh = async (data: AuthHeaderDto) => {
+  const refreshToken = token.extractToken(data);
+  const decodedToken = token.verifyRefreshToken(refreshToken);
+
+  const user = await authRepo.findUserById(decodedToken.id);
+  if (!user) throw ApiError.notFound('토큰에 등록된 사용자를 찾을 수 없습니다.');
+
+  const newAccessToken = token.generateAccessToken({ id: user.id });
+  const newRefreshToken = token.generateRefreshToken({ id: user.id });
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };
 
 export default {
   register,
-  login
+  login,
+  refresh,
 };

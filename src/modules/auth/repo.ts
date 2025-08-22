@@ -3,7 +3,7 @@ import { RegisterDto } from '#modules/auth/dto/register.dto';
 
 const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
-    where: { email }
+    where: { email },
   });
 };
 
@@ -13,7 +13,14 @@ const createAuth = async (data: RegisterDto) => {
   });
 };
 
+const findUserById = async (id: number) => {
+  return prisma.user.findUnique({
+    where: { id },
+  });
+};
+
 export default {
   findUserByEmail,
-  createAuth
+  createAuth,
+  findUserById,
 };
