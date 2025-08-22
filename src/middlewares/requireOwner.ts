@@ -20,13 +20,13 @@ import ApiError from '#errors/ApiError';
  */
 export const requireOwner: RequestHandler = async (req, _res, next) => {
   const projectId = Number(req.params.projectId);
-  if (!projectId) return next(ApiError.badRequest('Invalid projectId'));
+  if (!projectId) return next(ApiError.badRequest('❌ 프로젝트 ID가 유효하지 않습니다.'));
 
   const uid = req.user?.id;
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
-  if (!project) return next(ApiError.badRequest('Project not found'));
-  if (project.ownerId !== uid) return next(ApiError.forbidden('Owner only'));
+  if (!project) return next(ApiError.badRequest('❌ 존재하지 않는 프로젝트입니다.'));
+  if (project.ownerId !== uid) return next(ApiError.forbidden('❌ 프로젝트 소유자만 할 수 있는 작업입니다.'));
 
   next();
 };
