@@ -17,7 +17,7 @@ const generateAccessToken = (user: { id: number }): string => {
   try {
     return jwt.sign({ id: user.id }, ACCESS_SECRET, { expiresIn: '1h' });
   } catch (err) {
-    throw new ApiError(500, 'Access token generation failed');
+    throw new ApiError(500, '❌ Access Token 생성에 실패했습니다.');
   }
 };
 
@@ -25,7 +25,7 @@ const verifyAccessToken = (token: string): DecodedToken => {
   try {
     return jwt.verify(token, ACCESS_SECRET) as DecodedToken;
   } catch {
-    throw new ApiError(403, 'Access token invalid');
+    throw new ApiError(403, '❌ Access Token이 유효하지 않습니다.');
   }
 };
 
@@ -33,7 +33,7 @@ const generateRefreshToken = (user: { id: number }): string => {
   try {
     return jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '14d' });
   } catch (err) {
-    throw new ApiError(500, 'Refresh token generation failed');
+    throw new ApiError(500, '❌ Refresh Token 생성에 실패했습니다.');
   }
 };
 
@@ -41,7 +41,7 @@ const verifyRefreshToken = (token: string): DecodedToken => {
   try {
     return jwt.verify(token, REFRESH_SECRET) as DecodedToken;
   } catch {
-    throw new ApiError(403, 'Refresh token invalid');
+    throw new ApiError(403, '❌ Refresh Token이 유효하지 않습니다.');
   }
 };
 
