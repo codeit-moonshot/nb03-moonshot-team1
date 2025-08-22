@@ -1,4 +1,6 @@
 import type { RequestHandler } from 'express';
+import * as subtaskService from './service';
+import { CreateSubtaskDto } from './dto';
 
 /**
  * @function createSubtask
@@ -9,8 +11,14 @@ import type { RequestHandler } from 'express';
  *
  * @returns {201} 생성된 하위 할 일 반환
  */
-export const createSubtask: RequestHandler = (req, res) => {
-  res.send('Hello World!');
+export const createSubtask: RequestHandler = async (req, res) => {
+  const dto: CreateSubtaskDto = {
+    title: req.body.title,
+    taskId: Number(req.params.taskId),
+  }
+
+  const subtask = await subtaskService.createSubtask(dto);
+  res.status(201).json(subtask);
 };
 
 /**
@@ -38,8 +46,14 @@ export const getSubtaskList: RequestHandler = (req, res) => {
  * @throws {403} 권한 없음
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
-export const updateSubtask: RequestHandler = (req, res) => {
-  res.send('updateSubtask');
+export const updateSubtask: RequestHandler = async (req, res) => {
+  const dto = {
+    status: req.body.status,
+    taskId: Number(req.params.taskId),
+    subtaskId: Number(req.params.subtaskId)
+  }
+
+  res.send(subtask);
 };
 
 /**

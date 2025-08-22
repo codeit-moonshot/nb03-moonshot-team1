@@ -5,11 +5,11 @@ export const findMany = (offset = 0, limit = 10, search = '', sort: 'asc' | 'des
   prisma.product.findMany({
     where: search
       ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-          ],
-        }
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ],
+      }
       : {},
     orderBy: { createdAt: sort },
     skip: offset,
