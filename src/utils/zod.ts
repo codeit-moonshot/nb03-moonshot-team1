@@ -11,7 +11,7 @@ import ApiError from '#errors/ApiError';
  * @param {string} context - 에러 메시지에 포함할 컨텍스트
  * @param {NextFunction} next - Express의 next 함수
  *
- *
+ * @example
  * import { forwardZodError } from '#utils/zod';
  *
  * export const validateProductCreate: RequestHandler = (req, _res, next) =>
