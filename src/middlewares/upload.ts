@@ -110,7 +110,3 @@ export default {
   createImageUploader,
   createFileUploader,
 };
-
-/**
- * multer 및 multertype 모듈 추가 커밋 시에 알릴 것
- */
