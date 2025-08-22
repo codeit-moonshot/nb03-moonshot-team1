@@ -5,11 +5,13 @@
 import { Router } from 'express';
 
 import authRouter from '#modules/auth/router';
+import projectRouter from '#modules/projects/router';
 //import exampleRoutes from '../_example/router';
 
 const router = Router();
 
 router.use('/auth', authRouter);
+router.use('/projects', projectRouter);
 //router.use('/example', exampleRoutes);
 
 export default router;

@@ -13,9 +13,13 @@ import { InvitationDto } from './project.dto';
  */
 
 export const createInvitation: RequestHandler = async (req, res) => {
+  const invitationToken = 'some Token';
   const invitationDto: InvitationDto = {
     projectId: Number(req.params.projectId),
-    targetEmail: req.body.email
+    targetEmail: req.body.email,
+    invitationToken,
+    // inviter: req.user.id
+    inviter: 1
   }
 
   await sendInvitation(invitationDto);
