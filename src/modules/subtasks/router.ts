@@ -1,12 +1,13 @@
 import { Router } from 'express';
 
 import * as subtaskController from './controller';
+import { validateSubtaskCreate } from './validator';
 
 const router = Router({ mergeParams: true });
 
 router
   .route('/')
-  .post(subtaskController.createSubtask)
+  .post(validateSubtaskCreate, subtaskController.createSubtask)
   .get(subtaskController.getSubtaskList);
 
 router

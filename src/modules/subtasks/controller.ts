@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import * as subtaskService from './service';
-import { CreateSubtaskDto } from './dto';
+import { CreateSubtaskDto, UpdateSubtaskDto, } from './dto';
 
 /**
  * @function createSubtask
@@ -47,12 +47,12 @@ export const getSubtaskList: RequestHandler = (req, res) => {
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
 export const updateSubtask: RequestHandler = async (req, res) => {
-  const dto = {
+  const dto: UpdateSubtaskDto = {
     status: req.body.status,
     taskId: Number(req.params.taskId),
-    subtaskId: Number(req.params.subtaskId)
+    id: Number(req.params.subtaskId)
   }
-
+  const subtask = await subtaskService.updateSubtask(dto);
   res.send(subtask);
 };
 

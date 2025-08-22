@@ -5,7 +5,7 @@ export const create = (data: CreateSubtaskDto) => {
   return prisma.subtask.create({
     data: {
       title: data.title,
-      taskId: data.taskId
+      task: { connect: { id: data.taskId } }
     },
   });
 };
