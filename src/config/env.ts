@@ -22,6 +22,7 @@ const schema = z.object({
   SESSION_SECRET: z.string().min(10),
   ACCESS_TOKEN_SECRET: z.string().min(10),
   REFRESH_TOKEN_SECRET: z.string().min(10),
+  INVITATION_TOKEN_SECRET: z.string().min(10),
   UPLOAD_ROOT: z.string().default('./uploads'),
 
   MAILSERVICE: z.enum(['gmail', 'naver']).default('gmail'),
