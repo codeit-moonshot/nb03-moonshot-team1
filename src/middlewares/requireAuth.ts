@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import ApiError from '#errors/ApiError';
 import env from '#config/env';
 
+const ACCESS_SECRET = env.ACCESS_TOKEN_SECRET;
+
 interface JwtPayload {
   id: number;
   email: string;
@@ -30,7 +32,7 @@ export const requireAuth: RequestHandler = (req, _res, next) => {
   if (!token) return next(ApiError.unauthorized('❌ Token이 없습니다.'));
 
   try {
-    const payload = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, ACCESS_SECRET) as JwtPayload;
     req.user = payload;
     next();
   } catch {

@@ -6,5 +6,12 @@ export interface DecodedToken extends JwtPayload {
 }
 
 export interface RefreshDto {
-  refreshToken: string;
+  userId: number;
+  tokenHash: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
+export interface AuthHeaderDto {
+  authorization: string;
 }
