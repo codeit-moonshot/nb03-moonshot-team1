@@ -7,22 +7,18 @@ import { InvitationDto } from './project.dto';
 dotenv.config();
 
 export const sendInvitation = async (data: InvitationDto): Promise<void> => {
-  const invitationToken = 'some Token';
-  const invitationId = await create({...data , invitationToken});
-
+  const invitationToken = 'some Token5';
+  // db 저장부터 메일 발송까지 트랜잭션이 필요해보임
+  const invitationId = await create({ ...data, invitationToken });
   // 추후 분리해야 할듯
   const smtpTransport = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: false,
-    requireTLS: true,
+    host: process.env.HOSTMAIL,
+    port: Number(process.env.MAILPORT),
+    secure: true,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
     },
-    tls: {
-      rejectUnauthorized: false
-    }
   });
 
   const mailOptions = {
@@ -45,7 +41,7 @@ export const sendInvitation = async (data: InvitationDto): Promise<void> => {
     `
   };
 
-  await smtpTransport.sendMail(mailOptions, (error, info) => {
+  smtpTransport.sendMail(mailOptions, (error, info) => {
     if (error) {
       throw ApiError.internal('메일 전송 실패', error);
     }

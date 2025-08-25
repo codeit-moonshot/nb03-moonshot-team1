@@ -24,9 +24,9 @@ const schema = z.object({
   REFRESH_TOKEN_SECRET: z.string().min(10),
   UPLOAD_ROOT: z.string().default('./uploads'),
 
-  MAILSERVICE: z.enum(['google', 'naver']).default('google'),
+  MAILSERVICE: z.enum(['gmail', 'naver']).default('gmail'),
   HOSTMAIL: z.string(),
-  MAILPORT: z.number().int().positive().default(465), // 일반적으로 465 또는 587
+  MAILPORT: z.coerce.number().int().positive().default(465), // 일반적으로 465 또는 587
   SMTP_USER: z.string().email(),
   SMTP_PASS: z.string().min(8), // SMTP 비밀번호
   PASSWORD_PEPPER: z.string().min(10),

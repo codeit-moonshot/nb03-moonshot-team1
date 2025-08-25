@@ -6,3 +6,5 @@ const router = Router();
 router
   .route('/:projectId/invitations')
   .post(createInvitation)
+
+export default router;

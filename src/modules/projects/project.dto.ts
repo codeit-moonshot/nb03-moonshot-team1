@@ -16,7 +16,8 @@ const emailWithMX = z.string().refine(async (email) => {
 export const invitationSchema = z.object({
   projectId: z.number().min(1),
   targetEmail: emailWithMX,
-  invitationToken: z.string().min(10).optional()
+  invitationToken: z.string(),
+  inviter: z.number().min(1).optional()
 });
 
 export type InvitationDto = z.infer<typeof invitationSchema>;
