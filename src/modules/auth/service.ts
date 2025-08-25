@@ -34,7 +34,7 @@ const login = async (data: LoginDto) => {
   const decodedToken = token.verifyRefreshToken(refreshToken);
   const refreshDto: RefreshDto = {
     userId: decodedToken.id,
-    tokenHash: refreshToken,
+    refreshToken: refreshToken,
     createdAt: new Date(),
     expiresAt: new Date(decodedToken.exp! * 1000),
   };
@@ -59,7 +59,7 @@ const refresh = async (data: AuthHeaderDto) => {
   const newDecodedToken = token.verifyRefreshToken(newRefreshToken);
   const refreshDto: RefreshDto = {
     userId: newDecodedToken.id,
-    tokenHash: newRefreshToken,
+    refreshToken: newRefreshToken,
     createdAt: new Date(),
     expiresAt: new Date(newDecodedToken.exp! * 1000),
   };
