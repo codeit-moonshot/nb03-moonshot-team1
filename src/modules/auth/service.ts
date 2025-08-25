@@ -6,6 +6,7 @@ import ApiError from '#errors/ApiError';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
+import { de } from 'zod/v4/locales/index.cjs';
 
 const register = async (data: RegisterDto) => {
   const existingUser = await usersService.findUserByEmail(data.email);
@@ -26,8 +27,9 @@ const login = async (data: LoginDto) => {
   const isValidPassword = await isPasswordValid(data.password, password);
   if (!isValidPassword) throw ApiError.unauthorized(message);
 
-  const accessToken = token.generateAccessToken({ id: getUser.id });
-  const refreshToken = token.generateRefreshToken({ id: getUser.id });
+  const userId = Number(getUser.id);
+  const accessToken = token.generateAccessToken({ id: userId });
+  const refreshToken = token.generateRefreshToken({ id: userId });
 
   const decodedToken = token.verifyRefreshToken(refreshToken);
   const refreshDto: RefreshDto = {
@@ -50,8 +52,9 @@ const refresh = async (data: AuthHeaderDto) => {
   const decodedToken = token.verifyRefreshToken(refreshToken);
   await authRepo.deleteRefreshToken(refreshToken);
 
-  const newAccessToken = token.generateAccessToken({ id: decodedToken.id });
-  const newRefreshToken = token.generateRefreshToken({ id: decodedToken.id });
+  const tokenId = Number(decodedToken.id);
+  const newAccessToken = token.generateAccessToken({ id: tokenId });
+  const newRefreshToken = token.generateRefreshToken({ id: tokenId });
 
   const newDecodedToken = token.verifyRefreshToken(newRefreshToken);
   const refreshDto: RefreshDto = {

@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import usersService from '#modules/users/service';
-import { UpdateUserDto } from './dto/user.dto';
+import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 /**
  * @function getMyInfo
@@ -15,9 +15,22 @@ import { UpdateUserDto } from './dto/user.dto';
  */
 
 const getMyInfo: RequestHandler = async (req, res, next) => {
-  const user = await usersService.getMyInfo(req.user.id);
+  const id = Number(req.user.id);
+  const user = await usersService.getMyInfo(id);
   res.status(200).json(user);
 };
+
+/**
+ * @function updateMyInfo
+ * @description 내 정보 수정
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {201} 수정된 내 정보 반환
+ * @throws {404} 사용자 찾을 수 없음
+ * @throws {404} 사용자를 찾을 수 없는 경우
+ */
 
 const updateMyInfo: RequestHandler = async (req, res, next) => {
   const updateUserDto: UpdateUserDto = {
@@ -27,7 +40,8 @@ const updateMyInfo: RequestHandler = async (req, res, next) => {
     newPassword: req.body.newPassword,
     profileImage: req.body.profileImage,
   };
-  const user = await usersService.updateMyInfo(req.user.id, updateUserDto);
+  const id = Number(req.user.id);
+  const user = await usersService.updateMyInfo(id, updateUserDto);
   res.status(200).json(user);
 };
 
