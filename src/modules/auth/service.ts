@@ -1,5 +1,5 @@
 import authRepo from '#modules/auth/repo';
-import userService from '#modules/users/service';
+import usersService from '#modules/users/service';
 import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
 import token from '#modules/auth/tokenUtils';
 import ApiError from '#errors/ApiError';
@@ -8,18 +8,18 @@ import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
 
 const register = async (data: RegisterDto) => {
-  const existingUser = await userService.findUserByEmail(data.email);
+  const existingUser = await usersService.findUserByEmail(data.email);
   if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');
 
   const hashedPassword = await hashPassword(data.password);
-  const createdUser = await userService.createUser({ ...data, password: hashedPassword });
+  const createdUser = await usersService.createUser({ ...data, password: hashedPassword });
   const { password, deletedAt, ...user } = createdUser;
   return user;
 };
 
 const login = async (data: LoginDto) => {
   const message = '이메일 또는 비밀번호가 잘못되었습니다.';
-  const getUser = await userService.findUserByEmail(data.email);
+  const getUser = await usersService.findUserByEmail(data.email);
   if (!getUser) throw ApiError.unauthorized(message);
 
   const password = getUser.password as string; //로컬 로그인 경우 무조건 비밀번호가 존재하기 때문에 타입 단정

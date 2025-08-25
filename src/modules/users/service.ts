@@ -1,16 +1,16 @@
-import userRepo from '#modules/users/repo';
+import usersRepo from '#modules/users/repo';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 
 const findUserByEmail = async (email: string) => {
-  return userRepo.findByEmail(email);
+  return usersRepo.findByEmail(email);
 };
 
 const createUser = async (data: RegisterDto) => {
-  return userRepo.create(data);
+  return usersRepo.create(data);
 };
 
 const findUserById = async (id: number) => {
-  return userRepo.findById(id);
+  return usersRepo.findById(id);
 };
 
 export default {
