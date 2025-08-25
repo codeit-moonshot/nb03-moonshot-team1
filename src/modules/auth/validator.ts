@@ -14,7 +14,7 @@ const validateAuthRegister: RequestHandler = async (req, res, next) => {
     await authCreateSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
-    forwardZodError(err, '사용자 등록 유효성 검사 실패', next);
+    forwardZodError(err, '사용자 등록', next);
   }
 };
 
@@ -27,7 +27,7 @@ const validateAuthLogin: RequestHandler = async (req, res, next) => {
     await loginSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
-    forwardZodError(err, '사용자 로그인 유효성 검사 실패', next);
+    forwardZodError(err, '사용자 로그인', next);
   }
 };
 
