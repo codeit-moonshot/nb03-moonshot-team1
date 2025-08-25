@@ -50,7 +50,7 @@ export const updateSubtask: RequestHandler = async (req, res) => {
   const dto: UpdateSubtaskDto = {
     status: req.body.status,
     taskId: Number(req.params.taskId),
-    id: Number(req.params.subtaskId),
+    subtaskId: Number(req.params.subtaskId),
   };
   const subtask = await subtaskService.updateSubtask(dto);
   res.send(subtask);

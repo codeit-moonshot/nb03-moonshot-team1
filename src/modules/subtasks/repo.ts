@@ -10,11 +10,23 @@ export const create = (data: CreateSubtaskDto) => {
   });
 };
 
+export const findById = (id: number) => {
+  return prisma.subtask.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      title: true,
+      taskId: true,
+      createdAt: true,
+    },
+  });
+};
+
 export const update = (data: UpdateSubtaskDto) => {
   return prisma.subtask.update({
     where: {
       taskId: data.taskId,
-      id: data.id,
+      id: data.subtaskId,
     },
     data: {
       status: data.status,
