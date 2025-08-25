@@ -1,11 +1,11 @@
 import prisma from '#prisma/prisma';
-import { CreateSubtaskDto, UpdateSubtaskDto } from './dto';
+import { CreateSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 export const create = (data: CreateSubtaskDto) => {
   return prisma.subtask.create({
     data: {
       title: data.title,
-      task: { connect: { id: data.taskId } }
+      task: { connect: { id: data.taskId } },
     },
   });
 };
@@ -14,10 +14,10 @@ export const update = (data: UpdateSubtaskDto) => {
   return prisma.subtask.update({
     where: {
       taskId: data.taskId,
-      id: data.id
+      id: data.id,
     },
     data: {
-      status: data.status
-    }
+      status: data.status,
+    },
   });
 };

@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
-import * as subtaskService from './service';
-import { CreateSubtaskDto, UpdateSubtaskDto, } from './dto';
+import * as subtaskService from '#modules/subtasks/service';
+import { CreateSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 /**
  * @function createSubtask
@@ -15,7 +15,7 @@ export const createSubtask: RequestHandler = async (req, res) => {
   const dto: CreateSubtaskDto = {
     title: req.body.title,
     taskId: Number(req.params.taskId),
-  }
+  };
 
   const subtask = await subtaskService.createSubtask(dto);
   res.status(201).json(subtask);
@@ -50,8 +50,8 @@ export const updateSubtask: RequestHandler = async (req, res) => {
   const dto: UpdateSubtaskDto = {
     status: req.body.status,
     taskId: Number(req.params.taskId),
-    id: Number(req.params.subtaskId)
-  }
+    id: Number(req.params.subtaskId),
+  };
   const subtask = await subtaskService.updateSubtask(dto);
   res.send(subtask);
 };
