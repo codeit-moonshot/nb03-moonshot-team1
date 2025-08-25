@@ -1,26 +1,33 @@
 import prisma from '#prisma/prisma';
-import { RegisterDto } from '#modules/auth/dto/register.dto';
+import { RefreshDto } from '#modules/auth/dto/token.dto';
 
-const findUserByEmail = async (email: string) => {
-  return prisma.user.findUnique({
-    where: { email },
+const createRefreshToken = async (data: RefreshDto) => {
+  return prisma.refreshToken.create({
+    data: {
+      tokenHash: data.tokenHash,
+      createdAt: data.createdAt,
+      expiresAt: data.expiresAt,
+      user: {
+        connect: { id: data.userId },
+      },
+    },
   });
 };
 
-const createAuth = async (data: RegisterDto) => {
-  return prisma.user.create({
-    data,
+const findRefreshToken = async (tokenHash: string) => {
+  return prisma.refreshToken.findUnique({
+    where: { tokenHash },
   });
 };
 
-const findUserById = async (id: number) => {
-  return prisma.user.findUnique({
-    where: { id },
+const deleteRefreshToken = async (tokenHash: string) => {
+  return prisma.refreshToken.delete({
+    where: { tokenHash },
   });
 };
 
 export default {
-  findUserByEmail,
-  createAuth,
-  findUserById,
+  createRefreshToken,
+  findRefreshToken,
+  deleteRefreshToken,
 };

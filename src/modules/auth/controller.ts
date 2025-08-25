@@ -62,7 +62,7 @@ const login: RequestHandler = async (req, res, next) => {
 
 const refresh: RequestHandler = async (req, res, next) => {
   const AuthHeader: AuthHeaderDto = { authorization: req.headers.authorization as string };
-  if (!AuthHeader.authorization) throw ApiError.unauthorized('토큰이 없습니다.');
+  if (!AuthHeader.authorization) throw ApiError.unauthorized('토큰이 존재하지 않습니다.');
   const newToken = await authService.refresh(AuthHeader);
   res.status(200).json(newToken);
 };
