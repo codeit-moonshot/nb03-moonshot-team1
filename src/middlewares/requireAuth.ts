@@ -35,8 +35,7 @@ export const requireAuth: RequestHandler = (req, _res, next) => {
     const payload = jwt.verify(token, ACCESS_SECRET) as JwtPayload;
     req.user = payload;
     next();
-  } catch (err) {
-    console.log(err);
+  } catch {
     next(ApiError.unauthorized('❌ Token이 유효하지 않습니다.'));
   }
 };
