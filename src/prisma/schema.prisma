@@ -55,7 +55,7 @@ model User {
   comments        Comment[]
   invitationsSent Invitation[]    @relation("ProjectInvitationsByUser")
   socialAccounts  SocialAccount[]
-  RefreshToken    RefreshToken[]
+  RefreshToken    RefreshToken?
 }
 
 model SocialAccount {
@@ -76,15 +76,15 @@ model SocialAccount {
 }
 
 model RefreshToken {
-  id           Int      @id @default(autoincrement()) // 고유 ID
-  userId       Int // 토큰 소유자
-  refreshToken String   @unique // 리프레시 토큰
-  createdAt    DateTime @default(now()) // 발급 시각
-  expiresAt    DateTime // 만료 시각
+  id        Int      @id @default(autoincrement()) // 고유 ID
+  userId    Int      @unique // 토큰 소유자
+  tokenHash String   @unique // 리프레시 토큰
+  createdAt DateTime @default(now()) // 발급 시각
+  expiresAt DateTime // 만료 시각
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // 유저와 연결
 
-  @@index([userId, expiresAt]) // 유저별 유효 토큰 조회 효율
+  @@index([userId])
 }
 
 model Project {

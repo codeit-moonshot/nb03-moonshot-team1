@@ -6,7 +6,6 @@ import ApiError from '#errors/ApiError';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
-import { de } from 'zod/v4/locales/index.cjs';
 
 const register = async (data: RegisterDto) => {
   const existingUser = await usersService.findUserByEmail(data.email);
@@ -32,12 +31,14 @@ const login = async (data: LoginDto) => {
   const refreshToken = token.generateRefreshToken({ id: userId });
 
   const decodedToken = token.verifyRefreshToken(refreshToken);
+  const tokenHash = await hashPassword(refreshToken);
   const refreshDto: RefreshDto = {
     userId: decodedToken.id,
-    refreshToken: refreshToken,
+    tokenHash,
     createdAt: new Date(),
     expiresAt: new Date(decodedToken.exp! * 1000),
   };
+  await authRepo.deleteRefreshToken(userId);
   await authRepo.createRefreshToken(refreshDto);
 
   return { accessToken, refreshToken };
@@ -46,20 +47,24 @@ const login = async (data: LoginDto) => {
 const refresh = async (data: AuthHeaderDto) => {
   const message = '유효하지 않은 토큰입니다.';
   const refreshToken = token.extractToken(data);
-  const storedToken = await authRepo.findRefreshToken(refreshToken);
-  if (!storedToken) throw ApiError.unauthorized(message);
 
   const decodedToken = token.verifyRefreshToken(refreshToken);
-  await authRepo.deleteRefreshToken(refreshToken);
+  const storedTokenHash = await authRepo.findRefreshToken(decodedToken.id);
+  if (!storedTokenHash) throw ApiError.unauthorized(message);
+
+  const isValidHash = await isPasswordValid(refreshToken, storedTokenHash.tokenHash);
+  if (!isValidHash) throw ApiError.unauthorized(message);
+  await authRepo.deleteRefreshToken(decodedToken.id);
 
   const tokenId = Number(decodedToken.id);
   const newAccessToken = token.generateAccessToken({ id: tokenId });
   const newRefreshToken = token.generateRefreshToken({ id: tokenId });
 
   const newDecodedToken = token.verifyRefreshToken(newRefreshToken);
+  const newTokenHash = await hashPassword(newRefreshToken);
   const refreshDto: RefreshDto = {
     userId: newDecodedToken.id,
-    refreshToken: newRefreshToken,
+    tokenHash: newTokenHash,
     createdAt: new Date(),
     expiresAt: new Date(newDecodedToken.exp! * 1000),
   };

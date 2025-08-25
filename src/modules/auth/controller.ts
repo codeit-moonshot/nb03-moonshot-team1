@@ -21,7 +21,7 @@ const register: RequestHandler = async (req, res, next) => {
     email: req.body.email.toLowerCase(),
     name: req.body.name,
     password: req.body.password,
-    profileImage: req.body.profileImage ?? null,
+    profileImage: req.body.profileImage,
   };
   const user = await authService.register(registerDto);
   res.status(201).json(user);

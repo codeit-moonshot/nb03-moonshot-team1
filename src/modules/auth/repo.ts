@@ -4,7 +4,7 @@ import { RefreshDto } from '#modules/auth/dto/token.dto';
 const createRefreshToken = async (data: RefreshDto) => {
   return prisma.refreshToken.create({
     data: {
-      refreshToken: data.refreshToken,
+      tokenHash: data.tokenHash,
       createdAt: data.createdAt,
       expiresAt: data.expiresAt,
       user: {
@@ -14,15 +14,15 @@ const createRefreshToken = async (data: RefreshDto) => {
   });
 };
 
-const findRefreshToken = async (refreshToken: string) => {
+const findRefreshToken = async (userId: number) => {
   return prisma.refreshToken.findUnique({
-    where: { refreshToken },
+    where: { userId },
   });
 };
 
-const deleteRefreshToken = async (refreshToken: string) => {
+const deleteRefreshToken = async (userId: number) => {
   return prisma.refreshToken.delete({
-    where: { refreshToken },
+    where: { userId },
   });
 };
 
