@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import projectRepo from './project.repo';
 import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
-import { generateInvitationToken } from "./invitationToken";
+import { generateInvitationToken } from "./tokenUtils";
 
 dotenv.config();
 
