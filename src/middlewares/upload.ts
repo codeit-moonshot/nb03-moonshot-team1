@@ -4,7 +4,7 @@ import fs from 'fs';
 import ApiError from '#errors/ApiError';
 import crypto from 'crypto';
 import type { RequestHandler } from 'express';
-import { IMAGE_MIME_SET, DEFAULT_FILE_MIME_SET, isAllowedMime } from '#constants/mime';
+import { IMAGE_MIME_SET, DEFAULT_FILE_MIME_SET, isAllowedMime } from '#constants//mime.constants';
 
 const UPLOAD_ROOT = path.join(process.cwd(), 'uploads');
 
