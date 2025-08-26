@@ -13,13 +13,15 @@
       "#config/*": ["src/config/*"],
       "#constants/*": ["src/constants/*"],
       "#errors/*": ["src/errors/*"],
+      "#libs/*": ["src/libs/*"],
       "#modules/*": ["src/modules/*"],
       "#middlewares/*": ["src/middlewares/*"],
       "#prisma/*": ["src/prisma/*"],
       "#routes/*": ["src/routes/*"],
       "#uploads/*": ["uploads/*"],
       "#utils/*": ["src/utils/*"]
-    }
+    },
+    "typeRoots": ["./src/types"]
   },
   "include": ["src", "src/types"],
   "exclude": ["node_modules", "dist"]
