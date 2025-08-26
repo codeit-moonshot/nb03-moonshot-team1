@@ -1,9 +1,7 @@
 import ApiError from "#errors/ApiError";
-import dotenv from "dotenv";
 import type { AcceptInvitationDto } from "./dto/invitationDto";
 import invitationRepo from "./invitation.repo";
 
-dotenv.config();
 
 const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto): Promise<void> => {
   const { email, projectId, invitationId, ...rest } = acceptInvitationDto; 
