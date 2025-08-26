@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import * as subtaskController from '#modules/subtasks/controller';
-import { validateSubtaskCreate, validateSubtaskUpdate } from '#modules/subtasks/validator';
+import { validateSubtaskCreate, validateSubtaskUpdate, validateSubtaskDelete } from '#modules/subtasks/validator';
 
 const router = Router({ mergeParams: true });
 
@@ -10,6 +10,6 @@ router.route('/').post(validateSubtaskCreate, subtaskController.createSubtask).g
 router
   .route('/:subtaskId')
   .patch(validateSubtaskUpdate, subtaskController.updateSubtask)
-  .delete(subtaskController.deleteSubtask);
+  .delete(validateSubtaskDelete, subtaskController.deleteSubtask);
 
 export default router;

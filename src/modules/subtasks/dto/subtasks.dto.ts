@@ -21,5 +21,17 @@ export const subtaskUpdateSchema = z.object({
     .nonnegative('아이디를 작성해 주세요.'),
 });
 
+export const subtaskDeleteSchema = z.object({
+  taskId: z
+    .number('아이디는 숫자로 입력해 주세요.')
+    .int('아이디는 정수로 입력해 주세요.')
+    .nonnegative('아이디를 작성해 주세요.'),
+  subtaskId: z
+    .number('아이디는 숫자로 입력해 주세요.')
+    .int('아이디는 정수로 입력해 주세요.')
+    .nonnegative('아이디를 작성해 주세요.'),
+});
+
 export type CreateSubtaskDto = z.infer<typeof subtaskCreateSchema>;
 export type UpdateSubtaskDto = z.infer<typeof subtaskUpdateSchema>;
+export type DeleteSubtaskDto = z.infer<typeof subtaskDeleteSchema>;

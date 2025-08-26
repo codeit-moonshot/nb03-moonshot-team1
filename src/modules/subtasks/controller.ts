@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import * as subtaskService from '#modules/subtasks/service';
-import { CreateSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
+import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 /**
  * @function createSubtask
@@ -68,6 +68,11 @@ export const updateSubtask: RequestHandler = async (req, res) => {
  * @throws {403} 권한 없음
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
-export const deleteSubtask: RequestHandler = (req, res) => {
-  res.send('deleteSubtask');
+export const deleteSubtask: RequestHandler = async (req, res) => {
+  const dto: DeleteSubtaskDto = {
+    subtaskId: Number(req.body.subtaskId),
+    taskId: Number(req.body.taskId),
+  };
+  await subtaskService.deleteSubtask(dto);
+  res.status(204).end();
 };

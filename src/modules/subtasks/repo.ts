@@ -1,5 +1,5 @@
 import prisma from '#prisma/prisma';
-import { CreateSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
+import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 export const create = (data: CreateSubtaskDto) => {
   return prisma.subtask.create({
@@ -30,6 +30,15 @@ export const update = (data: UpdateSubtaskDto) => {
     },
     data: {
       status: data.status,
+    },
+  });
+};
+
+export const remove = (data: DeleteSubtaskDto) => {
+  return prisma.subtask.delete({
+    where: {
+      taskId: data.taskId,
+      id: data.subtaskId,
     },
   });
 };
