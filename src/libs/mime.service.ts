@@ -1,5 +1,5 @@
 import { fileTypeFromFile } from 'file-type';
-import { isAllowedMime } from '#constants/mime';
+import { isAllowedMime } from '#constants/mime.constants';
 
 type MulterFile = Express.Multer.File;
 
