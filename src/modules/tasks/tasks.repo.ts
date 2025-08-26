@@ -102,17 +102,16 @@ const update = (
 ) => {
   const payload: Prisma.TaskUpdateInput = {};
 
-  if (data.title !== undefined) payload.title = data.title;
-  if (data.status !== undefined) payload.status = data.status as PrismaTaskStatus;
-  if (data.startDate !== undefined) payload.startDate = data.startDate;
-  if (data.endDate !== undefined) payload.endDate = data.endDate;
+  payload.title = data.title;
+  payload.status = data.status as PrismaTaskStatus;
+  payload.startDate = data.startDate;
+  payload.endDate = data.endDate;
 
   if ('assigneeId' in data) {
     if (data.assigneeId === null) {
       payload.assignee = { disconnect: true };
     } else if (typeof data.assigneeId === 'number') {
       payload.assignee = { connect: { id: data.assigneeId } };
-    } else {
     }
   }
 

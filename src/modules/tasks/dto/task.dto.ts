@@ -1,14 +1,56 @@
 import { z } from 'zod';
-import type { Task, User, Tag, Attachments } from '@prisma/client';
 import { TASK_STATUS } from '#constants/taskStatus.constants';
+
+/* -------------------------------------------------------------------------- */
+/*                                 TYPES                                      */
+/* -------------------------------------------------------------------------- */
 
 /**
  * DB 원본 타입
  */
-export type DBTask = Task;
-export type DBUser = User;
-export type DBTag = Tag;
-export type DBAttachment = Attachments;
+type DBTaskStatus = (typeof TASK_STATUS)[number] | 'blocked';
+
+export interface DBUser {
+  id: number;
+  email: string;
+  name: string;
+  password?: string | null;
+  profileImage?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+}
+
+export interface DBTask {
+  id: number;
+  projectId: number;
+  assigneeId?: number | null;
+  title: string;
+  description?: string | null;
+  status: DBTaskStatus;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DBTag {
+  id: number;
+  name: string;
+  createdAt: Date;
+}
+
+export interface DBAttachment {
+  id: number;
+  taskId: number;
+  originalName: string;
+  storedName: string;
+  relPath: string;
+  mimeType?: string | null;
+  size?: number | null;
+  ext?: string | null;
+  createdAt: Date;
+}
 
 /**
  * API 응답용 서브 타입
@@ -16,13 +58,14 @@ export type DBAttachment = Attachments;
 export type PublicAssignee = Pick<DBUser, 'id' | 'name' | 'email' | 'profileImage'>;
 export type PublicTag = Pick<DBTag, 'id' | 'name'>;
 
-/**
- * API 응답용 첨부파일
- */
 export interface PublicAttachment {
   id: number;
   url: string;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                RESPONSE                                    */
+/* -------------------------------------------------------------------------- */
 
 /**
  * /tasks 단일 응답

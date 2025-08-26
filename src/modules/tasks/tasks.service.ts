@@ -9,38 +9,41 @@ import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
 /*                                 helper                                     */
 /* -------------------------------------------------------------------------- */
 
-const startOfDayUTC = (d: string) => new Date(`${d}T00:00:00.000Z`);
-const endOfDayUTC = (d: string) => new Date(`${d}T23:59:59.999Z`);
+const startOfDayUTC = (date: string) => new Date(`${date}T00:00:00.000Z`);
+const endOfDayUTC = (date: string) => new Date(`${date}T23:59:59.999Z`);
 
-const toApiStatus = (s: string): TaskStatus =>
-  (TASK_STATUS as readonly string[]).includes(s) ? (s as TaskStatus) : 'todo';
+const toApiStatus = (status: string): TaskStatus =>
+  (TASK_STATUS as readonly string[]).includes(status) ? (status as TaskStatus) : 'todo';
 
-const toPublicTask = (t: any): PublicTask => {
-  const s = new Date(t.startDate);
-  const e = new Date(t.endDate);
+const toPublicTask = (task: any): PublicTask => {
+  const startDate = new Date(task.startDate);
+  const endDate = new Date(task.endDate);
   return {
-    id: t.id,
-    projectId: t.projectId,
-    title: t.title,
-    startYear: s.getUTCFullYear(),
-    startMonth: s.getUTCMonth() + 1,
-    startDay: s.getUTCDate(),
-    endYear: e.getUTCFullYear(),
-    endMonth: e.getUTCMonth() + 1,
-    endDay: e.getUTCDate(),
-    status: toApiStatus(t.status as unknown as string),
-    assignee: t.assignee
+    id: task.id,
+    projectId: task.projectId,
+    title: task.title,
+    startYear: startDate.getUTCFullYear(),
+    startMonth: startDate.getUTCMonth() + 1,
+    startDay: startDate.getUTCDate(),
+    endYear: endDate.getUTCFullYear(),
+    endMonth: endDate.getUTCMonth() + 1,
+    endDay: endDate.getUTCDate(),
+    status: toApiStatus(task.status as unknown as string),
+    assignee: task.assignee
       ? {
-          id: t.assignee.id,
-          name: t.assignee.name,
-          email: t.assignee.email,
-          profileImage: t.assignee.profileImage ?? null,
+          id: task.assignee.id,
+          name: task.assignee.name,
+          email: task.assignee.email,
+          profileImage: task.assignee.profileImage ?? null,
         }
       : null,
-    tags: t.tags.map((tt: any) => ({ id: tt.tag.id, name: tt.tag.name })),
-    attachments: t.attachments.map((a: any) => ({ id: a.id, url: filePublicUrl(a.relPath) })),
-    createdAt: t.createdAt,
-    updatedAt: t.updatedAt,
+    tags: task.tags.map((tag: any) => ({ id: tag.tag.id, name: tag.tag.name })),
+    attachments: task.attachments.map((attachment: any) => ({
+      id: attachment.id,
+      url: filePublicUrl(attachment.relPath),
+    })),
+    createdAt: task.createdAt,
+    updatedAt: task.updatedAt,
   };
 };
 
@@ -133,9 +136,7 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
     core.endDate = new Date(Date.UTC(body.endYear, body.endMonth - 1, body.endDay));
   }
 
-  if (Object.keys(core).length) {
-    await tasksRepo.update(taskId, core);
-  }
+  if (Object.keys(core).length) await tasksRepo.update(taskId, core);
 
   const updated = await tasksRepo.findById(taskId, userId);
   if (!updated) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
