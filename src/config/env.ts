@@ -31,6 +31,7 @@ const schema = z.object({
   REFRESH_TOKEN_SECRET: z.string().min(10),
   INVITATION_TOKEN_SECRET: z.string().min(10),
   UPLOAD_ROOT: z.string().default('./uploads'),
+  PASSWORD_PEPPER: z.string().min(10),
 
   // MAIL
   MAILSERVICE: z.enum(['gmail', 'naver']).default('gmail'),
@@ -39,8 +40,9 @@ const schema = z.object({
   SMTP_USER: z.email(),
   SMTP_PASS: z.string().min(8), // SMTP 비밀번호
 
-  // PEPPER
-  PASSWORD_PEPPER: z.string().min(10),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_REDIRECT_URI: z.string().url().optional(),
 });
 
 const parsed = schema.safeParse(process.env);
