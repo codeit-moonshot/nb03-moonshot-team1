@@ -14,7 +14,7 @@ const createRefreshToken = async (data: RefreshDto) => {
   });
 };
 
-const findRefreshToken = async (userId: number) => {
+const findRefreshTokenByUserId = async (userId: number) => {
   return prisma.refreshToken.findUnique({
     where: { userId },
   });
@@ -28,6 +28,6 @@ const deleteRefreshToken = async (userId: number) => {
 
 export default {
   createRefreshToken,
-  findRefreshToken,
+  findRefreshTokenByUserId,
   deleteRefreshToken,
 };

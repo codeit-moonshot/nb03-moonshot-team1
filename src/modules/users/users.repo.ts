@@ -1,5 +1,5 @@
 import prisma from '#prisma/prisma';
-import { RegisterDto } from '#modules/auth/dto/register.dto';
+import { RegisterDto, SocialRegisterDto } from '#modules/auth/dto/register.dto';
 import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 const findByEmail = async (email: string) => {
@@ -32,9 +32,29 @@ const update = async (id: number, data: UpdateUserDto) => {
   });
 };
 
+const SocialCreate = async (data: SocialRegisterDto) => {
+  return prisma.user.create({
+    data: {
+      email: data.email,
+      name: data.name,
+      profileImage: data.profileImage,
+      socialAccounts: {
+        create: {
+          provider: data.socialAccounts.provider,
+          providerUid: data.socialAccounts.providerUid,
+          email: data.email,
+          displayName: data.name,
+          profileImage: data.profileImage,
+        },
+      },
+    },
+  });
+};
+
 export default {
   findByEmail,
   create,
   findById,
   update,
+  SocialCreate,
 };

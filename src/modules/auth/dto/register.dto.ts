@@ -28,3 +28,13 @@ export const authCreateSchema = z.object({
 });
 
 export type RegisterDto = z.infer<typeof authCreateSchema>;
+
+export interface SocialRegisterDto {
+  email: string;
+  name: string;
+  profileImage: string | null;
+  socialAccounts: {
+    provider: 'GOOGLE' | 'NAVER';
+    providerUid: string;
+  };
+}

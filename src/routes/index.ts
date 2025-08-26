@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import authRouter from '#modules/auth/router';
-import usersRouter from '#modules/users/router';
+import authRouter from '#modules/auth/auth.router';
+import usersRouter from '#modules/users/users.router';
 import projectRouter from '#modules/projects/router';
 import fileRouter from '#modules/files/router';
 import subtaskRoutes from '#modules/subtasks/router';

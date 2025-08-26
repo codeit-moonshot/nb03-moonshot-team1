@@ -1,9 +1,10 @@
-import authRepo from '#modules/auth/repo';
-import usersService from '#modules/users/service';
+import authRepo from '#modules/auth/auth.repo';
+import usersService from '#modules/users/users.service';
 import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
-import token from '#modules/auth/tokenUtils';
+import googleOauthUtils from '#modules/auth/utils/googleOauthUtils';
+import token from '#modules/auth/utils/tokenUtils';
 import ApiError from '#errors/ApiError';
-import { RegisterDto } from '#modules/auth/dto/register.dto';
+import { RegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
 
@@ -15,6 +16,21 @@ const register = async (data: RegisterDto) => {
   const createdUser = await usersService.createUser({ ...data, password: hashedPassword });
   const { password, deletedAt, ...user } = createdUser;
   return user;
+};
+
+const saveRefreshToken = async (refreshToken: string, userId: number) => {
+  const decodedToken = token.verifyRefreshToken(refreshToken);
+  const tokenHash = await hashPassword(refreshToken);
+
+  const refreshDto: RefreshDto = {
+    userId: decodedToken.id,
+    tokenHash,
+    createdAt: new Date(),
+    expiresAt: new Date(decodedToken.exp! * 1000),
+  };
+
+  await authRepo.deleteRefreshToken(userId); // 기존 토큰 제거
+  await authRepo.createRefreshToken(refreshDto);
 };
 
 const login = async (data: LoginDto) => {
@@ -30,16 +46,7 @@ const login = async (data: LoginDto) => {
   const accessToken = token.generateAccessToken({ id: userId });
   const refreshToken = token.generateRefreshToken({ id: userId });
 
-  const decodedToken = token.verifyRefreshToken(refreshToken);
-  const tokenHash = await hashPassword(refreshToken);
-  const refreshDto: RefreshDto = {
-    userId: decodedToken.id,
-    tokenHash,
-    createdAt: new Date(),
-    expiresAt: new Date(decodedToken.exp! * 1000),
-  };
-  await authRepo.deleteRefreshToken(userId);
-  await authRepo.createRefreshToken(refreshDto);
+  await saveRefreshToken(refreshToken, userId);
 
   return { accessToken, refreshToken };
 };
@@ -49,7 +56,7 @@ const refresh = async (data: AuthHeaderDto) => {
   const refreshToken = token.extractToken(data);
 
   const decodedToken = token.verifyRefreshToken(refreshToken);
-  const storedTokenHash = await authRepo.findRefreshToken(decodedToken.id);
+  const storedTokenHash = await authRepo.findRefreshTokenByUserId(decodedToken.id);
   if (!storedTokenHash) throw ApiError.unauthorized(message);
 
   const isValidHash = await isPasswordValid(refreshToken, storedTokenHash.tokenHash);
@@ -60,21 +67,39 @@ const refresh = async (data: AuthHeaderDto) => {
   const newAccessToken = token.generateAccessToken({ id: tokenId });
   const newRefreshToken = token.generateRefreshToken({ id: tokenId });
 
-  const newDecodedToken = token.verifyRefreshToken(newRefreshToken);
-  const newTokenHash = await hashPassword(newRefreshToken);
-  const refreshDto: RefreshDto = {
-    userId: newDecodedToken.id,
-    tokenHash: newTokenHash,
-    createdAt: new Date(),
-    expiresAt: new Date(newDecodedToken.exp! * 1000),
-  };
-  await authRepo.createRefreshToken(refreshDto);
+  await saveRefreshToken(newRefreshToken, tokenId);
 
   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+};
+
+const googleRegisterOrLogin = async (code: string) => {
+  const { access_token } = await googleOauthUtils.getGoogleToken(code);
+  const userInfo = await googleOauthUtils.getGoogleUserInfo(access_token);
+
+  let user = await usersService.findUserByEmail(userInfo.email);
+  if (!user) {
+    user = await usersService.SocialCreateUser({
+      email: userInfo.email,
+      name: userInfo.name ?? '이름 없음',
+      profileImage: userInfo.picture ?? null,
+      socialAccounts: {
+        provider: SocialProvider.GOOGLE,
+        providerUid: userInfo.id,
+      },
+    });
+  }
+
+  const accessToken = token.generateAccessToken({ id: user.id });
+  const refreshToken = token.generateRefreshToken({ id: user.id });
+
+  await saveRefreshToken(refreshToken, user.id);
+
+  return { accessToken, refreshToken };
 };
 
 export default {
   register,
   login,
   refresh,
+  googleRegisterOrLogin,
 };
