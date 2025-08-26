@@ -13,5 +13,5 @@ export const DOC_MIME = [
 export const IMAGE_MIME_SET: ReadonlySet<string> = new Set(IMAGE_MIME);
 export const DEFAULT_FILE_MIME_SET: ReadonlySet<string> = new Set([...IMAGE_MIME, ...DOC_MIME]);
 
-// 검사 헬퍼
+// 검사 헬퍼 TODO: 유틸로 빼버리기
 export const isAllowedMime = (mime: string, allow: ReadonlySet<string>) => allow.has(mime);
