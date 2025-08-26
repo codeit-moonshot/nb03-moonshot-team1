@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import invitationController from './controller'
+import invitationController from './invitation.controller'
 
 const router = Router();
 

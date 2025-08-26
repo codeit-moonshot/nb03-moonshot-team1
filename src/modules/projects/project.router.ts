@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import projectController from './controller';
+import projectController from './project.controller';
 
 const router = Router();
 
 router
-  .route('/:projectId/invitations')
+  .route('/:projectId/invitations') 
   .post(projectController.createInvitation)
 
 router

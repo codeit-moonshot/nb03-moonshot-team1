@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import projectService from './service';
+import projectService from './project.service';
 import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
 
 /**
@@ -22,8 +22,9 @@ const createInvitation: RequestHandler = async (req, res) => {
     inviter: 1
   }
 
-  await projectService.sendInvitation(invitationDto);
+  const invitation = await projectService.sendInvitation(invitationDto);
   console.log(`초대 : ${invitationDto.targetEmail}`);
+  res.status(201).json(invitation);
 }
 
 const excludeMember: RequestHandler = async (req, res) => {

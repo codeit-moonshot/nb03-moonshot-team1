@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { RequestHandler } from 'express';
 import type { AcceptInvitationDto, CreateMemberDto } from './dto/invitationDto';
-import invitationService from './service';
+import invitationService from './invitation.service';
 
 /**
  * @function acceptInvitation
@@ -28,6 +28,7 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
   }
 
   await invitationService.acceptInvitation(acceptInvitationDto);
+  res.sendStatus(200);
 }
 
 export default {

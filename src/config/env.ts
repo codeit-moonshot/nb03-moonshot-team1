@@ -15,6 +15,7 @@ const schema = z.object({
   // BASE URL
   BASE_URL: z.string().url(),
   BASE_URL_DEV: z.string().url().optional(),
+  FRONT_URL: z.url(),
 
   // RUNTIME
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -28,7 +29,7 @@ const schema = z.object({
   MAILSERVICE: z.enum(['gmail', 'naver']).default('gmail'),
   HOSTMAIL: z.string(),
   MAILPORT: z.coerce.number().int().positive().default(465), // 일반적으로 465 또는 587
-  SMTP_USER: z.string().email(),
+  SMTP_USER: z.email(),
   SMTP_PASS: z.string().min(8), // SMTP 비밀번호
   PASSWORD_PEPPER: z.string().min(10),
 });
