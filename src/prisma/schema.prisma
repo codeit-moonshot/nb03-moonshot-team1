@@ -12,10 +12,10 @@ datasource db {
  */
 
 enum TaskStatus {
-  TODO
-  IN_PROGRESS
-  BLOCKED
-  DONE
+  todo
+  in_progress
+  blocked
+  done
 }
 
 enum ProjectRole {
@@ -29,9 +29,9 @@ enum SocialProvider {
 }
 
 enum InvitationStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
+  pending
+  accepted
+  rejected
 }
 
 /**
@@ -124,7 +124,7 @@ model Task {
   assigneeId  Int?
   title       String
   description String?
-  status      TaskStatus @default(TODO)
+  status      TaskStatus @default(todo)
   startDate   DateTime
   endDate     DateTime
   createdAt   DateTime   @default(now())
@@ -162,7 +162,7 @@ model Subtask {
   id        Int        @id @default(autoincrement())
   title     String
   taskId    Int
-  status    TaskStatus @default(TODO)
+  status    TaskStatus @default(todo)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -196,7 +196,7 @@ model Invitation {
   createdBy Int
   createdAt DateTime         @default(now())
   expiresAt DateTime?
-  status    InvitationStatus @default(PENDING)
+  status    InvitationStatus @default(pending)
 
   project Project @relation("ProjectInvitations", fields: [projectId], references: [id], onDelete: Cascade)
   inviter User    @relation("ProjectInvitationsByUser", fields: [createdBy], references: [id], onDelete: Cascade)
