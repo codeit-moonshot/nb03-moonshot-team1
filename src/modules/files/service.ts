@@ -1,5 +1,5 @@
 import ApiError from '#errors/ApiError';
-import { IMAGE_MIME_SET, DEFAULT_FILE_MIME_SET } from '#constants/mime';
+import { IMAGE_MIME_SET, DEFAULT_FILE_MIME_SET } from '#constants//mime.constants';
 import { assertAllowedByMagic } from '#libs/mime.service';
 import { StorageService } from '#libs/storage.service';
 import { AttachmentRepo } from './repo';
