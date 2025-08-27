@@ -91,7 +91,7 @@ const main = async (): Promise<void> => {
           assigneeId: alice.id,
           title: '프로젝트 초기 세팅',
           description: '리포지토리 구조, TS/ESLint/Prettier, Prisma 설정',
-          status: TaskStatus.IN_PROGRESS,
+          status: TaskStatus.in_progress,
           startDate: now,
           endDate: nextWeek,
         },
@@ -105,7 +105,7 @@ const main = async (): Promise<void> => {
           assigneeId: bob.id,
           title: 'API 설계 초안',
           description: '인증/프로젝트/태스크/코멘트 엔드포인트 초안',
-          status: TaskStatus.TODO,
+          status: TaskStatus.todo,
           startDate: now,
           endDate: new Date(now.getTime() + DAYS(10)),
         },
@@ -119,8 +119,8 @@ const main = async (): Promise<void> => {
       }
     };
 
-    await ensureSubtask(task1.id, 'Prisma 스키마 정리', TaskStatus.IN_PROGRESS);
-    await ensureSubtask(task1.id, 'ESLint/Prettier 구성', TaskStatus.TODO);
+    await ensureSubtask(task1.id, 'Prisma 스키마 정리', TaskStatus.in_progress);
+    await ensureSubtask(task1.id, 'ESLint/Prettier 구성', TaskStatus.todo);
 
     // Comment
     const commentExists = await tx.comment.findFirst({

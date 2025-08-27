@@ -21,7 +21,7 @@ const findRefreshTokenByUserId = async (userId: number) => {
 };
 
 const deleteRefreshToken = async (userId: number) => {
-  return prisma.refreshToken.delete({
+  return prisma.refreshToken.deleteMany({
     where: { userId },
   });
 };

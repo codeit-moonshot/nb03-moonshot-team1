@@ -11,7 +11,7 @@ export interface UserDto {
   deletedAt: Date | null;
 }
 
-export type PublicUserDto = Omit<UserDto, 'id' | 'password' | 'deletedAt'>;
+export type PublicUserDto = Omit<UserDto, 'password' | 'deletedAt'>;
 
 export const userUpdateSchema = z.object({
   email: z.email('유효한 이메일 주소가 아닙니다.'),

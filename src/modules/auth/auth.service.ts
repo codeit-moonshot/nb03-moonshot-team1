@@ -7,8 +7,10 @@ import ApiError from '#errors/ApiError';
 import { RegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
+import { PublicUserDto } from '#modules/users/dto/user.dto';
+import { TokenDto } from '#modules/auth/dto/token.dto';
 
-const register = async (data: RegisterDto) => {
+const register = async (data: RegisterDto): Promise<PublicUserDto> => {
   const existingUser = await usersService.findUserByEmail(data.email);
   if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');
 
@@ -29,11 +31,11 @@ const saveRefreshToken = async (refreshToken: string, userId: number) => {
     expiresAt: new Date(decodedToken.exp! * 1000),
   };
 
-  await authRepo.deleteRefreshToken(userId); // 기존 토큰 제거
+  await authRepo.deleteRefreshToken(userId);
   await authRepo.createRefreshToken(refreshDto);
 };
 
-const login = async (data: LoginDto) => {
+const login = async (data: LoginDto): Promise<TokenDto> => {
   const message = '이메일 또는 비밀번호가 잘못되었습니다.';
   const getUser = await usersService.findUserByEmail(data.email);
   if (!getUser) throw ApiError.unauthorized(message);
@@ -51,7 +53,7 @@ const login = async (data: LoginDto) => {
   return { accessToken, refreshToken };
 };
 
-const refresh = async (data: AuthHeaderDto) => {
+const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
   const message = '유효하지 않은 토큰입니다.';
   const refreshToken = token.extractToken(data);
 
@@ -72,7 +74,7 @@ const refresh = async (data: AuthHeaderDto) => {
   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };
 
-const googleRegisterOrLogin = async (code: string) => {
+const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const { access_token } = await googleOauthUtils.getGoogleToken(code);
   const userInfo = await googleOauthUtils.getGoogleUserInfo(access_token);
 
