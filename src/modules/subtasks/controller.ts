@@ -70,8 +70,8 @@ export const updateSubtask: RequestHandler = async (req, res) => {
  */
 export const deleteSubtask: RequestHandler = async (req, res) => {
   const dto: DeleteSubtaskDto = {
-    subtaskId: Number(req.body.subtaskId),
-    taskId: Number(req.body.taskId),
+    subtaskId: Number(req.params.subtaskId),
+    taskId: Number(req.params.taskId),
   };
   await subtaskService.deleteSubtask(dto);
   res.status(204).end();
