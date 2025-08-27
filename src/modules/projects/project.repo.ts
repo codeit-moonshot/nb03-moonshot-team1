@@ -1,5 +1,27 @@
 import prisma from '#prisma/prisma';
-import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+
+const create = async (data: createProjectDto, userId: number) => {
+  return await prisma.project.create({
+    data: {
+      ...data,
+      owner: { connect: { id: userId } }
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      owner: { select: { id: true } },
+      members: { select: { userId: true } },
+      tasks: {
+        select: {
+          id: true,
+          status: true
+        }
+      }
+    }
+  });
+}
 
 const findById = async (id: {projectId: number, userId: number}) => {
   return await prisma.projectMember.findUnique({
@@ -38,6 +60,7 @@ const remove = async(data: ExcludeMemberDto): Promise<void> => {
 }
 
 export default {
+  create,
   findById,
   createInvitation,
   remove

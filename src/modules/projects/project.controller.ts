@@ -1,6 +1,44 @@
 import type { RequestHandler } from 'express';
+import jwt from 'jsonwebtoken';
 import projectService from './project.service';
-import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+import { getBearer } from './tokenUtils';
+import ApiError from '#errors/ApiError';
+
+/**
+ * @function createProject
+ * @description 프로젝트 생성
+ *
+ * @params {Object} req - { body: createProjectDto }
+ *                        { headers: { authorization: "Bearer <token>" } }
+ * @params {Object} res - {
+ *  id: number,
+ *  name: string,
+ *  description: string,
+ *  memberCount: number,
+ *  todoCount: number,
+ *  inProgressCount: number,
+ *  doneCount: number
+ * }
+ * 
+ * @returns {200} 생성된 프로젝트 정보
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ */
+const createProject: RequestHandler = async (req, res) => {
+  // TODO 토큰 추출, 검증 미들웨어로 분리
+  const accessToken = getBearer(req.headers.authorization)
+  if(!accessToken) throw ApiError.unauthorized('잘못된 토큰입니다.');
+  const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!) as { id: number };
+
+  const createDto: createProjectDto = {
+    name: req.body.name,
+    description: req.body.description
+  };
+
+  const project = await projectService.createProject(createDto, decodedToken.id);
+  res.status(200).json(project);
+}
 
 /**
  * @function createInvitation
@@ -41,6 +79,7 @@ const excludeMember: RequestHandler = async (req, res) => {
 }
 
 export default {
+  createProject,
   createInvitation,
   excludeMember
 }
