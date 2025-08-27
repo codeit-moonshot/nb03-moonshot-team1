@@ -15,8 +15,6 @@ const updateSubtask = async (data: UpdateSubtaskDto) => {
 };
 
 const deleteSubtask = async (data: DeleteSubtaskDto) => {
-  if (!Number.isInteger(data.taskId) || data.taskId <= 0) throw new ApiError(400, '하위 할 일 ID가 올바르지 않습니다.');
-
   const subtask = await subtaskRepo.findById(data.subtaskId);
   if (!subtask) throw new ApiError(404, '하위 할 일을 찾을 수 없습니다.');
 
