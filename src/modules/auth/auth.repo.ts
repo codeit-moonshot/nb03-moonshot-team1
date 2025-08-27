@@ -1,18 +1,6 @@
 import prisma from '#prisma/prisma';
 import { RefreshDto } from '#modules/auth/dto/token.dto';
-
-const createRefreshToken = async (data: RefreshDto) => {
-  return prisma.refreshToken.create({
-    data: {
-      tokenHash: data.tokenHash,
-      createdAt: data.createdAt,
-      expiresAt: data.expiresAt,
-      user: {
-        connect: { id: data.userId },
-      },
-    },
-  });
-};
+import { de } from 'zod/v4/locales/index.cjs';
 
 const findRefreshTokenByUserId = async (userId: number) => {
   return prisma.refreshToken.findUnique({
@@ -20,14 +8,31 @@ const findRefreshTokenByUserId = async (userId: number) => {
   });
 };
 
+const upsertRefreshToken = async (userId: number, data: RefreshDto) => {
+  return prisma.refreshToken.upsert({
+    where: { userId },
+    update: {
+      tokenHash: data.tokenHash,
+      createdAt: data.createdAt,
+      expiresAt: data.expiresAt,
+    },
+    create: {
+      tokenHash: data.tokenHash,
+      createdAt: data.createdAt,
+      expiresAt: data.expiresAt,
+      user: { connect: { id: userId } },
+    },
+  });
+};
+
 const deleteRefreshToken = async (userId: number) => {
-  return prisma.refreshToken.deleteMany({
+  return prisma.refreshToken.delete({
     where: { userId },
   });
 };
 
 export default {
-  createRefreshToken,
   findRefreshTokenByUserId,
+  upsertRefreshToken,
   deleteRefreshToken,
 };

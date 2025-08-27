@@ -21,8 +21,8 @@ const findUserById = async (id: number): Promise<UserDto | null> => {
   return usersRepo.findById(id);
 };
 
-const SocialCreateUser = async (data: SocialRegisterDto): Promise<UserDto> => {
-  return usersRepo.SocialCreate(data);
+const socialCreateUser = async (data: SocialRegisterDto): Promise<UserDto> => {
+  return usersRepo.socialCreate(data);
 };
 
 const getMyInfo = async (id: number): Promise<PublicUserDto | null> => {
@@ -51,5 +51,5 @@ export default {
   findUserById,
   getMyInfo,
   updateMyInfo,
-  SocialCreateUser,
+  socialCreateUser,
 };

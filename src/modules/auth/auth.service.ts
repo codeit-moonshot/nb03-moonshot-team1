@@ -30,9 +30,7 @@ const saveRefreshToken = async (refreshToken: string, userId: number) => {
     createdAt: new Date(),
     expiresAt: new Date(decodedToken.exp! * 1000),
   };
-
-  await authRepo.deleteRefreshToken(userId);
-  await authRepo.createRefreshToken(refreshDto);
+  await authRepo.upsertRefreshToken(userId, refreshDto);
 };
 
 const login = async (data: LoginDto): Promise<TokenDto> => {
@@ -49,7 +47,6 @@ const login = async (data: LoginDto): Promise<TokenDto> => {
   const refreshToken = token.generateRefreshToken({ id: userId });
 
   await saveRefreshToken(refreshToken, userId);
-
   return { accessToken, refreshToken };
 };
 
@@ -58,19 +55,17 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
   const refreshToken = token.extractToken(data);
 
   const decodedToken = token.verifyRefreshToken(refreshToken);
-  const storedTokenHash = await authRepo.findRefreshTokenByUserId(decodedToken.id);
-  if (!storedTokenHash) throw ApiError.unauthorized(message);
+  const storedToken = await authRepo.findRefreshTokenByUserId(decodedToken.id);
+  if (!storedToken) throw ApiError.unauthorized(message);
 
-  const isValidHash = await isPasswordValid(refreshToken, storedTokenHash.tokenHash);
+  const isValidHash = await isPasswordValid(refreshToken, storedToken.tokenHash);
   if (!isValidHash) throw ApiError.unauthorized(message);
-  await authRepo.deleteRefreshToken(decodedToken.id);
 
   const tokenId = Number(decodedToken.id);
   const newAccessToken = token.generateAccessToken({ id: tokenId });
   const newRefreshToken = token.generateRefreshToken({ id: tokenId });
 
   await saveRefreshToken(newRefreshToken, tokenId);
-
   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };
 
@@ -80,7 +75,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
 
   let user = await usersService.findUserByEmail(userInfo.email);
   if (!user) {
-    user = await usersService.SocialCreateUser({
+    user = await usersService.socialCreateUser({
       email: userInfo.email,
       name: userInfo.name ?? '이름 없음',
       profileImage: userInfo.picture ?? null,
@@ -95,7 +90,6 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const refreshToken = token.generateRefreshToken({ id: user.id });
 
   await saveRefreshToken(refreshToken, user.id);
-
   return { accessToken, refreshToken };
 };
 

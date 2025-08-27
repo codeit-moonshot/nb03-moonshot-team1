@@ -32,7 +32,7 @@ const update = async (id: number, data: UpdateUserDto) => {
   });
 };
 
-const SocialCreate = async (data: SocialRegisterDto) => {
+const socialCreate = async (data: SocialRegisterDto) => {
   return prisma.user.create({
     data: {
       email: data.email,
@@ -56,5 +56,5 @@ export default {
   create,
   findById,
   update,
-  SocialCreate,
+  socialCreate,
 };
