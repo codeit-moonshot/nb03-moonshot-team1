@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import * as subtaskService from '#modules/subtasks/service';
+import subtaskService from '#modules/subtasks/service';
 import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 /**
@@ -11,7 +11,7 @@ import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/s
  *
  * @returns {201} 생성된 하위 할 일 반환
  */
-export const createSubtask: RequestHandler = async (req, res) => {
+const createSubtask: RequestHandler = async (req, res) => {
   const dto: CreateSubtaskDto = {
     title: req.body.title,
     taskId: Number(req.params.taskId),
@@ -30,7 +30,7 @@ export const createSubtask: RequestHandler = async (req, res) => {
  *
  * @returns {200} 하위 할 일 목록 반환
  */
-export const getSubtaskList: RequestHandler = (req, res) => {
+const getSubtaskList: RequestHandler = (req, res) => {
   res.send('getSubtaskList');
 };
 
@@ -46,7 +46,7 @@ export const getSubtaskList: RequestHandler = (req, res) => {
  * @throws {403} 권한 없음
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
-export const updateSubtask: RequestHandler = async (req, res) => {
+const updateSubtask: RequestHandler = async (req, res) => {
   const dto: UpdateSubtaskDto = {
     status: req.body.status,
     taskId: Number(req.params.taskId),
@@ -68,11 +68,18 @@ export const updateSubtask: RequestHandler = async (req, res) => {
  * @throws {403} 권한 없음
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
-export const deleteSubtask: RequestHandler = async (req, res) => {
+const deleteSubtask: RequestHandler = async (req, res) => {
   const dto: DeleteSubtaskDto = {
     subtaskId: Number(req.params.subtaskId),
     taskId: Number(req.params.taskId),
   };
   await subtaskService.deleteSubtask(dto);
   res.status(204).end();
+};
+
+export default {
+  createSubtask,
+  getSubtaskList,
+  updateSubtask,
+  deleteSubtask,
 };
