@@ -1,6 +1,5 @@
 import prisma from '#prisma/prisma';
 import { RefreshDto } from '#modules/auth/dto/token.dto';
-import { de } from 'zod/v4/locales/index.cjs';
 
 const findRefreshTokenByUserId = async (userId: number) => {
   return prisma.refreshToken.findUnique({
@@ -25,14 +24,7 @@ const upsertRefreshToken = async (userId: number, data: RefreshDto) => {
   });
 };
 
-const deleteRefreshToken = async (userId: number) => {
-  return prisma.refreshToken.delete({
-    where: { userId },
-  });
-};
-
 export default {
   findRefreshTokenByUserId,
   upsertRefreshToken,
-  deleteRefreshToken,
 };
