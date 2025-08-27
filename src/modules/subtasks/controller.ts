@@ -30,8 +30,10 @@ const createSubtask: RequestHandler = async (req, res) => {
  *
  * @returns {200} 하위 할 일 목록 반환
  */
-const getSubtaskList: RequestHandler = (req, res) => {
-  res.send('getSubtaskList');
+const getSubtaskList: RequestHandler = async (req, res) => {
+  const taskId = Number(req.params.taskId);
+  const subtaskList = await subtaskService.getSubtaskList(taskId);
+  res.send(subtaskList);
 };
 
 /**
