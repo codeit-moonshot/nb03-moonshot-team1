@@ -1,6 +1,8 @@
+import path from 'node:path';
 import ApiError from '#errors/ApiError';
-import filePublicUrl from '#utils/filePublicUrl';
-import { TASK_STATUS, type TaskStatus } from '#constants/taskStatus.constants';
+import fileRelPathFromUrl from '#utils/fileRelPathFromUrl';
+import type { TaskStatus } from '#constants/taskStatus.constants';
+import toPublicTask from '#modules/tasks/tasks.utils';
 import tasksRepo from '#modules/tasks/tasks.repo';
 import type { PublicTask, PatchTaskBodyDto } from '#modules/tasks/dto/task.dto';
 import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
@@ -12,39 +14,15 @@ import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
 const startOfDayUTC = (date: string) => new Date(`${date}T00:00:00.000Z`);
 const endOfDayUTC = (date: string) => new Date(`${date}T23:59:59.999Z`);
 
-const toApiStatus = (status: string): TaskStatus =>
-  (TASK_STATUS as readonly string[]).includes(status) ? (status as TaskStatus) : 'todo';
+const ensureTaskAndAccess = async (taskId: number, userId: number) => {
+  const task = await tasksRepo.findById(taskId, userId);
+  if (!task) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
 
-const toPublicTask = (task: any): PublicTask => {
-  const startDate = new Date(task.startDate);
-  const endDate = new Date(task.endDate);
-  return {
-    id: task.id,
-    projectId: task.projectId,
-    title: task.title,
-    startYear: startDate.getUTCFullYear(),
-    startMonth: startDate.getUTCMonth() + 1,
-    startDay: startDate.getUTCDate(),
-    endYear: endDate.getUTCFullYear(),
-    endMonth: endDate.getUTCMonth() + 1,
-    endDay: endDate.getUTCDate(),
-    status: toApiStatus(task.status as unknown as string),
-    assignee: task.assignee
-      ? {
-          id: task.assignee.id,
-          name: task.assignee.name,
-          email: task.assignee.email,
-          profileImage: task.assignee.profileImage ?? null,
-        }
-      : null,
-    tags: task.tags.map((tag: any) => ({ id: tag.tag.id, name: tag.tag.name })),
-    attachments: task.attachments.map((attachment: any) => ({
-      id: attachment.id,
-      url: filePublicUrl(attachment.relPath),
-    })),
-    createdAt: task.createdAt,
-    updatedAt: task.updatedAt,
-  };
+  const isOwner = task.project.ownerId === userId;
+  const isMember = task.project.members.length > 0;
+  if (!isOwner && !isMember) throw new ApiError(403, '프로젝트 멤버가 아닙니다');
+
+  return task;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -55,21 +33,15 @@ const toPublicTask = (task: any): PublicTask => {
  * GET /tasks/:taskId
  */
 const getTaskById = async (taskId: number, userId: number): Promise<PublicTask> => {
-  const task = await tasksRepo.findById(taskId, userId);
-  if (!task) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
-
-  const isOwner = task.project.ownerId === userId;
-  const isMember = task.project.members.length > 0;
-  if (!isOwner && !isMember) throw new ApiError(403, '프로젝트 멤버가 아닙니다');
-
+  const task = await ensureTaskAndAccess(taskId, userId);
   return toPublicTask(task);
 };
 
 /**
  * GET /users/me/tasks
  */
-const getMyTasks = async (userId: number, q: MeTasksQueryDto): Promise<PublicTask[]> => {
-  const { from, to, project_id, status, assignee, keyword, page, size, sort, order } = q;
+const getMyTasks = async (userId: number, query: MeTasksQueryDto): Promise<PublicTask[]> => {
+  const { from, to, project_id, status, assignee, keyword, page, size, sort, order } = query;
 
   const range =
     from || to
@@ -106,20 +78,10 @@ const getMyTasks = async (userId: number, q: MeTasksQueryDto): Promise<PublicTas
  * PATCH /tasks/:taskId
  */
 const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto): Promise<PublicTask> => {
-  const existing = await tasksRepo.findById(taskId, userId);
-  if (!existing) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
+  await ensureTaskAndAccess(taskId, userId);
 
-  const isOwner = existing.project.ownerId === userId;
-  const isMember = existing.project.members.length > 0;
-  if (!isOwner && !isMember) throw new ApiError(403, '프로젝트 멤버가 아닙니다');
-
-  const core: {
-    title?: string;
-    status?: TaskStatus;
-    assigneeId?: number | null;
-    startDate?: Date;
-    endDate?: Date;
-  } = {};
+  const core: { title?: string; status?: TaskStatus; assigneeId?: number | null; startDate?: Date; endDate?: Date } =
+    {};
 
   if (body.title !== undefined) core.title = body.title;
   if (body.status !== undefined) core.status = body.status;
@@ -138,6 +100,22 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
 
   if (Object.keys(core).length) await tasksRepo.update(taskId, core);
 
+  if (Array.isArray(body.tags)) {
+    const tagIds = await tasksRepo.findOrCreateTagsByNames(body.tags);
+    await tasksRepo.updateTags(taskId, tagIds);
+  }
+
+  if (Array.isArray(body.attachments)) {
+    const files = body.attachments.map((url) => {
+      const relPath = fileRelPathFromUrl(url);
+      const storedName = path.basename(relPath);
+      const dot = storedName.lastIndexOf('.');
+      const ext = dot > -1 ? storedName.slice(dot + 1) : null;
+      return { originalName: storedName, storedName, relPath, mimeType: null, size: null, ext };
+    });
+    await tasksRepo.updateAttachments(taskId, files);
+  }
+
   const updated = await tasksRepo.findById(taskId, userId);
   if (!updated) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
   return toPublicTask(updated);
@@ -147,13 +125,7 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
  * DELETE /tasks/:taskId
  */
 const deleteTask = async (taskId: number, userId: number) => {
-  const task = await tasksRepo.findById(taskId, userId);
-  if (!task) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
-
-  const isOwner = task.project.ownerId === userId;
-  const isMember = task.project.members.length > 0;
-  if (!isOwner && !isMember) throw new ApiError(403, '프로젝트 멤버가 아닙니다');
-
+  await ensureTaskAndAccess(taskId, userId);
   return tasksRepo.remove(taskId);
 };
 
