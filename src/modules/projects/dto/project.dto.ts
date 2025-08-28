@@ -13,6 +13,11 @@ const emailWithMX = z.string().refine(async (email) => {
   message: '유효한 이메일 주소가 아닙니다.'
 });
 
+export const createProjectSchema = z.object({
+  name: z.string().min(2).max(100),
+  description: z.string().max(500),
+});
+
 export const invitationSchema = z.object({
   projectId: z.number().min(1),
   targetEmail: emailWithMX,
@@ -20,6 +25,7 @@ export const invitationSchema = z.object({
   inviter: z.number().min(1).optional()
 });
 
+export type createProjectDto = z.infer<typeof createProjectSchema>;
 export type ExcludeMemberDto = {
   projectId: number;
   targetUserId: number;

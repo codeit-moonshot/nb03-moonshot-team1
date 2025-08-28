@@ -1,10 +1,24 @@
 import ApiError from "#errors/ApiError";
 import nodemailer from "nodemailer";
 import projectRepo from './project.repo';
-import { InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+import { InvitationDto, ExcludeMemberDto, createProjectDto } from './dto/project.dto';
 import { generateInvitationToken } from "./tokenUtils";
 
-const sendInvitation = async (data: InvitationDto): Promise<{ invitationId: number; invitationToken: string }> => {
+const createProject = async (data: createProjectDto, userId: number) => {
+  const project = await projectRepo.create(data, userId);
+  const createdProject = {
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    memberCount: project.members.length,
+    todoCount: project.tasks.filter(task => task.status === 'todo').length,
+    inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
+    doneCount: project.tasks.filter(task => task.status === 'done').length
+  };
+  return createdProject;
+}
+
+const sendInvitation = async (data: InvitationDto) => {
   const invitationToken = generateInvitationToken(data.projectId, data.targetEmail);
   // db 저장부터 메일 발송까지 트랜잭션이 필요해보임
   const invitationId = await projectRepo.createInvitation({ ...data, invitationToken });
@@ -62,6 +76,7 @@ const excludeMember = async (data: ExcludeMemberDto) => {
 }
 
 export default {
+  createProject,
   sendInvitation,
   excludeMember
 }
