@@ -66,6 +66,8 @@ model SocialAccount {
   email        String? // 제공자가 내려준 이메일(선택)
   displayName  String? // 제공자 프로필 이름(선택)
   profileImage String? // 제공자 프로필 이미지(선택)
+  accessToken  String
+  refreshToken String
   createdAt    DateTime       @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -70,7 +70,7 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 };
 
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
-  const { access_token } = await googleOauthUtils.getGoogleToken(code);
+  const { access_token, refresh_token } = await googleOauthUtils.getGoogleToken(code);
   const userInfo = await googleOauthUtils.getGoogleUserInfo(access_token);
 
   let user = await usersService.findUserByEmail(userInfo.email);
@@ -82,6 +82,8 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
       socialAccounts: {
         provider: SocialProvider.GOOGLE,
         providerUid: userInfo.id,
+        accessToken: access_token,
+        refreshToken: refresh_token,
       },
     });
   }

@@ -45,6 +45,8 @@ const socialCreate = async (data: SocialRegisterDto) => {
           email: data.email,
           displayName: data.name,
           profileImage: data.profileImage,
+          accessToken: data.socialAccounts.accessToken,
+          refreshToken: data.socialAccounts.refreshToken,
         },
       },
     },

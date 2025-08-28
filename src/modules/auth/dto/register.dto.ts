@@ -41,5 +41,7 @@ export interface SocialRegisterDto {
   socialAccounts: {
     provider: SocialProvider;
     providerUid: string;
+    accessToken: string;
+    refreshToken: string;
   };
 }
