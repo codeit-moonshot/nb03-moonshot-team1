@@ -15,3 +15,8 @@ export interface RefreshDto {
 export interface AuthHeaderDto {
   authorization: string;
 }
+
+export interface TokenDto {
+  accessToken: string;
+  refreshToken: string;
+}

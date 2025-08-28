@@ -1,9 +1,10 @@
 import type { RequestHandler } from 'express';
-import authService from '#modules/auth/service';
+import authService from '#modules/auth/auth.service';
+import googleOauthService from '#libs/googleOauth.service';
+import ApiError from '#errors/ApiError';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
-import ApiError from '#errors/ApiError';
 
 /**
  * @function register
@@ -67,8 +68,23 @@ const refresh: RequestHandler = async (req, res, next) => {
   res.status(200).json(newToken);
 };
 
+const googleLogin: RequestHandler = async (req, res, next) => {
+  const authUrl = googleOauthService.getGoogleAuthURL();
+  res.redirect(authUrl);
+};
+
+const googleCallback: RequestHandler = async (req, res, next) => {
+  const { code } = req.query;
+  if (!code || typeof code !== 'string') throw ApiError.badRequest('유효하지 않은 요청입니다.');
+
+  const token = await authService.googleRegisterOrLogin(code);
+  res.status(200).json(token);
+};
+
 export default {
   register,
   login,
   refresh,
+  googleLogin,
+  googleCallback,
 };

@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import usersService from '#modules/users/service';
+import usersService from '#modules/users/users.service';
 import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 /**
