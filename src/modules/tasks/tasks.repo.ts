@@ -170,7 +170,7 @@ const updateAttachments = (
       : []),
   ]);
 
-export const findOrCreateTagsByNames = async (names: string[]) => {
+const findOrCreateTagsByNames = async (names: string[]) => {
   const unique = Array.from(new Set(names.map((n) => n.trim()).filter(Boolean)));
   if (!unique.length) return [] as number[];
 
