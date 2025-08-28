@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import projectController from './project.controller';
 import validateProject from './project.validator';
+import { requireAuth } from '#middlewares/requireAuth';
 
 const router = Router();
 
 router
   .route('/')
-  .post(validateProject.validateCreateProject, projectController.createProject);
+  .post(requireAuth, validateProject.validateCreateProject, projectController.createProject);
 
 router
   .route('/:projectId/invitations') 

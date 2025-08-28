@@ -26,17 +26,14 @@ import ApiError from '#errors/ApiError';
  * @throws {401} Unauthorized
  */
 const createProject: RequestHandler = async (req, res) => {
-  // TODO 토큰 추출, 검증 미들웨어로 분리
-  const accessToken = getBearer(req.headers.authorization)
-  if(!accessToken) throw ApiError.unauthorized('잘못된 토큰입니다.');
-  const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!) as { id: number };
+  const userId = req.user.id;
 
   const createDto: createProjectDto = {
     name: req.body.name,
     description: req.body.description
   };
 
-  const project = await projectService.createProject(createDto, decodedToken.id);
+  const project = await projectService.createProject(createDto, userId);
   res.status(200).json(project);
 }
 
