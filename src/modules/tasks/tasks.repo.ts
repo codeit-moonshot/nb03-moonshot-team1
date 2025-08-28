@@ -170,6 +170,22 @@ const updateAttachments = (
       : []),
   ]);
 
+const findOrCreateTagsByNames = async (names: string[]) => {
+  const unique = Array.from(new Set(names.map((n) => n.trim()).filter(Boolean)));
+  if (!unique.length) return [] as number[];
+
+  const existing = await prisma.tag.findMany({ where: { name: { in: unique } }, select: { id: true, name: true } });
+  const existingNames = new Set(existing.map((t) => t.name));
+  const toCreate = unique.filter((n) => !existingNames.has(n));
+
+  if (toCreate.length) {
+    await prisma.tag.createMany({ data: toCreate.map((name) => ({ name })), skipDuplicates: true });
+  }
+
+  const all = await prisma.tag.findMany({ where: { name: { in: unique } }, select: { id: true } });
+  return all.map((t) => t.id);
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                DELETE                                      */
 /* -------------------------------------------------------------------------- */
@@ -215,6 +231,7 @@ export default {
   update,
   updateTags,
   updateAttachments,
+  findOrCreateTagsByNames,
   remove,
   getGoogleSocialAccount,
   updateGoogleAccessToken,
