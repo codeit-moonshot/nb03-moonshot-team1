@@ -9,6 +9,20 @@ const create = (data: CreateSubtaskDto) => {
     },
   });
 };
+
+const findMany = async (taskId: number) => {
+  const where = { taskId };
+  const [data, total] = await prisma.$transaction([
+    prisma.subtask.findMany({ where }),
+    prisma.subtask.count({ where }),
+  ]);
+
+  return {
+    data,
+    total,
+  };
+};
+
 const findById = (id: number) => {
   return prisma.subtask.findUnique({
     where: { id },
@@ -44,6 +58,7 @@ const remove = (data: DeleteSubtaskDto) => {
 
 export default {
   create,
+  findMany,
   findById,
   update,
   remove,
