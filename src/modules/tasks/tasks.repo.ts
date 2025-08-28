@@ -182,6 +182,33 @@ const remove = (id: number) =>
     where: { id },
   });
 
+const getGoogleSocialAccount = (userId: number) => {
+  return prisma.socialAccount.findFirst({
+    where: {
+      userId,
+      provider: 'GOOGLE',
+    },
+    select: {
+      accessToken: true,
+      refreshToken: true,
+      expiryDate: true,
+    },
+  });
+};
+
+const updateGoogleAccessToken = (userId: number, accessToken: string, expiryDate: Date) => {
+  return prisma.socialAccount.updateMany({
+    where: {
+      userId,
+      provider: 'GOOGLE',
+    },
+    data: {
+      accessToken,
+      expiryDate,
+    },
+  });
+};
+
 export default {
   findById,
   findMany,
@@ -189,4 +216,6 @@ export default {
   updateTags,
   updateAttachments,
   remove,
+  getGoogleSocialAccount,
+  updateGoogleAccessToken,
 };

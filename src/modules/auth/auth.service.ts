@@ -1,7 +1,7 @@
 import authRepo from '#modules/auth/auth.repo';
 import usersService from '#modules/users/users.service';
 import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
-import googleOauthUtils from '#modules/auth/utils/googleOauthUtils';
+import googleOauthService from '#libs/googleOauth.service';
 import token from '#modules/auth/utils/tokenUtils';
 import ApiError from '#errors/ApiError';
 import { RegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
@@ -70,8 +70,8 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 };
 
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
-  const { access_token, refresh_token } = await googleOauthUtils.getGoogleToken(code);
-  const userInfo = await googleOauthUtils.getGoogleUserInfo(access_token);
+  const { access_token, refresh_token } = await googleOauthService.getGoogleToken(code);
+  const userInfo = await googleOauthService.getGoogleUserInfo(access_token);
 
   let user = await usersService.findUserByEmail(userInfo.email);
   if (!user) {
@@ -84,6 +84,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
         providerUid: userInfo.id,
         accessToken: access_token,
         refreshToken: refresh_token,
+        expiryDate: new Date(Date.now() + 3600 * 1000),
       },
     });
   }

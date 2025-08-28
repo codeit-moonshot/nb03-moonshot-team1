@@ -47,6 +47,7 @@ const socialCreate = async (data: SocialRegisterDto) => {
           profileImage: data.profileImage,
           accessToken: data.socialAccounts.accessToken,
           refreshToken: data.socialAccounts.refreshToken,
+          expiryDate: data.socialAccounts.expiryDate,
         },
       },
     },

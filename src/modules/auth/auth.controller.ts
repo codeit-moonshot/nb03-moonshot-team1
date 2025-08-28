@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
-import googleOauthUtils from '#modules/auth/utils/googleOauthUtils';
+import googleOauthService from '#libs/googleOauth.service';
 import ApiError from '#errors/ApiError';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
@@ -69,7 +69,7 @@ const refresh: RequestHandler = async (req, res, next) => {
 };
 
 const googleLogin: RequestHandler = async (req, res, next) => {
-  const authUrl = googleOauthUtils.getGoogleAuthURL();
+  const authUrl = googleOauthService.getGoogleAuthURL();
   res.redirect(authUrl);
 };
 

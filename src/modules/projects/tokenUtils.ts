@@ -12,3 +12,5 @@ export const generateInvitationToken = (projectId: number, email: string): strin
     throw ApiError.internal('토큰 생성에 실패했습니다.');
   }
 };
+
+export const getBearer = (h?: string) => (h?.startsWith('Bearer ') ? h.slice(7) : undefined);

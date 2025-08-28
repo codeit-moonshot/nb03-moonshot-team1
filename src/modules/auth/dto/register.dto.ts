@@ -43,5 +43,6 @@ export interface SocialRegisterDto {
     providerUid: string;
     accessToken: string;
     refreshToken: string;
+    expiryDate: Date;
   };
 }
