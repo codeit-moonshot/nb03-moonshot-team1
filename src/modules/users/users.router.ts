@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '#middlewares/requireAuth';
-import usersController from '#modules/users/controller';
-import validUsers from '#modules/users/validator';
+import usersController from '#modules/users/users.controller';
+import validUsers from '#modules/users/users.validator';
 
 const router = Router();
 

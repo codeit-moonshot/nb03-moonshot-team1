@@ -28,3 +28,18 @@ export const authCreateSchema = z.object({
 });
 
 export type RegisterDto = z.infer<typeof authCreateSchema>;
+
+export enum SocialProvider {
+  GOOGLE = 'GOOGLE',
+  NAVER = 'NAVER',
+}
+
+export interface SocialRegisterDto {
+  email: string;
+  name: string;
+  profileImage: string | null;
+  socialAccounts: {
+    provider: SocialProvider;
+    providerUid: string;
+  };
+}

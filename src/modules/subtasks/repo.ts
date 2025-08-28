@@ -1,7 +1,7 @@
 import prisma from '#prisma/prisma';
-import { CreateSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
+import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
-export const create = (data: CreateSubtaskDto) => {
+const create = (data: CreateSubtaskDto) => {
   return prisma.subtask.create({
     data: {
       title: data.title,
@@ -10,7 +10,20 @@ export const create = (data: CreateSubtaskDto) => {
   });
 };
 
-export const findById = (id: number) => {
+const findMany = async (taskId: number) => {
+  const where = { taskId };
+  const [data, total] = await prisma.$transaction([
+    prisma.subtask.findMany({ where }),
+    prisma.subtask.count({ where }),
+  ]);
+
+  return {
+    data,
+    total,
+  };
+};
+
+const findById = (id: number) => {
   return prisma.subtask.findUnique({
     where: { id },
     select: {
@@ -22,7 +35,7 @@ export const findById = (id: number) => {
   });
 };
 
-export const update = (data: UpdateSubtaskDto) => {
+const update = (data: UpdateSubtaskDto) => {
   return prisma.subtask.update({
     where: {
       taskId: data.taskId,
@@ -32,4 +45,21 @@ export const update = (data: UpdateSubtaskDto) => {
       status: data.status,
     },
   });
+};
+
+const remove = (data: DeleteSubtaskDto) => {
+  return prisma.subtask.delete({
+    where: {
+      taskId: data.taskId,
+      id: data.subtaskId,
+    },
+  });
+};
+
+export default {
+  create,
+  findMany,
+  findById,
+  update,
+  remove,
 };

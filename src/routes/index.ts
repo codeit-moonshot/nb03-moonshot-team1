@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import authRoutes from '#modules/auth/router';
-import usersRoutes from '#modules/users/router';
+import authRoutes from '#modules/auth/auth.router';
+import usersRoutes from '#modules/users/users.router';
 import projectRoutes from '#modules/projects/project.router';
 import invitationRoutes from '#modules/invitations/invitaion.router';
 import fileRoutes from '#modules/files/router';
