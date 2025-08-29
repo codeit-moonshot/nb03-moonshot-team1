@@ -9,10 +9,10 @@ export const uploadTempFiles: RequestHandler = async (req, res) => {
   try {
     const urls = await UploadService.issueTempUrls(files);
     return res.json(urls);
-  } catch (e: any) {
-    if (e?.code === 'UNSUPPORTED_MIME') {
+  } catch (err: any) {
+    if (err?.code === 'UNSUPPORTED_MIME') {
       throw new ApiError(415, '허용되지 않는 파일 형식입니다.');
     }
-    throw e;
+    throw err;
   }
 };
