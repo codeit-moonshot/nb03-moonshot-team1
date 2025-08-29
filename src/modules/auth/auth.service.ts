@@ -4,7 +4,7 @@ import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
 import googleOauthService from '#libs/googleOauth.service';
 import token from '#modules/auth/utils/tokenUtils';
 import ApiError from '#errors/ApiError';
-import { RegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
+import { RegisterDto, SocialProvider, SocialRegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
 import { PublicUserDto } from '#modules/users/dto/user.dto';
@@ -70,10 +70,10 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 };
 
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
-  const { access_token, refresh_token } = await googleOauthService.getGoogleToken(code);
+  const { access_token, refresh_token, expires_in } = await googleOauthService.getGoogleToken(code);
   const userInfo = await googleOauthService.getGoogleUserInfo(access_token);
 
-  let user = await usersService.findUserByEmail(userInfo.email);
+  let user = await usersService.findUserBySocial(SocialProvider.GOOGLE, userInfo.id);
   if (!user) {
     user = await usersService.socialCreateUser({
       email: userInfo.email,
@@ -84,7 +84,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
         providerUid: userInfo.id,
         accessToken: access_token,
         refreshToken: refresh_token,
-        expiryDate: new Date(Date.now() + 3600 * 1000),
+        expiryDate: new Date(Date.now() + expires_in * 1000),
       },
     });
   }

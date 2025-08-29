@@ -1,8 +1,8 @@
 import tasksRepo from '#modules/tasks/tasks.repo';
-import { de } from 'zod/v4/locales/index.cjs';
+import { UpdateGoogleAccessTokenDto } from '#modules/tasks/dto/googleEvent.dto';
 
-const updateGoogleAccessToken = async (userId: number, accessToken: string, expiryDate: Date) => {
-  const updatedAccount = await tasksRepo.updateGoogleAccessToken(userId, accessToken, expiryDate);
+const updateGoogleAccessToken = async (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto) => {
+  const updatedAccount = await tasksRepo.updateGoogleAccessToken(updateGoogleAccessTokenDto);
   return updatedAccount;
 };
 

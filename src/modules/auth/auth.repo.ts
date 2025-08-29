@@ -1,5 +1,6 @@
 import prisma from '#prisma/prisma';
 import { RefreshDto } from '#modules/auth/dto/token.dto';
+import { SocialProvider } from '#modules/auth/dto/register.dto';
 
 const findRefreshTokenByUserId = async (userId: number) => {
   return prisma.refreshToken.findUnique({

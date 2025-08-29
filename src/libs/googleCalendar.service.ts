@@ -1,7 +1,11 @@
 import { google } from 'googleapis';
 import tasksCalendar from '#modules/tasks/tasks.calendar';
 import { TokenDto } from '#modules/auth/dto/token.dto';
-import { GoogleEventCreateDto, GoogleEventUpdateDto } from '#modules/tasks/dto/googleEvent.dto';
+import {
+  GoogleEventCreateDto,
+  GoogleEventUpdateDto,
+  UpdateGoogleAccessTokenDto,
+} from '#modules/tasks/dto/googleEvent.dto';
 import ApiError from '#errors/ApiError';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -14,8 +18,13 @@ const calendar = google.calendar('v3');
 구글 토큰같은경우 google.auth.OAuth2 로 토큰 set 시켜둘경우 자동으로 만료시간 체크 후 갱신해주는데
 
 */
-const getAuthClient = async (userId: number, tokenDto: TokenDto) => {
-  const auth = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI);
+const getAuthClient = async (tokenDto: TokenDto) => {
+  //prettier-ignore
+  const auth = new google.auth.OAuth2(
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI
+  );
 
   auth.setCredentials({
     access_token: tokenDto.accessToken,
@@ -23,26 +32,29 @@ const getAuthClient = async (userId: number, tokenDto: TokenDto) => {
     expiry_date: tokenDto.expiryDate?.getTime(),
   });
 
-  if (!tokenDto.expiryDate || tokenDto.expiryDate.getTime() < Date.now()) {
-    const response = await auth.refreshAccessToken();
-    const newToken = response.credentials.access_token;
-    const expiryDate = new Date(Date.now() + 3600 * 1000);
-
-    if (!newToken) throw ApiError.internal('구글 캘린더 토큰 갱신 실패 - newToken 없음');
-    await tasksCalendar.updateGoogleAccessToken(userId, newToken, expiryDate);
-
-    auth.setCredentials({
-      access_token: newToken,
-      refresh_token: tokenDto.refreshToken,
-      expiry_date: expiryDate.getTime(),
-    });
-  }
-
   return auth;
 };
 
+export const saveLatestGoogleToken = async (userId: number, auth: any) => {
+  const latestAccessToken = auth.credentials.access_token;
+  if (!latestAccessToken) throw ApiError.internal('구글 액세스 토큰이 존재하지 않습니다.');
+
+  const expiryDate = auth.credentials.expiry_date
+    ? new Date(auth.credentials.expiry_date)
+    : new Date(Date.now() + 3600 * 1000); // fallback 1시간 후
+
+  const updateDto: UpdateGoogleAccessTokenDto = {
+    userId,
+    accessToken: latestAccessToken,
+    refreshToken: auth.credentials.refresh_token,
+    expiryDate,
+  };
+
+  await tasksCalendar.updateGoogleAccessToken(updateDto);
+};
+
 export const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventCreateDto) => {
-  const auth = await getAuthClient(userId, tokenDto);
+  const auth = await getAuthClient(tokenDto);
 
   try {
     const response = await calendar.events.insert({
@@ -50,7 +62,7 @@ export const createEvent = async (userId: number, tokenDto: TokenDto, event: Goo
       calendarId: 'primary',
       requestBody: event,
     });
-
+    await saveLatestGoogleToken(userId, auth);
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
@@ -59,7 +71,7 @@ export const createEvent = async (userId: number, tokenDto: TokenDto, event: Goo
 };
 
 const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventUpdateDto) => {
-  const auth = await getAuthClient(userId, tokenDto);
+  const auth = await getAuthClient(tokenDto);
 
   try {
     const response = await calendar.events.update({
@@ -68,6 +80,7 @@ const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
       eventId: event.id,
       requestBody: event,
     });
+    await saveLatestGoogleToken(userId, auth);
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
@@ -76,7 +89,7 @@ const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
 };
 
 const deleteEvent = async (userId: number, tokenDto: TokenDto, eventId: string) => {
-  const auth = await getAuthClient(userId, tokenDto);
+  const auth = await getAuthClient(tokenDto);
 
   try {
     const response = await calendar.events.delete({
@@ -84,6 +97,7 @@ const deleteEvent = async (userId: number, tokenDto: TokenDto, eventId: string) 
       calendarId: 'primary',
       eventId,
     });
+    await saveLatestGoogleToken(userId, auth);
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;

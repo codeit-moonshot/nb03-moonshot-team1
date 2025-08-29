@@ -15,3 +15,10 @@ export interface GoogleEventCreateDto {
 export interface GoogleEventUpdateDto extends GoogleEventCreateDto {
   id: string;
 }
+
+export interface UpdateGoogleAccessTokenDto {
+  userId: number;
+  accessToken: string;
+  refreshToken: string;
+  expiryDate: Date;
+}

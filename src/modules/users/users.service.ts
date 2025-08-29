@@ -1,7 +1,7 @@
 import usersRepo from '#modules/users/users.repo';
 import ApiError from '#errors/ApiError';
 import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
-import { RegisterDto, SocialRegisterDto } from '#modules/auth/dto/register.dto';
+import { RegisterDto, SocialRegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
 import { UserDto, UpdateUserDto, PublicUserDto } from '#modules/users/dto/user.dto';
 
 const filterSensitiveUserData = (user: UserDto): PublicUserDto => {
@@ -23,6 +23,10 @@ const findUserById = async (id: number): Promise<UserDto | null> => {
 
 const socialCreateUser = async (data: SocialRegisterDto): Promise<UserDto> => {
   return usersRepo.socialCreate(data);
+};
+
+const findUserBySocial = async (provider: SocialProvider, providerUid: string): Promise<UserDto | null> => {
+  return await usersRepo.findUserBySocial(provider, providerUid);
 };
 
 const getMyInfo = async (id: number): Promise<PublicUserDto | null> => {
@@ -52,4 +56,5 @@ export default {
   getMyInfo,
   updateMyInfo,
   socialCreateUser,
+  findUserBySocial,
 };

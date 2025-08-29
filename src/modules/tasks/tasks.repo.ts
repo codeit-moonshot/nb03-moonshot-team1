@@ -1,6 +1,7 @@
 import prisma from '#prisma/prisma';
 import type { Prisma, TaskStatus as PrismaTaskStatus } from '@prisma/client';
 import type { TaskStatus } from '#constants/taskStatus.constants';
+import { UpdateGoogleAccessTokenDto } from '#modules/tasks/dto/googleEvent.dto';
 
 /* -------------------------------------------------------------------------- */
 /*                                  GET                                       */
@@ -212,15 +213,15 @@ const getGoogleSocialAccount = (userId: number) => {
   });
 };
 
-const updateGoogleAccessToken = (userId: number, accessToken: string, expiryDate: Date) => {
+const updateGoogleAccessToken = (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto) => {
   return prisma.socialAccount.updateMany({
     where: {
-      userId,
+      userId: updateGoogleAccessTokenDto.userId,
       provider: 'GOOGLE',
     },
     data: {
-      accessToken,
-      expiryDate,
+      accessToken: updateGoogleAccessTokenDto.accessToken,
+      expiryDate: updateGoogleAccessTokenDto.expiryDate,
     },
   });
 };

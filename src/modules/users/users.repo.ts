@@ -1,6 +1,6 @@
 import prisma from '#prisma/prisma';
-import { RegisterDto, SocialRegisterDto } from '#modules/auth/dto/register.dto';
-import { UpdateUserDto } from '#modules/users/dto/user.dto';
+import { RegisterDto, SocialRegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
+import { UpdateUserDto, UserDto } from '#modules/users/dto/user.dto';
 
 const findByEmail = async (email: string) => {
   return prisma.user.findUnique({
@@ -54,10 +54,26 @@ const socialCreate = async (data: SocialRegisterDto) => {
   });
 };
 
+export const findUserBySocial = async (provider: SocialProvider, providerUid: string): Promise<UserDto | null> => {
+  const account = await prisma.socialAccount.findUnique({
+    where: {
+      provider_providerUid: {
+        provider,
+        providerUid,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  return account?.user ?? null;
+};
 export default {
   findByEmail,
   create,
   findById,
   update,
   socialCreate,
+  findUserBySocial,
 };
