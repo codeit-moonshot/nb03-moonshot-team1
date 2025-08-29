@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import subtaskService from '#modules/subtasks/service';
+import subtaskService from '#modules/subtasks/subtasks.service';
 import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
 
 /**
