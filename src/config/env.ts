@@ -39,10 +39,12 @@ const schema = z.object({
   MAILPORT: z.coerce.number().int().positive().default(465), // 일반적으로 465 또는 587
   SMTP_USER: z.email(),
   SMTP_PASS: z.string().min(8), // SMTP 비밀번호
-
+  //GOOGLE
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string().url().optional(),
+  //TOKENCRYPTO
+  TOKEN_ENCRYPT_KEY: z.string(),
 });
 
 const parsed = schema.safeParse(process.env);

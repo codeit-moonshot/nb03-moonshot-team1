@@ -1,10 +1,13 @@
 import path from 'node:path';
 import ApiError from '#errors/ApiError';
+import googleCalendarService from '#libs/googleCalendar.service';
+import tasksService from '#modules/tasks/tasks.service';
 import fileRelPathFromUrl from '#utils/fileRelPathFromUrl';
 import toPublicTask from '#modules/tasks/tasks.utils';
 import projectTasksRepo from '#modules/tasks/projects/projectTasks.repo';
 import type { PublicTask } from '#modules/tasks/dto/task.dto';
 import type { CreateProjectTaskDto, ListProjectTasksQueryDto } from '#modules/tasks/projects/dto/projects-tasks.dto';
+import { GoogleEventCreateDto } from '#modules/tasks/dto/googleEvent.dto';
 
 /* -------------------------------------------------------------------------- */
 /*                                 helper                                     */
@@ -45,6 +48,22 @@ const createTaskInProject = async (
     endDate,
     assigneeId: userId,
   });
+  //구글 계정 존재시 캘린더에 반영
+  const tokenDto = await tasksService.getGoogleSocialToken(userId);
+  if (tokenDto) {
+    const event: GoogleEventCreateDto = {
+      summary: body.title,
+      start: {
+        dateTime: startDate.toISOString(),
+        timeZone: 'Asia/Seoul',
+      },
+      end: {
+        dateTime: endDate.toISOString(),
+        timeZone: 'Asia/Seoul',
+      },
+    };
+    await googleCalendarService.createEvent(userId, tokenDto, event);
+  }
 
   // 태그 연결
   if (body.tags?.length) {

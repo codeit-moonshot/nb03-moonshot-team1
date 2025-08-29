@@ -6,6 +6,7 @@ import toPublicTask from '#modules/tasks/tasks.utils';
 import tasksRepo from '#modules/tasks/tasks.repo';
 import type { PublicTask, PatchTaskBodyDto } from '#modules/tasks/dto/task.dto';
 import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
+import { UpdateGoogleAccessTokenDto, GoogleTokenDto } from '#modules/tasks/dto/googleEvent.dto';
 
 /* -------------------------------------------------------------------------- */
 /*                                 helper                                     */
@@ -129,9 +130,21 @@ const deleteTask = async (taskId: number, userId: number) => {
   return tasksRepo.remove(taskId);
 };
 
+// 구글 엑세스 토큰 업데이트
+const updateGoogleAccessToken = async (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto): Promise<void> => {
+  await tasksRepo.updateGoogleAccessToken(updateGoogleAccessTokenDto);
+};
+
+// 구글 토큰 획득
+const getGoogleSocialToken = async (userId: number): Promise<GoogleTokenDto | null> => {
+  return await tasksRepo.getGoogleSocialToken(userId);
+};
+
 export default {
   getTaskById,
   getMyTasks,
   patchTask,
   deleteTask,
+  getGoogleSocialToken,
+  updateGoogleAccessToken,
 };

@@ -22,3 +22,5 @@ export interface UpdateGoogleAccessTokenDto {
   refreshToken: string;
   expiryDate: Date;
 }
+
+export type GoogleTokenDto = Omit<UpdateGoogleAccessTokenDto, 'userId'>;

@@ -199,7 +199,7 @@ const remove = (id: number) =>
     where: { id },
   });
 
-const getGoogleSocialAccount = (userId: number) => {
+const getGoogleSocialToken = (userId: number) => {
   return prisma.socialAccount.findFirst({
     where: {
       userId,
@@ -234,6 +234,6 @@ export default {
   updateAttachments,
   findOrCreateTagsByNames,
   remove,
-  getGoogleSocialAccount,
+  getGoogleSocialToken,
   updateGoogleAccessToken,
 };
