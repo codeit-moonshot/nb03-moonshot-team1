@@ -8,7 +8,7 @@ const GOOGLE_REDIRECT_URI = env.GOOGLE_REDIRECT_URI;
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-const SCOPE = ['openid', 'profile', 'email'].join(' ');
+const SCOPE = ['openid', 'profile', 'email', 'https://www.googleapis.com/auth/calendar'].join(' ');
 
 const getGoogleAuthURL = () => {
   const baseUrl = new URL(GOOGLE_AUTH_URL);

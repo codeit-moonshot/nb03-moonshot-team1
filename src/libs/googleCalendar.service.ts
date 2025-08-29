@@ -7,7 +7,6 @@ import {
   GoogleEventUpdateDto,
   UpdateGoogleAccessTokenDto,
 } from '#modules/tasks/dto/googleEvent.dto';
-import ApiError from '#errors/ApiError';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -56,21 +55,17 @@ const saveLatestGoogleToken = async (userId: number, auth: any) => {
 
 const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventCreateDto) => {
   const { auth, decryptAccessToken } = await getAuthClient(tokenDto);
-  console.log(auth.credentials.access_token);
-  console.log('이까지옴1');
   try {
     const response = await calendar.events.insert({
       auth,
       calendarId: 'primary',
       requestBody: event,
     });
-    console.log('이까지옴2');
     if (decryptAccessToken !== auth.credentials.access_token) await saveLatestGoogleToken(userId, auth);
-    console.log('이까지옴3');
-    return response.data;
+    return response.data.id;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    console.log(`구글 캘린더 이벤트 생성 실패: ${error}`);
+    console.log(`구글 캘린더 이벤트 생성 실패: ${message}`);
   }
 };
 

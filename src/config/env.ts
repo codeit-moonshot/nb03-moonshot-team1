@@ -45,10 +45,11 @@ const schema = z.object({
   // MAIL
   MAILSERVICE: z.string().default('gmail'),
   HOSTMAIL: z.string(),
-  MAILPORT: z.coerce.number().int().positive().default(465), // 일반적으로 465 또는 587
+  MAILPORT: z.coerce.number().int().positive().default(465),
   SMTP_USER: z.email(),
-  SMTP_PASS: z.string().min(8), // SMTP 비밀번호
-  //GOOGLE
+  SMTP_PASS: z.string().min(8),
+
+  // GOOGLE OAUTH
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string().url().optional(),

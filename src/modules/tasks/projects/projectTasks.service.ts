@@ -62,7 +62,8 @@ const createTaskInProject = async (
         timeZone: 'Asia/Seoul',
       },
     };
-    await googleCalendarService.createEvent(userId, tokenDto, event);
+    const eventId = await googleCalendarService.createEvent(userId, tokenDto, event);
+    if (eventId) await tasksService.updateGoogleEventId(created.id, eventId);
   }
 
   // 태그 연결

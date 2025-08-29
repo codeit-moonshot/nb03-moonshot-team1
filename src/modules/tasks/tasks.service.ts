@@ -140,6 +140,10 @@ const getGoogleSocialToken = async (userId: number): Promise<GoogleTokenDto | nu
   return await tasksRepo.getGoogleSocialToken(userId);
 };
 
+const updateGoogleEventId = async (taskId: number, googleEventId: string): Promise<void> => {
+  await tasksRepo.updateGoogleEventId(taskId, googleEventId);
+};
+
 export default {
   getTaskById,
   getMyTasks,
@@ -147,4 +151,5 @@ export default {
   deleteTask,
   getGoogleSocialToken,
   updateGoogleAccessToken,
+  updateGoogleEventId,
 };

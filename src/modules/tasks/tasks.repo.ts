@@ -226,6 +226,13 @@ const updateGoogleAccessToken = (updateGoogleAccessTokenDto: UpdateGoogleAccessT
   });
 };
 
+const updateGoogleEventId = (taskId: number, googleEventId: string) => {
+  return prisma.task.update({
+    where: { id: taskId },
+    data: { googleEventId },
+  });
+};
+
 export default {
   findById,
   findMany,
@@ -236,4 +243,5 @@ export default {
   remove,
   getGoogleSocialToken,
   updateGoogleAccessToken,
+  updateGoogleEventId,
 };
