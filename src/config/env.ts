@@ -46,8 +46,8 @@ const schema = z.object({
   MAILSERVICE: z.string().default('gmail'),
   HOSTMAIL: z.string(),
   MAILPORT: z.coerce.number().int().positive().default(465),
-  SMTP_USER: z.string(),
-  SMTP_PASS: z.string().min(1),
+  SMTP_USER: z.email(),
+  SMTP_PASS: z.string().min(8),
 
   // GOOGLE OAUTH
   GOOGLE_CLIENT_ID: z.string(),
