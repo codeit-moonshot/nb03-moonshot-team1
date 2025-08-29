@@ -12,7 +12,6 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 
@@ -40,7 +39,7 @@ app.use(
         'default-src': ["'self'"],
         'script-src': ["'self'", "'unsafe-inline'"],
         'style-src': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", 'data:', 'https:'],
+        'img-src': ["'self'", 'data:', 'https:', ...(env.NODE_ENV !== 'production' ? ['http:', 'blob:'] : [])],
         'object-src': ["'none'"],
         'frame-ancestors': ["'none'"],
       },
@@ -82,37 +81,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 /**
- * Session (쿠키 기반)
+ * 정적 파일 (공개 서빙)
+ * URL → 디스크:
+ * /uploads/temp/:filename  →  uploads/temp/files/:filename
+ * /uploads/:filename       →  uploads/files/:filename
  */
-app.use(
-  session({
-    secret: env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    },
-  })
-);
+const TEMP_FILES_DIR = path.join(process.cwd(), env.UPLOAD_ROOT, 'temp', 'files'); // uploads/temp/files
+const FINAL_FILES_DIR = path.join(process.cwd(), env.UPLOAD_ROOT, 'files'); // uploads/files
 
 /**
- * 정적 파일 (MIME 강제)
+ * 정적 서빙
+ * - 임시: 캐시 금지
+ * - 정식: 캐시 허용
  */
-app.use(
-  '/uploads',
-  express.static(path.join(process.cwd(), env.UPLOAD_ROOT), {
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith('.html')) {
-        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-      }
-    },
-  })
-);
+app.use('/uploads/temp', express.static(TEMP_FILES_DIR, { fallthrough: false, etag: false, maxAge: 0 }));
+app.use('/uploads', express.static(FINAL_FILES_DIR, { fallthrough: false, maxAge: '7d' }));
 
 /**
- * Routes
+ * Routes (API)
  */
 app.use('/api', routes);
 
