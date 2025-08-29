@@ -13,7 +13,7 @@ const TTL_MS = 60 * 60 * 1_000;
  * @returns {Promise<void>}
  *
  * @example
- * import { tempFileCleanerJob } from '#crons/cleanTempUploads.js';
+ * import { tempFileCleanerJob } from '#crons/cleanTempUploadFiles';
  * tempFileCleanerJob.start();
  */
 const cleanExpiredTempFiles = async (): Promise<void> => {
