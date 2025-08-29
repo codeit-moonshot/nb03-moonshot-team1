@@ -30,8 +30,8 @@ const register: RequestHandler = async (req, res, next) => {
   if (req.body.profileImage) {
     try {
       registerDto.profileImage = await commitTempFile(req.body.profileImage, 'users/profiles');
-    } catch (e) {
-      console.error('프로필 이미지 커밋 실패:', e);
+    } catch (err) {
+      console.error('프로필 이미지 커밋 실패:', err);
       registerDto.profileImage = null; // 처리 실패해도 가입은 진행
     }
   }
