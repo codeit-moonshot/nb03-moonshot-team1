@@ -1,6 +1,6 @@
 import ApiError from '#errors/ApiError';
 import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/subtasks/dto/subtasks.dto';
-import subtaskRepo from '#modules/subtasks/repo';
+import subtaskRepo from '#modules/subtasks/subtasks.repo';
 
 const createSubtask = (data: CreateSubtaskDto) => {
   // TODO:: taskID 존재 여부 확인 추가
