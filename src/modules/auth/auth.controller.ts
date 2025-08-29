@@ -5,6 +5,7 @@ import ApiError from '#errors/ApiError';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
+import commitTempFile from '#utils/commitTempFile';
 
 /**
  * @function register
@@ -25,6 +26,16 @@ const register: RequestHandler = async (req, res, next) => {
     profileImage: req.body.profileImage,
   };
   const user = await authService.register(registerDto);
+
+  if (req.body.profileImage) {
+    try {
+      registerDto.profileImage = await commitTempFile(req.body.profileImage, 'users/profiles');
+    } catch (e) {
+      console.error('프로필 이미지 커밋 실패:', e);
+      registerDto.profileImage = null; // 처리 실패해도 가입은 진행
+    }
+  }
+
   res.status(201).json(user);
 };
 

@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
 import usersService from '#modules/users/users.service';
 import { UpdateUserDto } from '#modules/users/dto/user.dto';
+import commitTempFile from '#utils/commitTempFile';
 
 /**
  * @function getMyInfo
@@ -42,6 +43,17 @@ const updateMyInfo: RequestHandler = async (req, res, next) => {
   };
   const id = Number(req.user.id);
   const user = await usersService.updateMyInfo(id, updateUserDto);
+
+  if (req.body.profileImage === null) {
+    updateUserDto.profileImage = null; // 삭제
+  } else if (typeof req.body.profileImage === 'string') {
+    try {
+      updateUserDto.profileImage = await commitTempFile(req.body.profileImage, 'users/profiles');
+    } catch (e) {
+      console.error('프로필 이미지 커밋 실패:', e);
+    }
+  }
+
   res.status(200).json(user);
 };
 
