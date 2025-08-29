@@ -35,7 +35,7 @@ const getAuthClient = async (tokenDto: TokenDto) => {
   return auth;
 };
 
-export const saveLatestGoogleToken = async (userId: number, auth: any) => {
+const saveLatestGoogleToken = async (userId: number, auth: any) => {
   const latestAccessToken = auth.credentials.access_token;
   if (!latestAccessToken) throw ApiError.internal('구글 액세스 토큰이 존재하지 않습니다.');
 
@@ -53,7 +53,7 @@ export const saveLatestGoogleToken = async (userId: number, auth: any) => {
   await tasksCalendar.updateGoogleAccessToken(updateDto);
 };
 
-export const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventCreateDto) => {
+const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventCreateDto) => {
   const auth = await getAuthClient(tokenDto);
 
   try {

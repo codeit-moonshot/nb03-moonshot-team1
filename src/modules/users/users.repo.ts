@@ -54,7 +54,7 @@ const socialCreate = async (data: SocialRegisterDto) => {
   });
 };
 
-export const findUserBySocial = async (provider: SocialProvider, providerUid: string): Promise<UserDto | null> => {
+const findUserBySocial = async (provider: SocialProvider, providerUid: string): Promise<UserDto | null> => {
   const account = await prisma.socialAccount.findUnique({
     where: {
       provider_providerUid: {
