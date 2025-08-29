@@ -73,7 +73,6 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const { access_token, refresh_token, expires_in } = await googleOauthService.getGoogleToken(code);
   const userInfo = await googleOauthService.getGoogleUserInfo(access_token);
-  console.log(access_token);
 
   const hashAccessToken = tokenCrypto.encryptToken(access_token);
   const hashRefreshToken = tokenCrypto.encryptToken(refresh_token);
