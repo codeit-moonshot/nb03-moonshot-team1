@@ -91,6 +91,13 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
         expiryDate: new Date(Date.now() + expires_in * 1000),
       },
     });
+  } else {
+    await authRepo.updateGoogleToken({
+      userId: user.id,
+      accessToken: hashAccessToken,
+      refreshToken: hashRefreshToken,
+      expiryDate: new Date(Date.now() + expires_in * 1000),
+    });
   }
 
   const accessToken = token.generateAccessToken({ id: user.id });

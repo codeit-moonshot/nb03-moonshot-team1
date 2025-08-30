@@ -21,3 +21,7 @@ export interface TokenDto {
   refreshToken: string;
   expiryDate?: Date;
 }
+
+export interface UpdateTokenDto extends TokenDto {
+  userId: number;
+}

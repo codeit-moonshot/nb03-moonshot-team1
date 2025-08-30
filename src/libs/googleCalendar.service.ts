@@ -19,7 +19,7 @@ const calendar = google.calendar('v3');
 구글에 보낼때 만료되었으면 refresh token으로 재발급 후 요청에 사용해줍니다
 그래서 만약에 엑세스 토큰이 새로 발급되었는지 체크하고 발급되었다면 우리 DB에 업데이트 해줍니다
 */
-const getAuthClient = async (tokenDto: TokenDto) => {
+const getAuthClient = (tokenDto: TokenDto) => {
   const decryptAccessToken = tokenCrypto.decryptToken(tokenDto.accessToken);
   const decryptRefreshToken = tokenCrypto.decryptToken(tokenDto.refreshToken);
   //prettier-ignore
@@ -54,7 +54,7 @@ const saveLatestGoogleToken = async (userId: number, auth: any) => {
 };
 
 const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventCreateDto) => {
-  const { auth, decryptAccessToken } = await getAuthClient(tokenDto);
+  const { auth, decryptAccessToken } = getAuthClient(tokenDto);
   try {
     const response = await calendar.events.insert({
       auth,
@@ -70,8 +70,7 @@ const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
 };
 
 const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEventUpdateDto) => {
-  const { auth, decryptAccessToken } = await getAuthClient(tokenDto);
-
+  const { auth, decryptAccessToken } = getAuthClient(tokenDto);
   try {
     const response = await calendar.events.update({
       auth,
@@ -87,8 +86,8 @@ const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
   }
 };
 
-const deleteEvent = async (userId: number, tokenDto: TokenDto, eventId: string) => {
-  const { auth, decryptAccessToken } = await getAuthClient(tokenDto);
+const deleteEvent = async (userId: number, eventId: string, tokenDto: TokenDto) => {
+  const { auth, decryptAccessToken } = getAuthClient(tokenDto);
 
   try {
     const response = await calendar.events.delete({

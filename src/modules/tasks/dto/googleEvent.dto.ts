@@ -12,9 +12,7 @@ export interface GoogleEventCreateDto {
   };
 }
 
-export interface GoogleEventUpdateDto extends GoogleEventCreateDto {
-  id: string;
-}
+export type GoogleEventUpdateDto = Partial<GoogleEventCreateDto> & { id: string };
 
 export interface UpdateGoogleAccessTokenDto {
   userId: number;
