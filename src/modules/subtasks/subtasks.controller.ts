@@ -16,8 +16,8 @@ const createSubtask: RequestHandler = async (req, res) => {
     title: req.body.title,
     taskId: Number(req.params.taskId),
   };
-
-  const subtask = await subtaskService.createSubtask(dto);
+  const userId = Number(req.user.id);
+  const subtask = await subtaskService.createSubtask(userId, dto);
   res.status(201).json(subtask);
 };
 
@@ -32,8 +32,29 @@ const createSubtask: RequestHandler = async (req, res) => {
  */
 const getSubtaskList: RequestHandler = async (req, res) => {
   const taskId = Number(req.params.taskId);
-  const subtaskList = await subtaskService.getSubtaskList(taskId);
+  const userId = Number(req.user.id);
+  const subtaskList = await subtaskService.getSubtaskList(taskId, userId);
   res.send(subtaskList);
+};
+
+/**
+ * @function getSubtaskId
+ * @description 특정 하위 할 일을 조회합니다.
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {200} 특정 하위 할 일 반환
+ * @throws {404} 잘못된 ID
+ * @throws {404} 할일을 찾을 수 없는 경우
+ * @throws {404} 하위 할 일을 찾을 수 없는 경우
+ */
+
+const getSubtaskId: RequestHandler = async (req, res) => {
+  const subtaskId = Number(req.params.subtaskId);
+  const userId = Number(req.user.id);
+  const subtask = await subtaskService.getSubtaskById(userId, subtaskId);
+  res.send(subtask);
 };
 
 /**
@@ -54,7 +75,8 @@ const updateSubtask: RequestHandler = async (req, res) => {
     taskId: Number(req.params.taskId),
     subtaskId: Number(req.params.subtaskId),
   };
-  const subtask = await subtaskService.updateSubtask(dto);
+  const userId = Number(req.user.id);
+  const subtask = await subtaskService.updateSubtask(userId, dto);
   res.send(subtask);
 };
 
@@ -75,13 +97,15 @@ const deleteSubtask: RequestHandler = async (req, res) => {
     subtaskId: Number(req.params.subtaskId),
     taskId: Number(req.params.taskId),
   };
-  await subtaskService.deleteSubtask(dto);
+  const userId = Number(req.user.id);
+  await subtaskService.deleteSubtask(userId, dto);
   res.status(204).end();
 };
 
 export default {
   createSubtask,
   getSubtaskList,
+  getSubtaskId,
   updateSubtask,
   deleteSubtask,
 };

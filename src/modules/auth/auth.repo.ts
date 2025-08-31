@@ -1,5 +1,6 @@
 import prisma from '#prisma/prisma';
 import { RefreshDto, UpdateTokenDto } from '#modules/auth/dto/token.dto';
+import { SocialProvider } from '#modules/auth/dto/register.dto';
 
 const findRefreshTokenByUserId = async (userId: number) => {
   return prisma.refreshToken.findUnique({
@@ -38,8 +39,24 @@ const updateGoogleToken = async (data: UpdateTokenDto) => {
   });
 };
 
+const findUserBySocial = async (provider: SocialProvider, providerUid: string) => {
+  const account = await prisma.socialAccount.findUnique({
+    where: {
+      provider_providerUid: {
+        provider,
+        providerUid,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
+  return account?.user;
+};
+
 export default {
   findRefreshTokenByUserId,
   upsertRefreshToken,
   updateGoogleToken,
+  findUserBySocial,
 };

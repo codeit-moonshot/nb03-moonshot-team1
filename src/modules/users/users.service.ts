@@ -25,10 +25,6 @@ const socialCreateUser = async (data: SocialRegisterDto): Promise<UserDto> => {
   return usersRepo.socialCreate(data);
 };
 
-const findUserBySocial = async (provider: SocialProvider, providerUid: string): Promise<UserDto | null> => {
-  return await usersRepo.findUserBySocial(provider, providerUid);
-};
-
 const getMyInfo = async (id: number): Promise<PublicUserDto | null> => {
   const user = await usersRepo.findById(id);
   if (!user) throw ApiError.notFound('유저를 찾을 수 없습니다');
@@ -56,5 +52,4 @@ export default {
   getMyInfo,
   updateMyInfo,
   socialCreateUser,
-  findUserBySocial,
 };

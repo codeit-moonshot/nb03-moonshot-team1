@@ -77,7 +77,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const hashAccessToken = tokenCrypto.encryptToken(access_token);
   const hashRefreshToken = tokenCrypto.encryptToken(refresh_token);
 
-  let user = await usersService.findUserBySocial(SocialProvider.GOOGLE, userInfo.id);
+  let user = await authRepo.findUserBySocial(SocialProvider.GOOGLE, userInfo.id);
   if (!user) {
     user = await usersService.socialCreateUser({
       email: userInfo.email,
