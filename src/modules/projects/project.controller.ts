@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import projectService from './project.service';
 import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
 import { generateInvitationToken } from './utils/tokenUtils';
+import { MeProjectQueryDto } from './dto/me-project.dto';
 
 /**
  * @function createProject
@@ -130,10 +131,30 @@ const excludeMember: RequestHandler = async (req, res) => {
   res.sendStatus(204);
 }
 
+/**
+ * @function getMyProjects
+ * @description 내 프로젝트 조회
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" }, 
+ *                            params: { meProjectQueryDto } } 
+ *
+ * @returns {200} 내 프로젝트 목록
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ */
+const getMyProjects: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const query: MeProjectQueryDto = res.locals.meProjectQuery;
+
+  const projects = await projectService.getMyProjects(userId, query);
+  res.status(200).json(projects);
+}
+
 export default {
   createProject,
   updateProject,
   deleteProject,
   createInvitation,
-  excludeMember
+  excludeMember,
+  getMyProjects
 }

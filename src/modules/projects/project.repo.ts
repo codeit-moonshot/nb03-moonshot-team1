@@ -1,6 +1,7 @@
 import prisma from '#prisma/prisma';
 import { Prisma } from '@prisma/client';
 import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
+import { MeProjectQueryDto } from './dto/me-project.dto';
 
 const findById = async (id: number) => {
   return await prisma.project.findUniqueOrThrow({
@@ -86,6 +87,42 @@ const findDeleteMailInfo = async (id: number) => {
   })
 }
 
+const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
+  const projects = await prisma.project.findMany({
+    where: { members: { some: { userId } } },
+    skip: query.limit * query.page,
+    take: query.limit,
+    orderBy: { [query.order_by]: query.order },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      members: { select: { userId: true } },
+      tasks: {
+        select: {
+          id: true,
+          status: true
+        }
+      },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+  return projects.map(project => {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      memberCount: project.members.length,
+      todoCount: project.tasks.filter(task => task.status === 'todo').length,
+      inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
+      doneCount: project.tasks.filter(task => task.status === 'done').length,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt
+    }
+  })
+}
+
 const createInvitation = async (data: InvitationDto, tx: Prisma.TransactionClient) => {
   return await tx.invitation.create({
     data: {
@@ -116,6 +153,7 @@ export default {
   findById,
   findMemberById,
   findDeleteMailInfo,
+  findMyProjects,
   createInvitation,
   remove,
   removeMember

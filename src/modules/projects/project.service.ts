@@ -3,6 +3,7 @@ import ApiError from "#errors/ApiError";
 import projectRepo from './project.repo';
 import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto } from './dto/project.dto';
 import mailUtils from "./utils/mailUtils";
+import { MeProjectQueryDto } from "./dto/me-project.dto";
 
 const checkRole = async (userId: number, projectId: number) => {
   const member = await projectRepo.findMemberById({ projectId, userId });
@@ -88,11 +89,21 @@ const excludeMember = async (data: ExcludeMemberDto) => {
   await projectRepo.removeMember(data);
 }
 
+const getMyProjects = async (userId: number, query: MeProjectQueryDto) => {
+  const projects = await projectRepo.findMyProjects(userId, query);
+  
+  return {
+    data: projects,
+    total: projects.length
+  }
+}
+
 export default {
   checkRole,
   createProject,
   updateProject,
   deleteProject,
   sendInvitation,
-  excludeMember
+  excludeMember,
+  getMyProjects
 }
