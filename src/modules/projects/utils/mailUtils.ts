@@ -11,19 +11,18 @@ const setSmtpTransport = () => nodemailer.createTransport({
   }
 });
 
-const sendMail = (smtpTransport: nodemailer.Transporter, targetEmail: string, mailBody: string) => {
+const sendMail = (smtpTransport: nodemailer.Transporter, targetEmail: string, mailInfo: { subject: string, html: string }) => {
   const mailOptions = {
   from: process.env.SMTP_USER,
   to: targetEmail,
-  subject: 'Test Email',
+  subject: mailInfo.subject,
   html: `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Test Email</title>
-      <body>`+ mailBody +`</body>
+      `+ mailInfo.html +`
     </html>
   `
 };
