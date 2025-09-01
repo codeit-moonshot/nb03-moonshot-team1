@@ -2,7 +2,7 @@ import prisma from '#prisma/prisma';
 import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
 
 const create = async (data: createProjectDto, userId: number) => {
-  return await prisma.project.create({
+  const project =  await prisma.project.create({
     data: {
       ...data,
       owner: { connect: { id: userId } }
@@ -21,6 +21,16 @@ const create = async (data: createProjectDto, userId: number) => {
       }
     }
   });
+
+  await prisma.projectMember.create({
+    data: {
+      projectId: project.id,
+      userId,
+      role: 'OWNER'
+    }
+  })
+
+  return project;
 }
 
 const findById = async (id: {projectId: number, userId: number}) => {
@@ -34,8 +44,7 @@ const findById = async (id: {projectId: number, userId: number}) => {
   });
 }
 
-const createInvitation = async (data: InvitationDto):
-  Promise<{ id: number }> => {
+const createInvitation = async (data: InvitationDto) => {
   return await prisma.invitation.create({
     data: {
       project: { connect: { id: data.projectId } },
