@@ -6,6 +6,8 @@ import toPublicTask from '#modules/tasks/tasks.utils';
 import tasksRepo from '#modules/tasks/tasks.repo';
 import type { PublicTask, PatchTaskBodyDto } from '#modules/tasks/dto/task.dto';
 import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
+import { UpdateGoogleAccessTokenDto, GoogleTokenDto, GoogleEventUpdateDto } from '#modules/tasks/dto/googleEvent.dto';
+import googleCalendarService from '#libs/googleCalendar.service';
 
 /* -------------------------------------------------------------------------- */
 /*                                 helper                                     */
@@ -78,7 +80,7 @@ const getMyTasks = async (userId: number, query: MeTasksQueryDto): Promise<Publi
  * PATCH /tasks/:taskId
  */
 const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto): Promise<PublicTask> => {
-  await ensureTaskAndAccess(taskId, userId);
+  const task = await ensureTaskAndAccess(taskId, userId);
 
   const core: { title?: string; status?: TaskStatus; assigneeId?: number | null; startDate?: Date; endDate?: Date } =
     {};
@@ -97,8 +99,20 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
       throw ApiError.badRequest('endYear/endMonth/endDay는 함께 제공되어야 합니다.');
     core.endDate = new Date(Date.UTC(body.endYear, body.endMonth - 1, body.endDay));
   }
-
-  if (Object.keys(core).length) await tasksRepo.update(taskId, core);
+  if (Object.keys(core).length) {
+    await tasksRepo.update(taskId, core);
+    if (task.googleEventId) {
+      const tokenDto = await tasksRepo.getGoogleSocialToken(userId);
+      if (!tokenDto) throw ApiError.notFound('구글 토큰을 찾을 수 없습니다.');
+      const event: GoogleEventUpdateDto = {
+        id: task.googleEventId,
+        ...(core.title && { summary: core.title }),
+        ...(core.startDate && { start: { dateTime: core.startDate.toISOString(), timeZone: 'Asia/Seoul' } }),
+        ...(core.endDate && { end: { dateTime: core.endDate.toISOString(), timeZone: 'Asia/Seoul' } }),
+      };
+      await googleCalendarService.updateEvent(userId, tokenDto, event);
+    }
+  }
 
   if (Array.isArray(body.tags)) {
     const tagIds = await tasksRepo.findOrCreateTagsByNames(body.tags);
@@ -125,8 +139,27 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
  * DELETE /tasks/:taskId
  */
 const deleteTask = async (taskId: number, userId: number) => {
-  await ensureTaskAndAccess(taskId, userId);
+  const task = await ensureTaskAndAccess(taskId, userId);
+  if (task.googleEventId) {
+    const tokenDto = await tasksRepo.getGoogleSocialToken(userId);
+    if (!tokenDto) throw ApiError.notFound('구글 토큰을 찾을 수 없습니다.');
+    await googleCalendarService.deleteEvent(userId, task.googleEventId, tokenDto);
+  }
   return tasksRepo.remove(taskId);
+};
+
+// 구글 엑세스 토큰 업데이트
+const updateGoogleAccessToken = async (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto): Promise<void> => {
+  await tasksRepo.updateGoogleAccessToken(updateGoogleAccessTokenDto);
+};
+
+// 구글 토큰 획득
+const getGoogleSocialToken = async (userId: number): Promise<GoogleTokenDto | null> => {
+  return await tasksRepo.getGoogleSocialToken(userId);
+};
+// 구글 이벤트 id 업데이트
+const updateGoogleEventId = async (taskId: number, googleEventId: string): Promise<void> => {
+  await tasksRepo.updateGoogleEventId(taskId, googleEventId);
 };
 
 export default {
@@ -134,4 +167,7 @@ export default {
   getMyTasks,
   patchTask,
   deleteTask,
+  getGoogleSocialToken,
+  updateGoogleAccessToken,
+  updateGoogleEventId,
 };

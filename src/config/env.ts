@@ -53,6 +53,8 @@ const schema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_REDIRECT_URI: z.string().url().optional(),
+  //TOKENCRYPTO
+  TOKEN_ENCRYPT_KEY: z.string(),
 });
 
 const parsed = schema.safeParse(process.env);

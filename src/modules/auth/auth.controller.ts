@@ -85,8 +85,11 @@ const googleLogin: RequestHandler = async (req, res, next) => {
 };
 
 const googleCallback: RequestHandler = async (req, res, next) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   if (!code || typeof code !== 'string') throw ApiError.badRequest('유효하지 않은 요청입니다.');
+
+  const verifiedState = googleOauthService.verifyState(state as string);
+  if (!verifiedState) throw ApiError.badRequest('유효하지 않은 state입니다.');
 
   const token = await authService.googleRegisterOrLogin(code);
   res.status(200).json(token);

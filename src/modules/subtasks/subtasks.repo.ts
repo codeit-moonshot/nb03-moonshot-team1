@@ -26,12 +26,6 @@ const findMany = async (taskId: number) => {
 const findById = (id: number) => {
   return prisma.subtask.findUnique({
     where: { id },
-    select: {
-      id: true,
-      title: true,
-      taskId: true,
-      createdAt: true,
-    },
   });
 };
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import tasksController from '#modules/tasks/tasks.controller';
 import { requireAuth } from '#middlewares/requireAuth';
+import { authMiddleware } from '#middlewares/authMiddleware';
 import tasksValidator from '#modules/tasks/tasks.validator';
 import subtasksController from '#modules/subtasks/subtasks.controller';
 import subtasksValidator from '#modules/subtasks/subtasks.validator';
@@ -21,12 +22,13 @@ router
  */
 router
   .route('/:taskId/subtasks')
-  .post(subtasksValidator.validateSubtaskCreate, subtasksController.createSubtask)
-  .get(subtasksController.getSubtaskList);
+  .get(authMiddleware, subtasksController.getSubtaskList)
+  .post(authMiddleware, subtasksValidator.validateSubtaskCreate, subtasksController.createSubtask);
 
 router
   .route('/:taskId/subtasks/:subtaskId')
-  .patch(subtasksValidator.validateSubtaskUpdate, subtasksController.updateSubtask)
-  .delete(subtasksValidator.validateSubtaskDelete, subtasksController.deleteSubtask);
+  .get(authMiddleware, subtasksController.getSubtaskId)
+  .patch(authMiddleware, subtasksValidator.validateSubtaskUpdate, subtasksController.updateSubtask)
+  .delete(authMiddleware, subtasksController.deleteSubtask);
 
 export default router;
