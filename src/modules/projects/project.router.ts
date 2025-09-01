@@ -7,7 +7,11 @@ import projectTasksValidator from '#modules/tasks/projects/projectTasks.validato
 
 const router = Router();
 
-router.route('/').post(validateProject.validateCreateProject, projectController.createProject);
+router.route('/').post(
+  requireAuth,
+  validateProject.validateCreateProject, 
+  projectController.createProject
+  );
 
 router
   .route('/:projectId')
