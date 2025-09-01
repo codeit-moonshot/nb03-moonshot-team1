@@ -12,6 +12,7 @@
     "paths": {
       "#config/*": ["src/config/*"],
       "#constants/*": ["src/constants/*"],
+      "#crons/*": ["src/crons/*"],
       "#errors/*": ["src/errors/*"],
       "#libs/*": ["src/libs/*"],
       "#modules/*": ["src/modules/*"],

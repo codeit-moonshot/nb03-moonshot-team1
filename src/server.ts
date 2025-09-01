@@ -2,6 +2,7 @@ import http from 'http';
 import app from './app';
 import env from '#config/env';
 import prisma from '#prisma/prisma';
+import tempFileCleanerJob from '#crons/cleanTempUploadFiles';
 
 const PORT = env.PORT || 3000;
 
@@ -19,6 +20,11 @@ void (async () => {
     process.exit(1);
   }
 })();
+
+/**
+ * 임시 파일 삭제
+ */
+tempFileCleanerJob.start();
 
 /**
  * 서버 실행
