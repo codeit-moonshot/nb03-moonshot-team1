@@ -1,13 +1,7 @@
 import type { RequestHandler } from 'express';
 import projectService from './project.service';
-<<<<<<< HEAD
 import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
-=======
-import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
-import { getBearer, generateInvitationToken } from './tokenUtils';
-import ApiError from '#errors/ApiError';
-import env from '#config/env';
->>>>>>> develop
+import { generateInvitationToken } from './utils/tokenUtils';
 
 /**
  * @function createProject
