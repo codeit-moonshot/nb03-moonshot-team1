@@ -1,9 +1,6 @@
 import type { RequestHandler } from 'express';
-import jwt from 'jsonwebtoken';
 import projectService from './project.service';
-import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
-import { getBearer } from './tokenUtils';
-import ApiError from '#errors/ApiError';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
 
 /**
  * @function createProject
@@ -35,6 +32,62 @@ const createProject: RequestHandler = async (req, res) => {
 
   const project = await projectService.createProject(createDto, userId);
   res.status(200).json(project);
+}
+
+/**
+ * @function updateProject
+ * @description 프로젝트 수정
+ *
+ * @params {Object} req - { body: updateProjectDto }
+ *                        { headers: { authorization: "Bearer <token>" } }
+ * @params {Object} res - {
+ *  id: number,
+ *  name: string,
+ *  description: string,
+ *  memberCount: number,
+ *  todoCount: number,
+ *  inProgressCount: number,
+ *  doneCount: number
+ * }
+ * 
+ * @returns {200} 생성된 프로젝트 정보
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ */
+const updateProject: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+
+  await projectService.checkRole(userId, projectId);
+
+  const updateDto: updateProjectDto = {
+    ...req.body
+  };
+  const project = await projectService.updateProject(updateDto, projectId);
+  res.status(200).json(project);
+}
+
+/**
+ * @function deleteProject
+ * @description 프로젝트 삭제
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
+ *
+ * @returns {204}
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
+ */
+const deleteProject: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+
+  await projectService.checkRole(userId, projectId);
+
+  await projectService.deleteProject(projectId);
+  res.sendStatus(204);
 }
 
 /**
@@ -77,6 +130,8 @@ const excludeMember: RequestHandler = async (req, res) => {
 
 export default {
   createProject,
+  updateProject,
+  deleteProject,
   createInvitation,
   excludeMember
 }
