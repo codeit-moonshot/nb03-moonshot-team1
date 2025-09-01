@@ -39,14 +39,13 @@ const getAuthClient = (tokenDto: TokenDto) => {
 };
 
 const saveLatestGoogleToken = async (userId: number, auth: any) => {
-  const expiryDate = auth.credentials.expiry_date
-    ? new Date(auth.credentials.expiry_date)
-    : new Date(Date.now() + 3600 * 1000); // fallback 1시간 후
+  const { access_token, refresh_token, expiry_date } = auth.credentials;
+  const expiryDate = expiry_date ? new Date(expiry_date) : new Date(Date.now() + 3600 * 1000); // fallback 1시간 후
 
   const updateDto: UpdateGoogleAccessTokenDto = {
     userId,
-    accessToken: auth.credentials.access_token,
-    refreshToken: auth.credentials.refresh_token,
+    accessToken: access_token,
+    refreshToken: refresh_token ?? undefined,
     expiryDate,
   };
 
@@ -65,7 +64,7 @@ const createEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
     return response.data.id;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    console.log(`구글 캘린더 이벤트 생성 실패: ${message}`);
+    console.error(`구글 캘린더 이벤트 생성 실패: ${message}`);
   }
 };
 
@@ -82,7 +81,7 @@ const updateEvent = async (userId: number, tokenDto: TokenDto, event: GoogleEven
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    console.log(`구글 캘린더 이벤트 업데이트 실패: ${message}`);
+    console.error(`구글 캘린더 이벤트 업데이트 실패: ${message}`);
   }
 };
 
@@ -90,16 +89,16 @@ const deleteEvent = async (userId: number, eventId: string, tokenDto: TokenDto) 
   const { auth, decryptAccessToken } = getAuthClient(tokenDto);
 
   try {
-    const response = await calendar.events.delete({
+    await calendar.events.delete({
       auth,
       calendarId: 'primary',
       eventId,
     });
     if (decryptAccessToken !== auth.credentials.access_token) await saveLatestGoogleToken(userId, auth);
-    return response.data;
+    return true;
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    console.log(`구글 캘린더 이벤트 삭제 실패: ${message}`);
+    console.error(`구글 캘린더 이벤트 삭제 실패: ${message}`);
   }
 };
 

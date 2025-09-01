@@ -1,4 +1,6 @@
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import env from '#config/env';
 import ApiError from '#errors/ApiError';
 
@@ -8,10 +10,15 @@ const GOOGLE_REDIRECT_URI = env.GOOGLE_REDIRECT_URI;
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-const SCOPE = ['openid', 'profile', 'email', 'https://www.googleapis.com/auth/calendar'].join(' ');
+const SCOPE = ['openid', 'profile', 'email', 'https://www.googleapis.com/auth/calendar.events'].join(' ');
+const ACCESS_TOKEN_SECRET = env.ACCESS_TOKEN_SECRET;
 
 const getGoogleAuthURL = () => {
   const baseUrl = new URL(GOOGLE_AUTH_URL);
+
+  // JWT로 state 생성 (5분 만료)
+  const state = jwt.sign({ nonce: randomUUID(), purpose: 'oauth-state' }, ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+
   baseUrl.search = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
     redirect_uri: GOOGLE_REDIRECT_URI!,
@@ -19,8 +26,10 @@ const getGoogleAuthURL = () => {
     scope: SCOPE,
     access_type: 'offline',
     prompt: 'consent',
+    state: state,
   }).toString();
-  return baseUrl.toString(); // Google OAuth URL 값 정의
+
+  return baseUrl.toString();
 };
 
 const getGoogleToken = async (code: string) => {
@@ -40,7 +49,8 @@ const getGoogleToken = async (code: string) => {
     return response.data; // 토큰 뽑아서 사용
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    throw ApiError.badRequest(`구글 토큰 발급 실패: ${message}`);
+    console.error(`구글 토큰 발급 실패: ${message}`);
+    throw ApiError.badRequest(`구글 토큰 발급 실패`);
   }
 };
 
@@ -65,7 +75,8 @@ const getGoogleUserInfo = async (accessToken: string) => {
     return response.data; // 사용자 정보 뽑아서 사용
   } catch (error: any) {
     const message = error.response?.data?.error_description || error.response?.data || error.message;
-    throw ApiError.badRequest(`구글 사용자 정보 조회 실패: ${message}`);
+    console.error(`구글 사용자 정보 조회 실패: ${message}`);
+    throw ApiError.badRequest(`구글 사용자 정보 조회 실패`);
   }
 };
 
@@ -78,8 +89,19 @@ const getGoogleUserInfo = async (accessToken: string) => {
   }
   */
 
+const verifyState = (state: string): boolean => {
+  try {
+    jwt.verify(state, ACCESS_TOKEN_SECRET);
+    return true;
+  } catch (error) {
+    console.error('OAuth state 검증 실패:', error);
+    return false;
+  }
+};
+
 export default {
   getGoogleAuthURL,
   getGoogleToken,
   getGoogleUserInfo,
+  verifyState,
 };
