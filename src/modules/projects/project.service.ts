@@ -91,10 +91,24 @@ const excludeMember = async (data: ExcludeMemberDto) => {
 
 const getMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   const projects = await projectRepo.findMyProjects(userId, query);
-  
+
+  const formattedProjects = projects.data.map(project => {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      memberCount: project._count.members,
+      todoCount: project.tasks.filter(task => task.status === 'todo').length,
+      inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
+      doneCount: project.tasks.filter(task => task.status === 'done').length,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt
+    }
+  });
+
   return {
-    data: projects,
-    total: projects.length
+    data: formattedProjects,
+    total: projects.total
   }
 }
 

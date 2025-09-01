@@ -90,37 +90,24 @@ const findDeleteMailInfo = async (id: number) => {
 const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   const projects = await prisma.project.findMany({
     where: { members: { some: { userId } } },
-    skip: query.limit * query.page,
+    skip: query.limit * (query.page - 1),
     take: query.limit,
     orderBy: { [query.order_by]: query.order },
     select: {
       id: true,
       name: true,
       description: true,
-      members: { select: { userId: true } },
-      tasks: {
-        select: {
-          id: true,
-          status: true
-        }
-      },
       createdAt: true,
-      updatedAt: true
+      updatedAt: true,
+      tasks: { select: { status: true } },
+      _count: { select: { members: true } }
     }
   });
-  return projects.map(project => {
-    return {
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      memberCount: project.members.length,
-      todoCount: project.tasks.filter(task => task.status === 'todo').length,
-      inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
-      doneCount: project.tasks.filter(task => task.status === 'done').length,
-      createdAt: project.createdAt,
-      updatedAt: project.updatedAt
-    }
-  })
+  const total = await prisma.project.count({
+    where: { members: { some: { userId } } }
+  });
+
+  return { data: projects, total };
 }
 
 const createInvitation = async (data: InvitationDto, tx: Prisma.TransactionClient) => {
