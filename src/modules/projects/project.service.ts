@@ -60,9 +60,8 @@ const deleteProject = async (projectId: number) => {
 }
 
 const sendInvitation = async (data: InvitationDto) => {
-  const { id } = await projectRepo.createInvitation(data);
-  
   await prisma.$transaction(async (tx) => {
+    const { id } = await projectRepo.createInvitation(data, tx);
     const smtpTransport = mailUtils.setSmtpTransport();
     const mailText = 
       `<title>Test Email</title>

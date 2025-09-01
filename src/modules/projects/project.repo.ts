@@ -1,4 +1,5 @@
 import prisma from '#prisma/prisma';
+import { Prisma } from '@prisma/client';
 import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
 
 const findById = async (id: number) => {
@@ -85,8 +86,8 @@ const findDeleteMailInfo = async (id: number) => {
   })
 }
 
-const createInvitation = async (data: InvitationDto) => {
-  return await prisma.invitation.create({
+const createInvitation = async (data: InvitationDto, tx: Prisma.TransactionClient) => {
+  return await tx.invitation.create({
     data: {
       project: { connect: { id: data.projectId } },
       inviter: { connect: { id: data.inviter } },
