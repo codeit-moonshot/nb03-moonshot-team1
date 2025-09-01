@@ -1,10 +1,6 @@
 import prisma from '#prisma/prisma';
 import type { CreateMemberDto } from './dto/invitationDto';
 
-export const getToken = () => {
-
-}
-
 export const findInvitationById = async (id: number) => {
   return await prisma.invitation.findUnique({
     where: { id }

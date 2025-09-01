@@ -8,10 +8,8 @@ export const createMemberSchema = z.object({
 
 export const acceptInvitationSchema = z.object({
   projectId: z.number().min(1),
-  email: z.email(),
-  role: z.enum(['OWNER', 'MEMBER']).default('MEMBER'),
-  invitationId: z.number().min(1),
-  invitationToken: z.string()
+  userId: z.number().min(1),
+  role: z.enum(['OWNER', 'MEMBER']).default('MEMBER')
 })
 
 export type CreateMemberDto = z.infer<typeof createMemberSchema>;

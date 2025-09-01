@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import invitationController from './invitation.controller'
+import { requireAuth } from '#middlewares/requireAuth';
 
 const router = Router();
 
 router
   .route('/:invitationId/accept')
-  .post(invitationController.acceptInvitation)
+  .post(requireAuth, invitationController.acceptInvitation)
 
 export default router;
