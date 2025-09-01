@@ -1,6 +1,13 @@
 import type { RequestHandler } from 'express';
 import projectService from './project.service';
+<<<<<<< HEAD
 import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
+=======
+import { createProjectDto, InvitationDto, ExcludeMemberDto } from './dto/project.dto';
+import { getBearer, generateInvitationToken } from './tokenUtils';
+import ApiError from '#errors/ApiError';
+import env from '#config/env';
+>>>>>>> develop
 
 /**
  * @function createProject
@@ -101,13 +108,14 @@ const deleteProject: RequestHandler = async (req, res) => {
  */
 
 const createInvitation: RequestHandler = async (req, res) => {
-  const invitationToken = 'some Token';
+  const projectId = req.params.projectId;
+  const email = req.body.email;
+  const invitationToken = generateInvitationToken(Number(projectId), email);
   const invitationDto: InvitationDto = {
-    projectId: Number(req.params.projectId),
-    targetEmail: req.body.email,
+    projectId: Number(projectId),
+    targetEmail: email,
     invitationToken,
-    // inviter: req.user.id
-    inviter: 1
+    inviter: req.user.id
   }
 
   const invitation = await projectService.sendInvitation(invitationDto);

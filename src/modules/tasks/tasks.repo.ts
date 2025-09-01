@@ -1,6 +1,7 @@
 import prisma from '#prisma/prisma';
 import type { Prisma, TaskStatus as PrismaTaskStatus } from '@prisma/client';
 import type { TaskStatus } from '#constants/taskStatus.constants';
+import { UpdateGoogleAccessTokenDto } from '#modules/tasks/dto/googleEvent.dto';
 
 /* -------------------------------------------------------------------------- */
 /*                                  GET                                       */
@@ -198,6 +199,40 @@ const remove = (id: number) =>
     where: { id },
   });
 
+const getGoogleSocialToken = (userId: number) => {
+  return prisma.socialAccount.findFirst({
+    where: {
+      userId,
+      provider: 'GOOGLE',
+    },
+    select: {
+      accessToken: true,
+      refreshToken: true,
+      expiryDate: true,
+    },
+  });
+};
+
+const updateGoogleAccessToken = (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto) => {
+  return prisma.socialAccount.updateMany({
+    where: {
+      userId: updateGoogleAccessTokenDto.userId,
+      provider: 'GOOGLE',
+    },
+    data: {
+      accessToken: updateGoogleAccessTokenDto.accessToken,
+      expiryDate: updateGoogleAccessTokenDto.expiryDate,
+    },
+  });
+};
+
+const updateGoogleEventId = (taskId: number, googleEventId: string) => {
+  return prisma.task.update({
+    where: { id: taskId },
+    data: { googleEventId },
+  });
+};
+
 export default {
   findById,
   findMany,
@@ -206,4 +241,7 @@ export default {
   updateAttachments,
   findOrCreateTagsByNames,
   remove,
+  getGoogleSocialToken,
+  updateGoogleAccessToken,
+  updateGoogleEventId,
 };

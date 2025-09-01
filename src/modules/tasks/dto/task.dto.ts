@@ -139,4 +139,6 @@ export const patchTaskBodySchema = z
     }
   });
 
-export type PatchTaskBodyDto = z.infer<typeof patchTaskBodySchema>;
+export type PatchTaskBodyDto = z.infer<typeof patchTaskBodySchema> & {
+  googleEventId?: string;
+};

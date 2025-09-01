@@ -19,4 +19,9 @@ export interface AuthHeaderDto {
 export interface TokenDto {
   accessToken: string;
   refreshToken: string;
+  expiryDate?: Date;
+}
+
+export interface UpdateTokenDto extends TokenDto {
+  userId: number;
 }

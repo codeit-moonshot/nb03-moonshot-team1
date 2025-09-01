@@ -9,7 +9,7 @@ const findById = async (id: number) => {
 }
 
 const create = async (data: createProjectDto, userId: number) => {
-  return await prisma.project.create({
+  const project =  await prisma.project.create({
     data: {
       ...data,
       owner: { connect: { id: userId } }
@@ -27,6 +27,16 @@ const create = async (data: createProjectDto, userId: number) => {
       }
     }
   });
+
+  await prisma.projectMember.create({
+    data: {
+      projectId: project.id,
+      userId,
+      role: 'OWNER'
+    }
+  })
+
+  return project;
 }
 
 const update = async (data: updateProjectDto, id: number) => {
@@ -75,8 +85,7 @@ const findDeleteMailInfo = async (id: number) => {
   })
 }
 
-const createInvitation = async (data: InvitationDto):
-  Promise<{ id: number }> => {
+const createInvitation = async (data: InvitationDto) => {
   return await prisma.invitation.create({
     data: {
       project: { connect: { id: data.projectId } },

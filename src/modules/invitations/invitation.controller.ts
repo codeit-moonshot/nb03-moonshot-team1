@@ -16,18 +16,17 @@ import invitationService from './invitation.service';
 export const acceptInvitation: RequestHandler = async (req, res) => {
   // 필요한 데이터를 dto에 넣는다
   const invitationId = Number(req.params.invitationId);
-  const invitationToken = req.query.token as string;
-  const decodedToken = jwt.verify(invitationToken, process.env.INVITATION_TOKEN_SECRET!) as { projectId: number, email: string };
+  const invitationToken = req.body.token as string;
+  const projectId = await invitationService.checkInvitation(invitationId, invitationToken);
+  const userId = req.user.id;
 
   const acceptInvitationDto: AcceptInvitationDto = {
-    projectId: decodedToken.projectId,
-    email: decodedToken.email,
-    role: 'MEMBER',
-    invitationId,
-    invitationToken
-  }
+    projectId,
+    userId,
+    role: 'MEMBER'
+  };
 
-  await invitationService.acceptInvitation(acceptInvitationDto);
+  await invitationService.acceptInvitation(acceptInvitationDto, invitationId);
   res.sendStatus(200);
 }
 
