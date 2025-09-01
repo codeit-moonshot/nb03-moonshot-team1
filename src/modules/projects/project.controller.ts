@@ -10,15 +10,6 @@ import { MeProjectQueryDto } from './dto/me-project.dto';
  *
  * @params {Object} req - { body: createProjectDto }
  *                        { headers: { authorization: "Bearer <token>" } }
- * @params {Object} res - {
- *  id: number,
- *  name: string,
- *  description: string,
- *  memberCount: number,
- *  todoCount: number,
- *  inProgressCount: number,
- *  doneCount: number
- * }
  * 
  * @returns {200} 생성된 프로젝트 정보
  * @throws {400} Bad Request
@@ -42,15 +33,6 @@ const createProject: RequestHandler = async (req, res) => {
  *
  * @params {Object} req - { body: updateProjectDto }
  *                        { headers: { authorization: "Bearer <token>" } }
- * @params {Object} res - {
- *  id: number,
- *  name: string,
- *  description: string,
- *  memberCount: number,
- *  todoCount: number,
- *  inProgressCount: number,
- *  doneCount: number
- * }
  * 
  * @returns {200} 생성된 프로젝트 정보
  * @throws {400} Bad Request
@@ -99,18 +81,24 @@ const deleteProject: RequestHandler = async (req, res) => {
  * @params {Object} req - Express 요청 객체
  * @params {Object} res - Express 응답 객체
  * 
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
  * @returns {201} 반환 없음
  */
-
 const createInvitation: RequestHandler = async (req, res) => {
-  const projectId = req.params.projectId;
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+  await projectService.checkRole(userId, projectId);
+
   const email = req.body.email;
-  const invitationToken = generateInvitationToken(Number(projectId), email);
+  const invitationToken = generateInvitationToken(projectId, email);
   const invitationDto: InvitationDto = {
-    projectId: Number(projectId),
+    projectId,
     targetEmail: email,
     invitationToken,
-    inviter: req.user.id
+    inviter: userId
   }
 
   const invitation = await projectService.sendInvitation(invitationDto);
@@ -118,10 +106,24 @@ const createInvitation: RequestHandler = async (req, res) => {
   res.status(201).json(invitation);
 }
 
+/**
+ * @function excludeMember
+ * @description 프로젝트 멤버 제외
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
+ * 
+ * @throws {400} Bad Request
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
+ * @returns {204}
+ */
 const excludeMember: RequestHandler = async (req, res) => {
   const projectId = Number(req.params.projectId);
-  const targetUserId = Number(req.params.userId);
+  const userId = req.user.id;
+  await projectService.checkRole(userId, projectId);
 
+  const targetUserId = Number(req.params.userId);
   const excludeMemberDto: ExcludeMemberDto = {
     projectId,
     targetUserId
