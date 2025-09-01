@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authMiddleware } from '#middlewares/authMiddleware';
 import usersController from '#modules/users/users.controller';
+import tasksController from '#modules/tasks/tasks.controller';
+import { authMiddleware } from '#middlewares/authMiddleware';
 import validUsers from '#modules/users/users.validator';
 import tasksValidator from '#modules/tasks/tasks.validator';
-import tasksController from '#modules/tasks/tasks.controller';
 
 const router = Router();
 

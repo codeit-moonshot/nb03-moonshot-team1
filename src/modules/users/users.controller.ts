@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import usersService from '#modules/users/users.service';
-import { UpdateUserDto } from '#modules/users/dto/user.dto';
 import commitTempFile from '#utils/commitTempFile';
+import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 /**
  * @function getMyInfo

@@ -1,6 +1,6 @@
 import prisma from '#prisma/prisma';
-import { RegisterDto, SocialRegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
-import { UpdateUserDto, UserDto } from '#modules/users/dto/user.dto';
+import { RegisterDto, SocialRegisterDto } from '#modules/auth/dto/register.dto';
+import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 const findByEmail = async (email: string) => {
   return prisma.user.findUnique({
@@ -21,33 +21,36 @@ const findById = async (id: number) => {
 };
 
 const update = async (id: number, data: UpdateUserDto) => {
+  const { email, name, newPassword, profileImage } = data;
   return prisma.user.update({
     where: { id },
     data: {
-      email: data.email,
-      name: data.name,
-      password: data.newPassword,
-      profileImage: data.profileImage,
+      email,
+      name,
+      password: newPassword,
+      profileImage,
     },
   });
 };
 
 const socialCreate = async (data: SocialRegisterDto) => {
+  const { email, name, profileImage } = data;
+  const { provider, providerUid, accessToken, refreshToken, expiryDate } = data.socialAccounts;
   return prisma.user.create({
     data: {
-      email: data.email,
-      name: data.name,
-      profileImage: data.profileImage,
+      email,
+      name,
+      profileImage,
       socialAccounts: {
         create: {
-          provider: data.socialAccounts.provider,
-          providerUid: data.socialAccounts.providerUid,
-          email: data.email,
-          displayName: data.name,
-          profileImage: data.profileImage,
-          accessToken: data.socialAccounts.accessToken,
-          refreshToken: data.socialAccounts.refreshToken,
-          expiryDate: data.socialAccounts.expiryDate,
+          provider,
+          providerUid,
+          email,
+          displayName: name,
+          profileImage,
+          accessToken,
+          refreshToken,
+          expiryDate,
         },
       },
     },

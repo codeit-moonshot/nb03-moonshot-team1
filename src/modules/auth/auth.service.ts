@@ -1,11 +1,11 @@
 import authRepo from '#modules/auth/auth.repo';
 import usersService from '#modules/users/users.service';
-import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
 import googleOauthService from '#libs/googleOauth.service';
 import token from '#modules/auth/utils/tokenUtils';
 import tokenCrypto from '#modules/auth/utils/tokenCrypto';
 import ApiError from '#errors/ApiError';
-import { RegisterDto, SocialProvider, SocialRegisterDto } from '#modules/auth/dto/register.dto';
+import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
+import { RegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
 import { PublicUserDto } from '#modules/users/dto/user.dto';

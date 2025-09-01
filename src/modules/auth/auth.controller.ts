@@ -2,10 +2,10 @@ import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
 import googleOauthService from '#libs/googleOauth.service';
 import ApiError from '#errors/ApiError';
+import commitTempFile from '#utils/commitTempFile';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
-import commitTempFile from '#utils/commitTempFile';
 
 /**
  * @function register

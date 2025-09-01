@@ -214,14 +214,15 @@ const getGoogleSocialToken = (userId: number) => {
 };
 
 const updateGoogleAccessToken = (updateGoogleAccessTokenDto: UpdateGoogleAccessTokenDto) => {
+  const { userId, accessToken, expiryDate } = updateGoogleAccessTokenDto;
   return prisma.socialAccount.updateMany({
     where: {
-      userId: updateGoogleAccessTokenDto.userId,
+      userId,
       provider: 'GOOGLE',
     },
     data: {
-      accessToken: updateGoogleAccessTokenDto.accessToken,
-      expiryDate: updateGoogleAccessTokenDto.expiryDate,
+      accessToken,
+      expiryDate,
     },
   });
 };
