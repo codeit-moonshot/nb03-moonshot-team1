@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import env from '#config/env';
 import tasksService from '#modules/tasks/tasks.service';
 import tokenCrypto from '#modules/auth/utils/tokenCrypto';
 import { TokenDto } from '#modules/auth/dto/token.dto';
@@ -8,9 +9,9 @@ import {
   UpdateGoogleAccessTokenDto,
 } from '#modules/tasks/dto/googleEvent.dto';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = env.GOOGLE_REDIRECT_URI;
 
 const calendar = google.calendar('v3');
 

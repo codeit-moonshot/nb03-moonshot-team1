@@ -1,6 +1,7 @@
 import crypto from 'crypto';
+import env from '#config/env';
 
-const TOKEN_ENCRYPT_KEY = process.env.TOKEN_ENCRYPT_KEY;
+const TOKEN_ENCRYPT_KEY = env.TOKEN_ENCRYPT_KEY;
 if (!TOKEN_ENCRYPT_KEY) {
   throw new Error('토큰 암호화 키가 설정되지 않았습니다.');
 }

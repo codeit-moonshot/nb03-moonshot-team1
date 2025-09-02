@@ -2,10 +2,10 @@ import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
 import googleOauthService from '#libs/googleOauth.service';
 import ApiError from '#errors/ApiError';
+import commitTempFile from '#utils/commitTempFile';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
-import commitTempFile from '#utils/commitTempFile';
 
 /**
  * @function register
@@ -15,7 +15,9 @@ import commitTempFile from '#utils/commitTempFile';
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 생성된 사용자 반환
- * @throws {409} 이메일 충돌
+ *
+ * @throws {400} 유효하지 않은 요청
+ * @throws {409} 이메일 중복으로 인한 충돌
  */
 
 const register: RequestHandler = async (req, res, next) => {
@@ -47,7 +49,8 @@ const register: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 생성된 토큰 반환
- * @throws {401} 이메일 또는 비밀번호가 잘못되었습니다.
+ *
+ * @throws {401} 이메일 또는 비밀번호가 잘못됨
  */
 
 const login: RequestHandler = async (req, res, next) => {
@@ -67,9 +70,9 @@ const login: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 생성된 토큰 반환
- * @throws {401} 이메일 또는 비밀번호가 잘못되었습니다.
- * @throws {403} 토큰이 유효하지 않습니다.
- * @throws {404} 토큰에 등록된 사용자를 찾을 수 없습니다.
+ *
+ * @throws {401} 토큰이 존재하지 않거나 잘못된 토큰
+ * @throws {404} 토큰에 등록된 사용자를 찾을 수 없음
  */
 
 const refresh: RequestHandler = async (req, res, next) => {
@@ -79,10 +82,34 @@ const refresh: RequestHandler = async (req, res, next) => {
   res.status(200).json(newToken);
 };
 
-const googleLogin: RequestHandler = async (req, res, next) => {
+/**
+ * @function googleLogin
+ * @description 구글 로그인
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {302} 구글 로그인 페이지로 리다이렉트
+ *
+ * @throws {500} 구글 로그인 URL 생성 실패
+ */
+
+const googleLogin: RequestHandler = (req, res, next) => {
   const authUrl = googleOauthService.getGoogleAuthURL();
   res.redirect(authUrl);
 };
+
+/**
+ * 구글 로그인 콜백
+ *
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} res - Express 응답 객체
+ *
+ * @returns {200} 생성된 토큰 반환
+ *
+ * @throws {400} 유효하지 않은 요청 및 상태 불일치, 구글과 통신 실패
+ * @throws {500} 구글 로그인 실패
+ */
 
 const googleCallback: RequestHandler = async (req, res, next) => {
   const { code, state } = req.query;
