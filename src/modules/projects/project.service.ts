@@ -44,11 +44,9 @@ const deleteProject = async (projectId: number) => {
   const deleteMailInfo = await projectRepo.findDeleteMailInfo(projectId);
   await projectRepo.remove(projectId);
   
-  const smtpTransport = mailUtils.setSmtpTransport();
   const mailInfo = {
     subject: '[Moonshot] 프로젝트 삭제 알림',
     html: `
-      <title>프로젝트 삭제 알림</title>
       <body>
         <h1> 참여중인 프로젝트가 삭제되었습니다. </h1>
         <p>삭제된 프로젝트: ${deleteMailInfo.name}</p>
@@ -57,17 +55,16 @@ const deleteProject = async (projectId: number) => {
   }
   for (const member of deleteMailInfo.members) {
     const targetEmail = member.user.email;
-    await mailUtils.sendMail(smtpTransport, targetEmail, mailInfo);
+    await mailUtils.sendMail(targetEmail, mailInfo);
   }
 }
 
 const sendInvitation = async (data: InvitationDto) => {
   await prisma.$transaction(async (tx) => {
     const { id } = await projectRepo.createInvitation(data, tx);
-    const smtpTransport = mailUtils.setSmtpTransport();
     const mailInfo = {
       subject: "프로젝트에 초대합니다",
-      html: `<title>프로젝트 초대 메일</title>
+      html: `
       <body>
         <h1> 프로젝트에 초대합니다. </h1>
         <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
@@ -75,7 +72,7 @@ const sendInvitation = async (data: InvitationDto) => {
       </body>
       `
     }
-    await mailUtils.sendMail(smtpTransport, data.targetEmail, mailInfo);
+    await mailUtils.sendMail(data.targetEmail, mailInfo);
   })
 }
 
