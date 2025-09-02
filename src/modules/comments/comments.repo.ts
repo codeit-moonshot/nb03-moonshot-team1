@@ -39,7 +39,7 @@ const findMany = async (data: CommentQueryDto) => {
   ]);
 
   return {
-    list,
+    data: list,
     total,
   };
 };
@@ -67,7 +67,7 @@ const remove = (id: number) => {
   });
 };
 
-const checkProjectMemberByComment = (commentId: number, userId: number) => {
+const checkProjectOwnerByComment = (commentId: number) => {
   return prisma.comment.findUnique({
     where: { id: commentId },
     select: {
@@ -76,10 +76,6 @@ const checkProjectMemberByComment = (commentId: number, userId: number) => {
           project: {
             select: {
               ownerId: true,
-              members: {
-                where: { userId },
-                select: { userId: true },
-              },
             },
           },
         },
@@ -94,5 +90,5 @@ export default {
   findById,
   update,
   remove,
-  checkProjectMemberByComment,
+  checkProjectOwnerByComment,
 };

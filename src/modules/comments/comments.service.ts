@@ -1,43 +1,46 @@
 import commentsRepo from '#modules/comments/comments.repo';
 import tasksService from '#modules/tasks/tasks.service';
 import ApiError from '#errors/ApiError';
-import { CommentCreateDto, CommentUpdateDto } from '#modules/comments/dto/comment.dto';
+import {
+  CommentCreateDto,
+  CommentUpdateDto,
+  PublicCommentDto,
+  PublicCommentListDto,
+} from '#modules/comments/dto/comment.dto';
 import { CommentQueryDto } from '#modules/comments/dto/commentQuery.dto';
 
-const checkTaskExists = async (taskId: number, userId: number) => {
-  const task = await tasksService.getTaskById(taskId, userId);
-  if (!task) throw ApiError.notFound('할일을 찾을 수 없습니다.');
-  return task;
+const checkTaskExists = async (taskId: number, userId: number): Promise<void> => {
+  await tasksService.getTaskById(taskId, userId);
 };
 
-const createComment = async (data: CommentCreateDto) => {
+const createComment = async (data: CommentCreateDto): Promise<PublicCommentDto> => {
   await checkTaskExists(data.taskId, data.authorId);
   return commentsRepo.create(data);
 };
 
-const getCommentList = async (data: CommentQueryDto) => {
+const getCommentList = async (data: CommentQueryDto): Promise<PublicCommentListDto> => {
   await checkTaskExists(data.taskId, data.userId);
   return commentsRepo.findMany(data);
 };
 
-const updateComment = async (userId: number, data: CommentUpdateDto) => {
-  const checkUser = await commentsRepo.checkProjectMemberByComment(data.commentId, userId);
-  if (!checkUser) throw ApiError.forbidden('프로젝트 멤버가 아닙니다');
-  if (checkUser?.task?.project?.ownerId !== userId) throw ApiError.forbidden('댓글 수정 권한이 없습니다.');
+const updateComment = async (userId: number, data: CommentUpdateDto): Promise<PublicCommentDto> => {
   const comment = await commentsRepo.findById(data.commentId);
   if (!comment) throw ApiError.notFound('댓글을 찾을 수 없습니다.');
-  if (comment?.authorId !== userId) throw ApiError.forbidden('댓글 수정 권한이 없습니다.');
+  const checkUser = await commentsRepo.checkProjectOwnerByComment(data.commentId);
+  if (comment.authorId !== userId && checkUser?.task.project.ownerId !== userId) {
+    throw ApiError.forbidden('댓글 수정 권한이 없습니다.');
+  }
   return commentsRepo.update(data);
 };
 
-const deleteComment = async (userId: number, commentId: number) => {
-  const checkUser = await commentsRepo.checkProjectMemberByComment(commentId, userId);
-  if (!checkUser) throw ApiError.forbidden('프로젝트 멤버가 아닙니다');
-  if (checkUser?.task?.project?.ownerId !== userId) throw ApiError.forbidden('댓글 삭제 권한이 없습니다.');
+const deleteComment = async (userId: number, commentId: number): Promise<void> => {
   const comment = await commentsRepo.findById(commentId);
   if (!comment) throw ApiError.notFound('댓글을 찾을 수 없습니다.');
-  if (comment?.authorId !== userId) throw ApiError.forbidden('댓글 삭제 권한이 없습니다.');
-  return commentsRepo.remove(commentId);
+  const checkUser = await commentsRepo.checkProjectOwnerByComment(commentId);
+  if (comment.authorId !== userId && checkUser?.task.project.ownerId !== userId) {
+    throw ApiError.forbidden('댓글 삭제 권한이 없습니다.');
+  }
+  await commentsRepo.remove(commentId);
 };
 
 export default {
