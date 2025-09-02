@@ -1,7 +1,7 @@
 import prisma from '#prisma/prisma';
 import { Prisma } from '@prisma/client';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
-import { MeProjectQueryDto } from './dto/me-project.dto';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
+import { MeProjectQueryDto } from './dto/me-projects.dto';
 
 const findById = async (id: number) => {
   return await prisma.project.findUniqueOrThrow({

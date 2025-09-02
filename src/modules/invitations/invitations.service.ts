@@ -1,6 +1,6 @@
 import ApiError from "#errors/ApiError";
-import type { AcceptInvitationDto } from "./dto/invitationDto";
-import invitationRepo from "./invitation.repo";
+import type { AcceptInvitationDto } from "./dto/invitations.Dto";
+import invitationRepo from "./invitations.repo";
 
 
 const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {

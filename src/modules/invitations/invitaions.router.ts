@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import invitationController from './invitation.controller'
+import invitationController from './invitations.controller'
 import { requireAuth } from '#middlewares/requireAuth';
 
 const router = Router();

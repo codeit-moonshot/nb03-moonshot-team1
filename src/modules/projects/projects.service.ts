@@ -1,9 +1,9 @@
 import prisma from "#prisma/prisma";
 import ApiError from "#errors/ApiError";
-import projectRepo from './project.repo';
-import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto } from './dto/project.dto';
+import projectRepo from './projects.repo';
+import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto } from './dto/projects.dto';
 import mailUtils from "./utils/mailUtils";
-import { MeProjectQueryDto } from "./dto/me-project.dto";
+import { MeProjectQueryDto } from "./dto/me-projects.dto";
 
 const checkRole = async (userId: number, projectId: number) => {
   const member = await projectRepo.findMemberById({ projectId, userId });

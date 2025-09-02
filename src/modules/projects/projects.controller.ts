@@ -1,8 +1,8 @@
 import type { RequestHandler } from 'express';
-import projectService from './project.service';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
+import projectService from './projects.service';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
 import { generateInvitationToken } from './utils/tokenUtils';
-import { MeProjectQueryDto } from './dto/me-project.dto';
+import { MeProjectQueryDto } from './dto/me-projects.dto';
 
 /**
  * @function createProject

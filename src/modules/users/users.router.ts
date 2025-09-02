@@ -4,8 +4,8 @@ import usersController from '#modules/users/users.controller';
 import validUsers from '#modules/users/users.validator';
 import tasksValidator from '#modules/tasks/tasks.validator';
 import tasksController from '#modules/tasks/tasks.controller';
-import projectValidator from '#modules/projects/project.validator';
-import projectController from '#modules/projects/project.controller';
+import projectValidator from '#modules/projects/projects.validator';
+import projectController from '#modules/projects/projects.controller';
 
 const router = Router();
 
