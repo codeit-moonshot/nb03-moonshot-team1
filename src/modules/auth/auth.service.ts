@@ -73,6 +73,7 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const { access_token, refresh_token, expires_in } = await googleOauthService.getGoogleToken(code);
   const userInfo = await googleOauthService.getGoogleUserInfo(access_token);
+  const { id, email, name, picture } = userInfo;
 
   const hashAccessToken = tokenCrypto.encryptToken(access_token);
   const hashRefreshToken = tokenCrypto.encryptToken(refresh_token);
@@ -80,12 +81,12 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   let user = await authRepo.findUserBySocial(SocialProvider.GOOGLE, userInfo.id);
   if (!user) {
     user = await usersService.socialCreateUser({
-      email: userInfo.email,
-      name: userInfo.name ?? '이름 없음',
-      profileImage: userInfo.picture ?? null,
+      email: email.toLowerCase(),
+      name: name ?? '이름 없음',
+      profileImage: picture ?? null,
       socialAccounts: {
         provider: SocialProvider.GOOGLE,
-        providerUid: userInfo.id,
+        providerUid: id,
         accessToken: hashAccessToken,
         refreshToken: hashRefreshToken,
         expiryDate: new Date(Date.now() + expires_in * 1000),
