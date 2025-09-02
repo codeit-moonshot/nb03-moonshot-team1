@@ -1,8 +1,15 @@
+import prisma from "#prisma/prisma";
 import ApiError from "#errors/ApiError";
-import nodemailer from "nodemailer";
 import projectRepo from './project.repo';
-import { InvitationDto, ExcludeMemberDto, createProjectDto } from './dto/project.dto';
-import { generateInvitationToken } from "./tokenUtils";
+import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto } from './dto/project.dto';
+import mailUtils from "./utils/mailUtils";
+import { MeProjectQueryDto } from "./dto/me-project.dto";
+
+const checkRole = async (userId: number, projectId: number) => {
+  const member = await projectRepo.findMemberById({ projectId, userId });
+  if (!member) throw ApiError.notFound('사용자를 찾을 수 없습니다.');
+  if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
+}
 
 const createProject = async (data: createProjectDto, userId: number) => {
   const project = await projectRepo.create(data, userId);
@@ -16,68 +23,94 @@ const createProject = async (data: createProjectDto, userId: number) => {
     doneCount: project.tasks.filter(task => task.status === 'done').length
   };
 
-  
   return createdProject;
 }
 
-const sendInvitation = async (data: InvitationDto) => {
-  // db 저장부터 메일 발송까지 트랜잭션이 필요해보임
-  const { id } = await projectRepo.createInvitation(data);
-  // return {
-  //   invitationId: id,
-  //   invitationToken: data.invitationToken
-  // }
-  // 추후 분리해야 할듯
-  const smtpTransport = nodemailer.createTransport({
-    host: process.env.HOSTMAIL,
-    port: Number(process.env.MAILPORT),
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    },
-  });
-
-  const mailOptions = {
-    from: process.env.SMTP_USER,
-    to: data.targetEmail,
-    subject: 'Test Email',
-    html: `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Test Email</title>
-        <body>
-          <h1> 프로젝트에 초대합니다. </h1>
-          <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
-          <a href=${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}>참여하기</a>
-        </body>
-      </html>
-    `
+const updateProject = async (data: updateProjectDto, projectId: number) => {
+  const project = await projectRepo.update(data, projectId);
+  const updatedProject = {
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    memberCount: project.members.length,
+    todoCount: project.tasks.filter(task => task.status === 'todo').length,
+    inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
+    doneCount: project.tasks.filter(task => task.status === 'done').length
   };
+  return updatedProject;
+}
 
-  smtpTransport.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      throw ApiError.internal('메일 전송 실패', error);
+const deleteProject = async (projectId: number) => {
+  const deleteMailInfo = await projectRepo.findDeleteMailInfo(projectId);
+  await projectRepo.remove(projectId);
+  
+  const mailInfo = {
+    subject: '[Moonshot] 프로젝트 삭제 알림',
+    html: `
+        <h1> 참여중인 프로젝트가 삭제되었습니다. </h1>
+        <p>삭제된 프로젝트: ${deleteMailInfo.name}</p>
+    `
+  }
+  for (const member of deleteMailInfo.members) {
+    const targetEmail = member.user.email;
+    await mailUtils.sendMail(targetEmail, mailInfo);
+  }
+}
+
+const sendInvitation = async (data: InvitationDto) => {
+  await prisma.$transaction(async (tx) => {
+    const { id } = await projectRepo.createInvitation(data, tx);
+    const mailInfo = {
+      subject: "프로젝트에 초대합니다",
+      html: `
+        <h1> 프로젝트에 초대합니다. </h1>
+        <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
+        <a href="${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}">참여하기</a>
+      `
     }
-    console.log('메일 전송 성공: ', info.response);
-  });
+    await mailUtils.sendMail(data.targetEmail, mailInfo);
+  })
 }
 
 const excludeMember = async (data: ExcludeMemberDto) => {
   if(data.targetUserId < 1) throw ApiError.badRequest('유효하지 않은 사용자 ID입니다.');
 
-  const member = await projectRepo.findById({ projectId: data.projectId, userId: data.targetUserId });
+  const member = await projectRepo.findMemberById({ projectId: data.projectId, userId: data.targetUserId });
   if(!member) throw ApiError.notFound('프로젝트 멤버가 아닙니다.');
   if(member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
   
-  await projectRepo.remove(data);
+  await projectRepo.removeMember(data);
+}
+
+const getMyProjects = async (userId: number, query: MeProjectQueryDto) => {
+  const projects = await projectRepo.findMyProjects(userId, query);
+
+  const formattedProjects = projects.data.map(project => {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      memberCount: project._count.members,
+      todoCount: project.tasks.filter(task => task.status === 'todo').length,
+      inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
+      doneCount: project.tasks.filter(task => task.status === 'done').length,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt
+    }
+  });
+
+  return {
+    data: formattedProjects,
+    total: projects.total
+  }
 }
 
 export default {
+  checkRole,
   createProject,
+  updateProject,
+  deleteProject,
   sendInvitation,
-  excludeMember
+  excludeMember,
+  getMyProjects
 }

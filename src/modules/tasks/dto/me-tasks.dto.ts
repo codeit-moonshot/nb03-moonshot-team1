@@ -10,7 +10,7 @@ const paginationSchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 });
 
-export const meTasksQuerySchema = z
+export const  meTasksQuerySchema = z
   .object({
     from: dateStr.optional(),
     to: dateStr.optional(),
