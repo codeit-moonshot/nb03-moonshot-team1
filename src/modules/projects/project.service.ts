@@ -47,10 +47,8 @@ const deleteProject = async (projectId: number) => {
   const mailInfo = {
     subject: '[Moonshot] 프로젝트 삭제 알림',
     html: `
-      <body>
         <h1> 참여중인 프로젝트가 삭제되었습니다. </h1>
         <p>삭제된 프로젝트: ${deleteMailInfo.name}</p>
-      </body>
     `
   }
   for (const member of deleteMailInfo.members) {
@@ -65,11 +63,9 @@ const sendInvitation = async (data: InvitationDto) => {
     const mailInfo = {
       subject: "프로젝트에 초대합니다",
       html: `
-      <body>
         <h1> 프로젝트에 초대합니다. </h1>
         <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
         <a href=${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}>참여하기</a>
-      </body>
       `
     }
     await mailUtils.sendMail(data.targetEmail, mailInfo);

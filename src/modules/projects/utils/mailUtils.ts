@@ -14,17 +14,16 @@ const sendMail = async (targetEmail: string, mailInfo: { subject: string, html: 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${mailInfo.subject}</title>
     </head>
-      `+ mailInfo.html +`
+      <body>`+ mailInfo.html +`</body>
     </html>
   `
-};
+  };
 
-  smtpTransport.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      throw ApiError.internal('메일 전송 실패', error);
-    }
-    console.log('메일 전송 성공: ', info.response);
-  });
+  try{
+    await smtpTransport.sendMail(mailOptions);
+  } catch (error) {
+    throw ApiError.internal('메일 전송 실패', error);
+  }
 }
 
 export default {
