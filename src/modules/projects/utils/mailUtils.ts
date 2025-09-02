@@ -14,7 +14,7 @@ const sendMail = async (targetEmail: string, mailInfo: { subject: string, html: 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${mailInfo.subject}</title>
     </head>
-      <body>`+ mailInfo.html +`</body>
+      <body>${mailInfo.html}</body>
     </html>
   `
   };
