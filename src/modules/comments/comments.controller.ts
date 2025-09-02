@@ -11,6 +11,7 @@ import { CommentQueryDto } from '#modules/comments/dto/commentQuery.dto';
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 생성된 댓글 반환
+ *
  * @throws {400} 잘못된 요청 형식
  * @throws {403} 프로젝트 접근 권한 없음
  * @throws {404} 할일을 찾을 수 없는 경우
@@ -34,6 +35,7 @@ const createComment: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 댓글 목록 반환
+ *
  * @throws {400} 잘못된 요청 형식
  * @throws {403} 프로젝트 접근 권한 없음
  * @throws {404} 할일을 찾을 수 없는 경우
@@ -59,6 +61,7 @@ const getCommentList: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 수정된 댓글 반환
+ *
  * @throws {400} 잘못된 요청 형식
  * @throws {403} 댓글 수정 권한 없음
  * @throws {404} 댓글을 찾을 수 없는 경우
@@ -75,13 +78,14 @@ const updateComment: RequestHandler = async (req, res, next) => {
 };
 
 /**
- * @function updateComment
+ * @function deleteComment
  * @description 댓글을 삭제합니다.
  *
  * @param {Object} req - Express 요청 객체
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 삭제된 댓글 반환
+ *
  * @throws {400} 잘못된 요청 형식
  * @throws {403} 댓글 삭제 권한 없음
  * @throws {404} 댓글을 찾을 수 없는 경우

@@ -8,6 +8,7 @@ import {
   PublicCommentListDto,
 } from '#modules/comments/dto/comment.dto';
 import { CommentQueryDto } from '#modules/comments/dto/commentQuery.dto';
+import { th } from 'zod/v4/locales/index.cjs';
 
 const checkTaskExists = async (taskId: number, userId: number): Promise<void> => {
   await tasksService.getTaskById(taskId, userId);
@@ -24,20 +25,18 @@ const getCommentList = async (data: CommentQueryDto): Promise<PublicCommentListD
 };
 
 const updateComment = async (userId: number, data: CommentUpdateDto): Promise<PublicCommentDto> => {
-  const comment = await commentsRepo.findById(data.commentId);
+  const comment = await commentsRepo.checkAuthorAndOwnerByComment(data.commentId);
   if (!comment) throw ApiError.notFound('댓글을 찾을 수 없습니다.');
-  const checkUser = await commentsRepo.checkProjectOwnerByComment(data.commentId);
-  if (comment.authorId !== userId && checkUser?.task.project.ownerId !== userId) {
+  if (comment.authorId !== userId && comment.task.project.ownerId !== userId) {
     throw ApiError.forbidden('댓글 수정 권한이 없습니다.');
   }
   return commentsRepo.update(data);
 };
 
 const deleteComment = async (userId: number, commentId: number): Promise<void> => {
-  const comment = await commentsRepo.findById(commentId);
+  const comment = await commentsRepo.checkAuthorAndOwnerByComment(commentId);
   if (!comment) throw ApiError.notFound('댓글을 찾을 수 없습니다.');
-  const checkUser = await commentsRepo.checkProjectOwnerByComment(commentId);
-  if (comment.authorId !== userId && checkUser?.task.project.ownerId !== userId) {
+  if (comment.authorId !== userId && comment.task.project.ownerId !== userId) {
     throw ApiError.forbidden('댓글 삭제 권한이 없습니다.');
   }
   await commentsRepo.remove(commentId);

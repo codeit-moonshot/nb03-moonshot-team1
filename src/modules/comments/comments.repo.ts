@@ -33,6 +33,7 @@ const findMany = async (data: CommentQueryDto) => {
       where,
       ...(page && { skip: (page - 1) * limit }),
       take: limit,
+      orderBy: { createdAt: 'desc' },
       select,
     }),
     prisma.comment.count({ where }),
@@ -54,9 +55,7 @@ const update = (data: CommentUpdateDto) => {
   const { commentId, content } = data;
   return prisma.comment.update({
     where: { id: commentId },
-    data: {
-      content,
-    },
+    data: { content },
     select,
   });
 };
@@ -67,22 +66,14 @@ const remove = (id: number) => {
   });
 };
 
-const checkProjectOwnerByComment = (commentId: number) => {
-  return prisma.comment.findUnique({
+const checkAuthorAndOwnerByComment = (commentId: number) =>
+  prisma.comment.findUnique({
     where: { id: commentId },
     select: {
-      task: {
-        select: {
-          project: {
-            select: {
-              ownerId: true,
-            },
-          },
-        },
-      },
+      authorId: true,
+      task: { select: { project: { select: { ownerId: true } } } },
     },
   });
-};
 
 export default {
   create,
@@ -90,5 +81,5 @@ export default {
   findById,
   update,
   remove,
-  checkProjectOwnerByComment,
+  checkAuthorAndOwnerByComment,
 };

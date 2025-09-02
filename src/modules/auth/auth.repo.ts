@@ -47,9 +47,7 @@ const findUserBySocial = async (providerUid: string, provider: SocialProvider) =
         providerUid,
       },
     },
-    include: {
-      user: true,
-    },
+    include: { user: true },
   });
   return account?.user;
 };

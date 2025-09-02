@@ -35,9 +35,7 @@ const update = (data: UpdateSubtaskDto) => {
       taskId: data.taskId,
       id: data.subtaskId,
     },
-    data: {
-      status: data.status,
-    },
+    data: { status: data.status },
   });
 };
 
