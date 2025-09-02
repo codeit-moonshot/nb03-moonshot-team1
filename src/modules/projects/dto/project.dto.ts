@@ -18,6 +18,11 @@ export const createProjectSchema = z.object({
   description: z.string().max(500),
 });
 
+export const updateProjectSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  description: z.string().max(500).optional()
+});
+
 export const invitationSchema = z.object({
   projectId: z.number().min(1),
   targetEmail: emailWithMX,
@@ -26,6 +31,7 @@ export const invitationSchema = z.object({
 });
 
 export type createProjectDto = z.infer<typeof createProjectSchema>;
+export type updateProjectDto = z.infer<typeof updateProjectSchema>;
 export type ExcludeMemberDto = {
   projectId: number;
   targetUserId: number;
