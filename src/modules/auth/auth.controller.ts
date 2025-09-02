@@ -15,7 +15,8 @@ import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 생성된 사용자 반환
- * @throws {409} 이메일 충돌
+ * @throws {400} 유효하지 않은 요청
+ * @throws {409} 이메일 중복으로 인한 충돌
  */
 
 const register: RequestHandler = async (req, res, next) => {
