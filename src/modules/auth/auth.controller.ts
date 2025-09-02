@@ -15,6 +15,7 @@ import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 생성된 사용자 반환
+ *
  * @throws {400} 유효하지 않은 요청
  * @throws {409} 이메일 중복으로 인한 충돌
  */
@@ -48,6 +49,7 @@ const register: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 생성된 토큰 반환
+ *
  * @throws {401} 이메일 또는 비밀번호가 잘못됨
  */
 
@@ -68,7 +70,7 @@ const login: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 생성된 토큰 반환
- * @throws {401} 이메일 또는 비밀번호가 잘못됨
+ *
  * @throws {401} 토큰이 존재하지 않거나 잘못된 토큰
  * @throws {404} 토큰에 등록된 사용자를 찾을 수 없음
  */
@@ -88,6 +90,7 @@ const refresh: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {302} 구글 로그인 페이지로 리다이렉트
+ *
  * @throws {500} 구글 로그인 URL 생성 실패
  */
 
@@ -103,6 +106,7 @@ const googleLogin: RequestHandler = (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 생성된 토큰 반환
+ *
  * @throws {400} 유효하지 않은 요청 및 상태 불일치, 구글과 통신 실패
  * @throws {500} 구글 로그인 실패
  */
