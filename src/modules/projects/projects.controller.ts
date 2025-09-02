@@ -28,6 +28,27 @@ const createProject: RequestHandler = async (req, res) => {
 }
 
 /**
+ * @function getProject
+ * @description 프로젝트 조회
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
+ * 
+ * @returns {200} 프로젝트 정보
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
+ */
+const getProject: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+
+  await projectService.checkMember(userId, projectId);
+
+  const project = await projectService.getProject(projectId);
+  res.status(200).json(project);
+}
+
+/**
  * @function updateProject
  * @description 프로젝트 수정
  *
@@ -154,6 +175,7 @@ const getMyProjects: RequestHandler = async (req, res) => {
 
 export default {
   createProject,
+  getProject,
   updateProject,
   deleteProject,
   createInvitation,
