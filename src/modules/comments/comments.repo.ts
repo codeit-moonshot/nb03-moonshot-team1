@@ -67,10 +67,32 @@ const remove = (id: number) => {
   });
 };
 
+const checkProjectMemberByComment = (commentId: number, userId: number) => {
+  return prisma.comment.findUnique({
+    where: { id: commentId },
+    select: {
+      task: {
+        select: {
+          project: {
+            select: {
+              ownerId: true,
+              members: {
+                where: { userId },
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 export default {
   create,
   findMany,
   findById,
   update,
   remove,
+  checkProjectMemberByComment,
 };

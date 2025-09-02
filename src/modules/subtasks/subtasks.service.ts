@@ -23,13 +23,15 @@ const getSubtaskById = async (subtaskId: number) => {
   return subtaskRepo.findById(subtaskId);
 };
 
-const updateSubtask = async (data: UpdateSubtaskDto) => {
+const updateSubtask = async (userId: number, data: UpdateSubtaskDto) => {
+  await checkTaskExists(data.taskId, userId);
   const subtask = await subtaskRepo.findById(data.subtaskId);
   if (!subtask) throw ApiError.notFound('하위 할 일을 찾을 수 없습니다.');
   return subtaskRepo.update(data);
 };
 
-const deleteSubtask = async (data: DeleteSubtaskDto) => {
+const deleteSubtask = async (userId: number, data: DeleteSubtaskDto) => {
+  await checkTaskExists(data.taskId, userId);
   const subtask = await subtaskRepo.findById(data.subtaskId);
   if (!subtask) throw ApiError.notFound('하위 할 일을 찾을 수 없습니다.');
   return subtaskRepo.remove(data);

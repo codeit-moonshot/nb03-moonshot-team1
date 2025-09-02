@@ -74,7 +74,8 @@ const updateSubtask: RequestHandler = async (req, res) => {
     taskId: Number(req.params.taskId),
     subtaskId: Number(req.params.subtaskId),
   };
-  const subtask = await subtaskService.updateSubtask(dto);
+  const userId = Number(req.user.id);
+  const subtask = await subtaskService.updateSubtask(userId, dto);
   res.send(subtask);
 };
 
