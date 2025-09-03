@@ -14,7 +14,7 @@ const server = http.createServer(app);
 void (async () => {
   try {
     await prisma.$connect();
-    console.warn('✅ Database connected');
+    console.log('✅ Database connected');
   } catch (err) {
     console.error('❌ Failed to connect to database', err);
     process.exit(1);
