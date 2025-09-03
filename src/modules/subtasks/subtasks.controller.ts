@@ -10,7 +10,12 @@ import { CreateSubtaskDto, DeleteSubtaskDto, UpdateSubtaskDto } from '#modules/s
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 생성된 하위 할 일 반환
+ *
+ * @throws {400} 잘못된 요청 형식
+ * @throws {403} 프로젝트 접근 권한 없음
+ * @throws {404} 할일을 찾을 수 없는 경우
  */
+
 const createSubtask: RequestHandler = async (req, res) => {
   const dto: CreateSubtaskDto = {
     title: req.body.title,
@@ -29,7 +34,12 @@ const createSubtask: RequestHandler = async (req, res) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 하위 할 일 목록 반환
+ *
+ * @throws {400} 잘못된 ID
+ * @throws {403} 프로젝트 접근 권한 없음
+ * @throws {404} 할일을 찾을 수 없는 경우
  */
+
 const getSubtaskList: RequestHandler = async (req, res) => {
   const taskId = Number(req.params.taskId);
   const userId = Number(req.user.id);
@@ -45,15 +55,16 @@ const getSubtaskList: RequestHandler = async (req, res) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 특정 하위 할 일 반환
- * @throws {404} 잘못된 ID
+ *
+ * @throws {400} 잘못된 ID
+ * @throws {403} 프로젝트 접근 권한 없음
  * @throws {404} 할일을 찾을 수 없는 경우
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
 
 const getSubtaskId: RequestHandler = async (req, res) => {
   const subtaskId = Number(req.params.subtaskId);
-  const userId = Number(req.user.id);
-  const subtask = await subtaskService.getSubtaskById(userId, subtaskId);
+  const subtask = await subtaskService.getSubtaskById(subtaskId);
   res.send(subtask);
 };
 
@@ -65,8 +76,9 @@ const getSubtaskId: RequestHandler = async (req, res) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {200} 수정된 하위 할 일 반환
+ *
  * @throws {400} 잘못된 ID
- * @throws {403} 권한 없음
+ * @throws {403} 프로젝트 접근 권한 없음
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
 const updateSubtask: RequestHandler = async (req, res) => {
@@ -88,8 +100,10 @@ const updateSubtask: RequestHandler = async (req, res) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {204} 삭제 성공
+ *
  * @throws {400} 잘못된 ID
- * @throws {403} 권한 없음
+ * @throws {403} 프로젝트 접근 권한 없음
+ * @throws {404} 할일을 찾을 수 없는 경우
  * @throws {404} 하위 할 일을 찾을 수 없는 경우
  */
 const deleteSubtask: RequestHandler = async (req, res) => {

@@ -154,8 +154,8 @@ const updateGoogleAccessToken = async (updateGoogleAccessTokenDto: UpdateGoogleA
 };
 
 // 구글 토큰 획득
-const getGoogleSocialToken = async (userId: number): Promise<GoogleTokenDto | null> => {
-  return await tasksRepo.getGoogleSocialToken(userId);
+const getGoogleSocialToken = (userId: number): Promise<GoogleTokenDto | null> => {
+  return tasksRepo.getGoogleSocialToken(userId);
 };
 // 구글 이벤트 id 업데이트
 const updateGoogleEventId = async (taskId: number, googleEventId: string): Promise<void> => {

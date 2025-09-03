@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import usersService from '#modules/users/users.service';
-import { UpdateUserDto } from '#modules/users/dto/user.dto';
 import commitTempFile from '#utils/commitTempFile';
+import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 /**
  * @function getMyInfo
@@ -29,8 +29,8 @@ const getMyInfo: RequestHandler = async (req, res, next) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 수정된 내 정보 반환
- * @throws {404} 사용자 찾을 수 없음
- * @throws {404} 사용자를 찾을 수 없는 경우
+ * @throws {400} 사용자 찾을 수 없음
+ * @throws {404} 비밀번호 불일치
  */
 
 const updateMyInfo: RequestHandler = async (req, res, next) => {

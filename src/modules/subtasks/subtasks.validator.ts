@@ -1,6 +1,6 @@
-import { subtaskCreateSchema, subtaskUpdateSchema } from '#modules/subtasks/dto/subtasks.dto';
 import type { RequestHandler } from 'express';
 import forwardZodError from '#utils/zod';
+import { subtaskCreateSchema, subtaskUpdateSchema } from '#modules/subtasks/dto/subtasks.dto';
 
 const validateSubtaskCreate: RequestHandler = (req, _res, next) => {
   try {

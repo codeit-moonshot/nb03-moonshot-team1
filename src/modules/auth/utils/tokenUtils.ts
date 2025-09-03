@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
+import env from '#config/env';
 import type { DecodedToken } from '#modules/auth/dto/token.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
 import ApiError from '#errors/ApiError';
 
-const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET;
+const ACCESS_SECRET = env.ACCESS_TOKEN_SECRET;
+const REFRESH_SECRET = env.REFRESH_TOKEN_SECRET;
 
 if (!ACCESS_SECRET || !REFRESH_SECRET) throw new Error('❌ Invalid ACCESS_TOKEN_SECRET or REFRESH_TOKEN_SECRET');
 

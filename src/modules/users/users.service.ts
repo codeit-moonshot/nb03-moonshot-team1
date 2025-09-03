@@ -1,7 +1,7 @@
 import usersRepo from '#modules/users/users.repo';
 import ApiError from '#errors/ApiError';
 import { hashPassword, isPasswordValid } from '#utils/passwordUtils';
-import { RegisterDto, SocialRegisterDto, SocialProvider } from '#modules/auth/dto/register.dto';
+import { RegisterDto, SocialRegisterDto } from '#modules/auth/dto/register.dto';
 import { UserDto, UpdateUserDto, PublicUserDto } from '#modules/users/dto/user.dto';
 
 const filterSensitiveUserData = (user: UserDto): PublicUserDto => {

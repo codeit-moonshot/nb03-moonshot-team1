@@ -17,6 +17,20 @@ export const subtaskDeleteSchema = z.object({
   subtaskId: z.int().positive(),
 });
 
+export interface PublicSubtaskDto {
+  id: number;
+  title: string;
+  taskId: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubtaskListResponse {
+  data: PublicSubtaskDto[];
+  total: number;
+}
+
 export type CreateSubtaskDto = z.infer<typeof subtaskCreateSchema>;
 export type UpdateSubtaskDto = z.infer<typeof subtaskUpdateSchema>;
 export type DeleteSubtaskDto = z.infer<typeof subtaskDeleteSchema>;

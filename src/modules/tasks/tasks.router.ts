@@ -5,6 +5,8 @@ import { authMiddleware } from '#middlewares/authMiddleware';
 import tasksValidator from '#modules/tasks/tasks.validator';
 import subtasksController from '#modules/subtasks/subtasks.controller';
 import subtasksValidator from '#modules/subtasks/subtasks.validator';
+import commentsValidator from '#modules/comments/comments.validator';
+import commentsController from '#modules/comments/comments.controller';
 
 const router = Router();
 
@@ -30,5 +32,10 @@ router
   .get(authMiddleware, subtasksController.getSubtaskId)
   .patch(authMiddleware, subtasksValidator.validateSubtaskUpdate, subtasksController.updateSubtask)
   .delete(authMiddleware, subtasksController.deleteSubtask);
+
+router
+  .route('/:taskId/comments')
+  .get(authMiddleware, commentsValidator.validateCommentQuery, commentsController.getCommentList)
+  .post(authMiddleware, commentsValidator.validateCommentCreate, commentsController.createComment);
 
 export default router;
