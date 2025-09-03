@@ -1,13 +1,32 @@
 import prisma from '#prisma/prisma';
 import { Prisma } from '@prisma/client';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
-import { MeProjectQueryDto } from './dto/me-project.dto';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
+import { MeProjectQueryDto } from './dto/me-projects.dto';
+
+const select = {
+  id: true,
+  name: true,
+  description: true,
+  members: { select: { userId: true } },
+  tasks: {
+    select: {
+      id: true,
+      status: true
+    }
+  }
+};
 
 const findById = async (id: number) => {
-  return await prisma.project.findUniqueOrThrow({
+  return await prisma.project.findUnique({
     where: { id },
-    include: { owner: true }
-  })
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      tasks: { select: { status: true } },
+      _count: { select: { members: true } }
+    }
+  });
 }
 
 const create = async (data: createProjectDto, userId: number) => {
@@ -16,18 +35,7 @@ const create = async (data: createProjectDto, userId: number) => {
       ...data,
       owner: { connect: { id: userId } }
     },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      members: { select: { userId: true } },
-      tasks: {
-        select: {
-          id: true,
-          status: true
-        }
-      }
-    }
+    select
   });
 
   await prisma.projectMember.create({
@@ -45,18 +53,7 @@ const update = async (data: updateProjectDto, id: number) => {
   return await prisma.project.update({
     where: { id },
     data,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      members: { select: { userId: true } },
-      tasks: {
-        select: {
-          id: true,
-          status: true
-        }
-      }
-    }
+    select
   });
 }
 
