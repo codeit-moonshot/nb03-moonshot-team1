@@ -29,6 +29,14 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
   res.sendStatus(200);
 }
 
+export const deleteInvitation: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const invitationId = Number(req.params.invitationId);
+  await invitationService.removeInvitation(invitationId, userId);
+  res.sendStatus(204);
+}
+
 export default {
-  acceptInvitation
+  acceptInvitation,
+  deleteInvitation
 }
