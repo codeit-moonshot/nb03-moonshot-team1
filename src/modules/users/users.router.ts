@@ -5,7 +5,7 @@ import { authMiddleware } from '#middlewares/authMiddleware';
 import validUsers from '#modules/users/users.validator';
 import tasksValidator from '#modules/tasks/tasks.validator';
 import projectValidator from '#modules/projects/projects.validator';
-import projectController from '#modules/projects/projects.repo';
+import projectController from '#modules/projects/projects.controller';
 
 const router = Router();
 
@@ -18,6 +18,8 @@ router.route('/me/tasks').get(authMiddleware, tasksValidator.validateMeTasksQuer
 
 router
   .route('/me/projects')
-  .get(authMiddleware, projectValidator.validateMeProjectQuery, projectController.getMyProjects);
+  .get(authMiddleware, 
+    projectValidator.validateMeProjectQuery, 
+    projectController.getMyProjects);
 
 export default router;
