@@ -19,7 +19,7 @@ const formatProject = (project: any) => {
 
 const checkRole = async (userId: number, projectId: number) => {
   const member = await projectRepo.findMemberById({ projectId, userId });
-  if (!member) throw ApiError.notFound('프로젝트 멤버가 아닙니다.');
+  if (!member) throw ApiError.forbidden('프로젝트 멤버가 아닙니다.');
   if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
 }
 
