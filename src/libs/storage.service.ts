@@ -27,8 +27,8 @@ export const StorageService = {
    */
   async moveTempToFinal(tempAbsPath: string, storedName: string, finalSubdir: string) {
     const cleanSubdir = finalSubdir.replace(/^\/+|\/+$/g, ''); // 앞뒤 슬래시 제거
-    const relBase = path.posix.join('files', cleanSubdir);
-    const absBase = path.join(UPLOAD_ROOT, relBase);
+    const relBase = cleanSubdir;
+    const absBase = path.join(UPLOAD_ROOT, 'files', cleanSubdir);
     await ensureDir(absBase);
 
     const finalAbs = path.join(absBase, storedName);

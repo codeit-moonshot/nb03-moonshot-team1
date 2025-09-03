@@ -1,6 +1,8 @@
 import path from 'node:path';
+import dayjs from 'dayjs';
 import ApiError from '#errors/ApiError';
 import fileRelPathFromUrl from '#utils/fileRelPathFromUrl';
+import commitTempFile from '#utils/commitTempFile';
 import type { TaskStatus } from '#constants/taskStatus.constants';
 import toPublicTask from '#modules/tasks/tasks.utils';
 import tasksRepo from '#modules/tasks/tasks.repo';
@@ -99,6 +101,14 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
       throw ApiError.badRequest('endYear/endMonth/endDay는 함께 제공되어야 합니다.');
     core.endDate = new Date(Date.UTC(body.endYear, body.endMonth - 1, body.endDay));
   }
+
+  const effectiveStart = core.startDate ?? task.startDate;
+  const effectiveEnd = core.endDate ?? task.endDate;
+
+  if (core.startDate !== undefined || core.endDate !== undefined) {
+    if (dayjs(effectiveStart).isAfter(effectiveEnd)) throw ApiError.badRequest('시작일은 종료일보다 늦을 수 없습니다.');
+  }
+
   if (Object.keys(core).length) {
     await tasksRepo.update(taskId, core);
     if (task.googleEventId) {
@@ -120,12 +130,21 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
   }
 
   if (Array.isArray(body.attachments)) {
-    const files = body.attachments.map((url) => {
-      const relPath = fileRelPathFromUrl(url);
+    const uniqUrls = Array.from(new Set(body.attachments.filter(Boolean)));
+    const committedUrls = await Promise.all(uniqUrls.map((url) => commitTempFile(url, `tasks/${taskId}`)));
+    const files = committedUrls.map((finalUrl) => {
+      const relPath = fileRelPathFromUrl(finalUrl);
       const storedName = path.basename(relPath);
       const dot = storedName.lastIndexOf('.');
       const ext = dot > -1 ? storedName.slice(dot + 1) : null;
-      return { originalName: storedName, storedName, relPath, mimeType: null, size: null, ext };
+      return {
+        originalName: storedName,
+        storedName,
+        relPath,
+        mimeType: null,
+        size: null,
+        ext,
+      };
     });
     await tasksRepo.updateAttachments(taskId, files);
   }

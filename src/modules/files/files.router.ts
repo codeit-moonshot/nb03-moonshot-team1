@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import upload from '#middlewares/upload';
+import upload from '#modules/files/files.middleware';
 import { uploadTempFiles } from '#modules/files/files.controller';
 
 const router = Router();

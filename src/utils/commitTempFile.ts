@@ -14,6 +14,11 @@ import { StorageService } from '#libs/storage.service';
  */
 const commitTempFile = async (tempUrl: string, finalSubdir: string): Promise<string> => {
   const rel = fileRelPathFromUrl(tempUrl);
+
+  if (!rel.startsWith('temp/')) {
+    return filePublicUrl(rel);
+  }
+
   const name = path.basename(rel);
   const src = path.join(StorageService.tempDir(), name);
   const { finalRel } = await StorageService.moveTempToFinal(src, name, finalSubdir);
