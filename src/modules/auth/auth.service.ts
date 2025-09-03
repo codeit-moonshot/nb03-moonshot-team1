@@ -73,7 +73,8 @@ const refresh = async (data: AuthHeaderDto): Promise<TokenDto> => {
 const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const { access_token, refresh_token, expires_in } = await googleOauthService.getGoogleToken(code);
   const userInfo = await googleOauthService.getGoogleUserInfo(access_token);
-  const { id, email, name, picture } = userInfo;
+  const { id, name, picture } = userInfo;
+  const email = userInfo.email.toLowerCase();
 
   const hashAccessToken = tokenCrypto.encryptToken(access_token);
   const hashRefreshToken = tokenCrypto.encryptToken(refresh_token);
@@ -83,7 +84,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
     const existingUser = await usersService.findUserByEmail(email);
     if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');
     user = await usersService.socialCreateUser({
-      email: email.toLowerCase(),
+      email,
       name: name ?? '이름 없음',
       profileImage: picture ?? null,
       socialAccounts: {
