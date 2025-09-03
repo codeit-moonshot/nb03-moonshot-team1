@@ -108,6 +108,7 @@ const googleLogin: RequestHandler = (req, res, next) => {
  * @returns {200} 생성된 토큰 반환
  *
  * @throws {400} 유효하지 않은 요청 및 상태 불일치, 구글과 통신 실패
+ * @throws {409} 이메일 중복시 회원가입 실패
  * @throws {500} 구글 로그인 실패
  */
 
