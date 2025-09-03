@@ -15,7 +15,7 @@ import { UpdateUserDto } from '#modules/users/dto/user.dto';
  * @throws {404} 사용자를 찾을 수 없는 경우
  */
 
-const getMyInfo: RequestHandler = async (req, res, next) => {
+const getMyInfo: RequestHandler = async (req, res) => {
   const id = Number(req.user.id);
   const user = await usersService.getMyInfo(id);
   res.status(200).json(user);
@@ -33,27 +33,25 @@ const getMyInfo: RequestHandler = async (req, res, next) => {
  * @throws {404} 비밀번호 불일치
  */
 
-const updateMyInfo: RequestHandler = async (req, res, next) => {
-  const updateUserDto: UpdateUserDto = {
-    email: req.body.email,
-    name: req.body.name,
-    currentPassword: req.body.currentPassword,
-    newPassword: req.body.newPassword,
-    profileImage: req.body.profileImage,
-  };
+const updateMyInfo: RequestHandler = async (req, res) => {
   const id = Number(req.user.id);
-  const user = await usersService.updateMyInfo(id, updateUserDto);
 
-  if (req.body.profileImage === null) {
-    updateUserDto.profileImage = null; // 삭제
-  } else if (typeof req.body.profileImage === 'string') {
-    try {
-      updateUserDto.profileImage = await commitTempFile(req.body.profileImage, 'users/profiles');
-    } catch (err) {
-      console.error('프로필 이미지 커밋 실패:', err);
+  // validator에서 추출한 값만 가져옴
+  const dto: UpdateUserDto = { ...req.body };
+
+  if ('profileImage' in dto) {
+    if (dto.profileImage === null) {
+    } else if (typeof dto.profileImage === 'string') {
+      try {
+        dto.profileImage = await commitTempFile(dto.profileImage, 'users/profiles');
+      } catch (err) {
+        console.error('프로필 이미지 커밋 실패:', err);
+        delete (dto as any).profileImage;
+      }
     }
   }
 
+  const user = await usersService.updateMyInfo(id, dto);
   res.status(200).json(user);
 };
 
