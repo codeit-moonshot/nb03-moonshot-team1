@@ -40,8 +40,8 @@ const updateMyInfo = async (id: number, data: UpdateUserDto): Promise<PublicUser
   if (wantPwChange) {
     // 소셜 계정
     if (!user.password) throw ApiError.badRequest('비밀번호를 설정할 수 없는 계정입니다.');
-    const ok = await isPasswordValid(data.currentPassword!, user.password);
-    if (!ok) throw ApiError.badRequest('현재 비밀번호가 일치하지 않습니다.');
+    const isPassValid = await isPasswordValid(data.currentPassword!, user.password);
+    if (!isPassValid) throw ApiError.badRequest('현재 비밀번호가 일치하지 않습니다.');
     if (data.newPassword === data.currentPassword)
       throw ApiError.badRequest('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
   }
