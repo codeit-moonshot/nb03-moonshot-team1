@@ -19,6 +19,7 @@ const checkInvitation = async (invitationId: number, acceptedToken: string) => {
   if (!invitation) throw ApiError.notFound("잘못된 초대입니다.");
   if (invitation.token !== acceptedToken) throw ApiError.notFound("잘못된 초대입니다.");
   if (invitation.expiresAt! < new Date()) throw ApiError.badRequest("만료된 초대입니다.");
+  if (invitation.status === 'accepted') throw ApiError.badRequest("이미 수락된 초대입니다.");
 
   return invitation.projectId;
 }
@@ -26,7 +27,9 @@ const checkInvitation = async (invitationId: number, acceptedToken: string) => {
 const removeInvitation = async (invitationId: number, userId: number) => {
   const invitation = await invitationRepo.findById(invitationId);
   if (!invitation) throw ApiError.notFound("초대 정보를 찾을 수 없습니다.");
-  checkRole(userId, invitation.projectId);
+  if (invitation.status === 'accepted') throw ApiError.badRequest("이미 수락된 초대입니다.");
+
+  await checkRole(userId, invitation.projectId);
   await invitationRepo.remove(invitation);
 };
 
