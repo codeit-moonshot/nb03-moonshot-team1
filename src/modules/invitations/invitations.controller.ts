@@ -1,7 +1,6 @@
-import jwt from 'jsonwebtoken';
 import type { RequestHandler } from 'express';
-import type { AcceptInvitationDto, CreateMemberDto } from './dto/invitations.Dto';
-import invitationService from './invitations.service';
+import type { AcceptInvitationDto, CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import invitationService from '#modules/invitations/invitations.service';
 
 /**
  * @function acceptInvitation

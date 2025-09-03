@@ -1,5 +1,5 @@
 import prisma from '#prisma/prisma';
-import type { CreateMemberDto } from './dto/invitations.Dto';
+import type { CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
 
 export const findInvitationById = async (id: number) => {
   return await prisma.invitation.findUnique({
@@ -17,6 +17,13 @@ export const createMember = async (data: CreateMemberDto) => {
   })
 }
 
+export const update = async (id: number) => {
+  await prisma.invitation.update({
+    where: { id },
+    data: { status: 'accepted' }
+  })
+}
+
 export const remove = async (invitationId: number) => {
   return await prisma.invitation.delete({
     where: { id: invitationId }
@@ -26,5 +33,6 @@ export const remove = async (invitationId: number) => {
 export default {
   findInvitationById,
   createMember,
+  update,
   remove
 }

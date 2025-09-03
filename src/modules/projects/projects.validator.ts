@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import forwardZodError from '#utils/zod';
-import { createProjectSchema, updateProjectSchema } from './dto/projects.dto';
-import { meProjectQuerySchema } from './dto/me-projects.dto';
+import { createProjectSchema, projectMemberQuerySchema, updateProjectSchema } from '#modules/projects/dto/projects.dto';
+import { meProjectQuerySchema } from '#modules/projects/dto/me-projects.dto';
 
 const validateCreateProject: RequestHandler = async (req, res, next) => {
   try {
@@ -21,6 +21,15 @@ const validateUpdateProject: RequestHandler = async (req, res, next) => {
   }
 }
 
+const validateProjectMemberQuery: RequestHandler = async (req, res, next) => {
+  try {
+    res.locals.projectMemberQuery = projectMemberQuerySchema.parse(req.query);
+    next();
+  } catch (err) {
+    forwardZodError(err, '프로젝트 멤버 조회', next);
+  }
+};
+
 const validateMeProjectQuery: RequestHandler = async (req, res, next) => {
   try {
     res.locals.meProjectQuery = meProjectQuerySchema.parse(req.query);
@@ -33,5 +42,6 @@ const validateMeProjectQuery: RequestHandler = async (req, res, next) => {
 export default {
   validateCreateProject,
   validateUpdateProject,
+  validateProjectMemberQuery,
   validateMeProjectQuery
 }

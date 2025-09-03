@@ -1,11 +1,11 @@
 import ApiError from "#errors/ApiError";
-import type { AcceptInvitationDto } from "./dto/invitations.Dto";
-import invitationRepo from "./invitations.repo";
+import type { AcceptInvitationDto } from "#modules/invitations/dto/invitations.Dto";
+import invitationRepo from "#modules/invitations/invitations.repo";
 
 
 const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {
   await invitationRepo.createMember(acceptInvitationDto);
-  await invitationRepo.remove(invitationId);
+  await invitationRepo.update(invitationId);
 };
 
 const checkInvitation = async (invitationId: number, acceptedToken: string) => {

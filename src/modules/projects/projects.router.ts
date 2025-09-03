@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import projectController from './projects.controller';
-import validateProject from './projects.validator';
+import projectController from '#modules/projects/projects.controller';
+import validateProject from '#modules/projects/projects.validator';
 import { requireAuth } from '#middlewares/requireAuth';
 import projectTasksController from '#modules/tasks/projects/projectTasks.controller';
 import projectTasksValidator from '#modules/tasks/projects/projectTasks.validator';
@@ -15,6 +15,10 @@ router.route('/').post(
 
 router
   .route('/:projectId')
+  .get(
+    requireAuth,
+    projectController.getProject
+  )
   .patch(
     requireAuth, 
     validateProject.validateUpdateProject,
@@ -26,6 +30,12 @@ router
   )
 
 router.route('/:projectId/invitations').post(requireAuth, projectController.createInvitation);
+
+router.route('/:projectId/users').get(
+  requireAuth,
+  validateProject.validateProjectMemberQuery,
+  projectController.getProjectMembers
+);
 
 router.route('/:projectId/users/:userId').delete(projectController.excludeMember);
 

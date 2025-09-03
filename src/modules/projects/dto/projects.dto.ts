@@ -23,6 +23,15 @@ export const updateProjectSchema = z.object({
   description: z.string().max(500).optional()
 });
 
+export type createProjectDto = z.infer<typeof createProjectSchema>;
+export type updateProjectDto = z.infer<typeof updateProjectSchema>;
+
+export const projectMemberQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(5),
+})
+export type projectMemberQueryDto = z.infer<typeof projectMemberQuerySchema>;
+
 export const invitationSchema = z.object({
   projectId: z.number().min(1),
   targetEmail: emailWithMX,
@@ -30,8 +39,7 @@ export const invitationSchema = z.object({
   inviter: z.number().min(1).optional()
 });
 
-export type createProjectDto = z.infer<typeof createProjectSchema>;
-export type updateProjectDto = z.infer<typeof updateProjectSchema>;
+
 export type ExcludeMemberDto = {
   projectId: number;
   targetUserId: number;

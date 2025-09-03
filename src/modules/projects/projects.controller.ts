@@ -1,8 +1,8 @@
 import type { RequestHandler } from 'express';
-import projectService from './projects.service';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
-import { generateInvitationToken } from './utils/tokenUtils';
-import { MeProjectQueryDto } from './dto/me-projects.dto';
+import projectService from '#modules/projects/projects.service';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto, projectMemberQueryDto } from '#modules/projects/dto/projects.dto';
+import { generateInvitationToken } from '#modules/projects/utils/tokenUtils';
+import { MeProjectQueryDto } from '#modules/projects/dto/me-projects.dto';
 
 /**
  * @function createProject
@@ -42,10 +42,28 @@ const getProject: RequestHandler = async (req, res) => {
   const userId = req.user.id;
   const projectId = Number(req.params.projectId);
 
-  await projectService.checkMember(userId, projectId);
-
-  const project = await projectService.getProject(projectId);
+  const project = await projectService.getProject(projectId, userId);
   res.status(200).json(project);
+}
+
+/**
+ * @function getProjectMembers
+ * @description 프로젝트 멤버 조회
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
+ * 
+ * @returns {200} 프로젝트 멤버 정보
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
+ */
+const getProjectMembers: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+  const query: projectMemberQueryDto = res.locals.projectMemberQuery;
+
+  const members = await projectService.getProjectMembers(projectId, query);
+  res.status(200).json(members);
 }
 
 /**
@@ -64,12 +82,10 @@ const updateProject: RequestHandler = async (req, res) => {
   const userId = req.user.id;
   const projectId = Number(req.params.projectId);
 
-  await projectService.checkRole(userId, projectId);
-
   const updateDto: updateProjectDto = {
     ...req.body
   };
-  const project = await projectService.updateProject(updateDto, projectId);
+  const project = await projectService.updateProject(updateDto, projectId, userId);
   res.status(200).json(project);
 }
 
@@ -89,9 +105,7 @@ const deleteProject: RequestHandler = async (req, res) => {
   const userId = req.user.id;
   const projectId = Number(req.params.projectId);
 
-  await projectService.checkRole(userId, projectId);
-
-  await projectService.deleteProject(projectId);
+  await projectService.deleteProject(projectId, userId);
   res.sendStatus(204);
 }
 
@@ -111,7 +125,6 @@ const deleteProject: RequestHandler = async (req, res) => {
 const createInvitation: RequestHandler = async (req, res) => {
   const userId = req.user.id;
   const projectId = Number(req.params.projectId);
-  await projectService.checkRole(userId, projectId);
 
   const email = req.body.email;
   const invitationToken = generateInvitationToken(projectId, email);
@@ -123,7 +136,6 @@ const createInvitation: RequestHandler = async (req, res) => {
   }
 
   const invitation = await projectService.sendInvitation(invitationDto);
-  console.log(`초대 : ${invitationDto.targetEmail}`);
   res.status(201).json(invitation);
 }
 
@@ -142,7 +154,6 @@ const createInvitation: RequestHandler = async (req, res) => {
 const excludeMember: RequestHandler = async (req, res) => {
   const projectId = Number(req.params.projectId);
   const userId = req.user.id;
-  await projectService.checkRole(userId, projectId);
 
   const targetUserId = Number(req.params.userId);
   const excludeMemberDto: ExcludeMemberDto = {
@@ -150,7 +161,7 @@ const excludeMember: RequestHandler = async (req, res) => {
     targetUserId
   }
 
-  await projectService.excludeMember(excludeMemberDto);
+  await projectService.excludeMember(excludeMemberDto, userId);
   res.sendStatus(204);
 }
 
@@ -176,6 +187,7 @@ const getMyProjects: RequestHandler = async (req, res) => {
 export default {
   createProject,
   getProject,
+  getProjectMembers,
   updateProject,
   deleteProject,
   createInvitation,
