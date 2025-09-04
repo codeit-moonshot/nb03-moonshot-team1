@@ -43,8 +43,8 @@ const createSubtask: RequestHandler = async (req, res) => {
 const getSubtaskList: RequestHandler = async (req, res) => {
   const taskId = Number(req.params.taskId);
   const userId = Number(req.user.id);
-  const subtaskList = await subtaskService.getSubtaskList(taskId, userId);
-  res.send(subtaskList);
+  const { data } = await subtaskService.getSubtaskList(taskId, userId);
+  res.json(data);
 };
 
 /**
