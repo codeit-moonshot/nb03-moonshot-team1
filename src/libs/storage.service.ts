@@ -44,6 +44,37 @@ export const StorageService = {
   async removeTemp(absPath: string) {
     await fs.unlink(absPath).catch(() => {});
   },
+
+  /**
+   * 최종 파일 삭제
+   */
+  finalRoot(): string {
+    return path.join(UPLOAD_ROOT, 'files');
+  },
+
+  // 절대경로 변환
+  resolveFinalAbs(relPath: string): string {
+    const safeRel = relPath
+      .replace(/^\/+|\/+$/g, '')
+      .split('/')
+      .join(path.sep);
+    const abs = path.join(this.finalRoot(), safeRel);
+    const norm = path.normalize(abs);
+    if (!norm.startsWith(this.finalRoot() + path.sep) && norm !== this.finalRoot()) {
+      throw new Error(`Invalid relPath outside uploads: ${relPath}`);
+    }
+    return norm;
+  },
+
+  async removeFinalByRelPath(relPath: string): Promise<void> {
+    const abs = this.resolveFinalAbs(relPath);
+    try {
+      await fs.unlink(abs);
+    } catch (err: any) {
+      if (err?.code === 'ENOENT') return;
+      throw err;
+    }
+  },
 };
 
 export default StorageService;

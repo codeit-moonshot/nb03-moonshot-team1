@@ -31,4 +31,16 @@ router
   .get(authMiddleware, commentsValidator.validateCommentQuery, commentsController.getCommentList)
   .post(authMiddleware, commentsValidator.validateCommentCreate, commentsController.createComment);
 
+/**
+ * /tasks/:taskId/attachments
+ * 임시 업로드 커밋 - 전체 교체
+ */
+router.post(
+  '/:taskId/attachments',
+  authMiddleware,
+  tasksValidator.validateTaskId,
+  tasksValidator.validateCommitAttachmentsBody,
+  tasksController.commitAttachments
+);
+
 export default router;
