@@ -1,6 +1,5 @@
 import type { RequestHandler } from 'express';
 import usersService from '#modules/users/users.service';
-import commitTempFile from '#utils/commitTempFile';
 import { UpdateUserDto } from '#modules/users/dto/user.dto';
 
 /**
@@ -36,22 +35,7 @@ const getMyInfo: RequestHandler = async (req, res) => {
 
 const updateMyInfo: RequestHandler = async (req, res) => {
   const id = Number(req.user.id);
-
-  // validator에서 추출한 값만 가져옴
   const dto: UpdateUserDto = { ...req.body };
-
-  if ('profileImage' in dto) {
-    if (dto.profileImage === null) {
-    } else if (typeof dto.profileImage === 'string') {
-      try {
-        dto.profileImage = await commitTempFile(dto.profileImage, 'users/profiles');
-      } catch (err) {
-        console.error('프로필 이미지 커밋 실패:', err);
-        delete (dto as any).profileImage;
-      }
-    }
-  }
-
   const user = await usersService.updateMyInfo(id, dto);
   res.status(200).json(user);
 };

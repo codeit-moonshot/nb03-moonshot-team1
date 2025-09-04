@@ -10,13 +10,29 @@ import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto, RefreshDto } from '#modules/auth/dto/token.dto';
 import { PublicUserDto } from '#modules/users/dto/user.dto';
 import { TokenDto } from '#modules/auth/dto/token.dto';
+import commitTempFile from '#utils/commitTempFile';
 
 const register = async (data: RegisterDto): Promise<PublicUserDto> => {
   const existingUser = await usersService.findUserByEmail(data.email);
   if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');
 
+  let profileImage: string | null | undefined = data.profileImage;
+  if (typeof data.profileImage === 'string' && data.profileImage) {
+    try {
+      profileImage = await commitTempFile(data.profileImage, 'users/profiles');
+    } catch (err) {
+      console.error('프로필 이미지 커밋 실패:', err);
+      profileImage = null;
+    }
+  }
+
   const hashedPassword = await hashPassword(data.password);
-  const createdUser = await usersService.createUser({ ...data, password: hashedPassword });
+  const createdUser = await usersService.createUser({
+    ...data,
+    password: hashedPassword,
+    profileImage,
+  });
+
   const { password, deletedAt, ...user } = createdUser;
   return user;
 };

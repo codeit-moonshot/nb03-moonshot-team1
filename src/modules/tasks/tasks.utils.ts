@@ -18,7 +18,7 @@ const toPublicTask = (task: any): PublicTask => {
     endYear: endDate.getUTCFullYear(),
     endMonth: endDate.getUTCMonth() + 1,
     endDay: endDate.getUTCDate(),
-    status: toApiStatus(task.status as unknown as string),
+    status: toApiStatus(task.status as string),
     assignee: task.assignee
       ? {
           id: task.assignee.id,
@@ -27,10 +27,10 @@ const toPublicTask = (task: any): PublicTask => {
           profileImage: task.assignee.profileImage ?? null,
         }
       : null,
-    tags: task.tags.map((tag: any) => ({ id: tag.tag.id, name: tag.tag.name })),
-    attachments: task.attachments.map((attachment: any) => ({
-      id: attachment.id,
-      url: filePublicUrl(attachment.relPath),
+    tags: (task.tags ?? []).map((tag: any) => ({ id: tag.tag.id, name: tag.tag.name })),
+    attachments: (task.attachments ?? []).map((attach: any) => ({
+      id: attach.id,
+      url: filePublicUrl(attach.relPath),
     })),
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,

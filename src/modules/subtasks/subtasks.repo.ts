@@ -29,22 +29,16 @@ const findById = (id: number) => {
   });
 };
 
-const update = (data: UpdateSubtaskDto) => {
+const update = (subtaskId: number, status: 'done' | 'todo') => {
   return prisma.subtask.update({
-    where: {
-      taskId: data.taskId,
-      id: data.subtaskId,
-    },
-    data: { status: data.status },
+    where: { id: subtaskId },
+    data: { status },
   });
 };
 
-const remove = (data: DeleteSubtaskDto) => {
+const remove = (subtaskId: number) => {
   return prisma.subtask.delete({
-    where: {
-      taskId: data.taskId,
-      id: data.subtaskId,
-    },
+    where: { id: subtaskId },
   });
 };
 

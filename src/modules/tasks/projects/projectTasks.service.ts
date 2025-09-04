@@ -24,6 +24,11 @@ const assertProjectAccess = async (projectId: number, userId: number) => {
   if (!isOwner && !isMember) throw new ApiError(403, '프로젝트 멤버가 아닙니다');
 };
 
+const mapAttachmentsToUrlArray = (url: any) => ({
+  ...url,
+  attachments: Array.isArray(url.attachments) ? url.attachments.map((attach: any) => attach.url) : [],
+});
+
 /* -------------------------------------------------------------------------- */
 /*                                Services                                    */
 /* -------------------------------------------------------------------------- */
@@ -99,7 +104,9 @@ const createTaskInProject = async (
   // 응답 후 매핑
   const full = await projectTasksRepo.findTaskByIdWithRels(created.id, userId);
   if (!full) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
-  return toPublicTask(full);
+
+  const api = toPublicTask(full);
+  return mapAttachmentsToUrlArray(api);
 };
 
 /**
@@ -132,7 +139,8 @@ const listProjectTasks = async (
     userIdForScope: userId,
   });
 
-  return { data: rows.map(toPublicTask), total };
+  const data = rows.map(toPublicTask).map(mapAttachmentsToUrlArray);
+  return { data, total };
 };
 
 export default {
