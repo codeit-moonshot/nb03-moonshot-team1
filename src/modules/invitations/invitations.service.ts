@@ -4,8 +4,9 @@ import invitationRepo from '#modules/invitations/invitations.repo';
 import projectRepo from '#modules/projects/projects.repo';
 
 const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {
-  await invitationRepo.createMember(acceptInvitationDto);
-  await invitationRepo.update(invitationId);
+  const accept = await invitationRepo.acceptInvitation(acceptInvitationDto, invitationId);
+  if (accept === 'unknown') throw ApiError.internal();
+  if (accept === 'not found') throw ApiError.notFound();
 };
 
 const checkRole = async (userId: number, projectId: number) => {
