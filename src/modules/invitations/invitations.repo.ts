@@ -1,30 +1,14 @@
 import prisma from '#prisma/prisma';
-import type { CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import type { AcceptInvitationDto, CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import { Prisma } from '@prisma/client';
 
-export const findById = async (id: number) => {
+const findById = async (id: number) => {
   return await prisma.invitation.findUnique({
     where: { id },
   });
 };
 
-export const createMember = async (data: CreateMemberDto) => {
-  return await prisma.projectMember.create({
-    data: {
-      project: { connect: { id: data.projectId } },
-      user: { connect: { id: data.userId } },
-      role: data.role,
-    },
-  });
-};
-
-export const update = async (id: number) => {
-  await prisma.invitation.update({
-    where: { id },
-    data: { status: 'accepted' },
-  });
-};
-
-export const remove = async (invitation: { id: number; projectId: number; email: string }) => {
+const remove = async (invitation: { id: number; projectId: number; email: string }) => {
   await prisma.$transaction(async (tx) => {
     // 프로젝트 멤버 데이터 삭제
     await tx.projectMember.deleteMany({
@@ -41,9 +25,35 @@ export const remove = async (invitation: { id: number; projectId: number; email:
   });
 };
 
+const acceptInvitation = async (data: AcceptInvitationDto, invitationId: number) => {
+  try{
+    await prisma.$transaction(async (tx) => {
+      await tx.invitation.update({
+        where: { id: invitationId },
+        data: { status: 'accepted' },
+      });
+      await tx.projectMember.update({
+        where: {
+          projectId_userId: {
+            projectId: data.projectId,
+            userId: data.userId,
+          }
+        },
+        data: { role: 'MEMBER' },
+      });
+    });
+    return 'ok';
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') return 'not found';
+    }
+    else return 'unknown';
+  }
+  
+};
+
 export default {
   findById,
-  createMember,
-  update,
   remove,
+  acceptInvitation,
 };
