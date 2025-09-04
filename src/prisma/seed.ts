@@ -39,34 +39,6 @@ const main = async (): Promise<void> => {
     password: '$2a$10$/UGSBBwtEt.twkDP/3NMau24CEHykn5hSOjq5LwhDoH00JtHQUdr2', //1q2w3e4r
   });
 
-  // Social
-  await prisma.socialAccount.upsert({
-    where: {
-      provider_providerUid: {
-        provider: SocialProvider.GOOGLE,
-        providerUid: 'google-sub-001',
-      },
-    },
-    update: {
-      email: 'user1@test.com',
-      displayName: 'User1 Google',
-      accessToken: 'access-token-user1',
-      refreshToken: 'refresh-token-user1',
-      expiryDate: new Date(Date.now() + DAYS(7)),
-    },
-    create: {
-      userId: user1.id,
-      provider: SocialProvider.GOOGLE,
-      providerUid: 'google-sub-001',
-      email: 'user1@test.com',
-      displayName: 'User1 Google',
-      profileImage: null,
-      accessToken: 'access-token-user1',
-      refreshToken: 'refresh-token-user1',
-      expiryDate: new Date(Date.now() + DAYS(7)),
-    },
-  });
-
   // Project / Members
   const project =
     (await prisma.project.findFirst({ where: { name: 'Demo', ownerId: user1.id } })) ??
@@ -164,24 +136,6 @@ const main = async (): Promise<void> => {
       ensureTaskTag(task1.id, backend.id),
       ensureTaskTag(task2.id, design.id),
     ]);
-
-    // Attachments
-    const attach1 = await tx.attachments.findFirst({
-      where: { taskId: task1.id, storedName: 'setup-guide.md' },
-    });
-    if (!attach1) {
-      await tx.attachments.create({
-        data: {
-          taskId: task1.id,
-          originalName: 'setup-guide.md',
-          storedName: 'setup-guide.md',
-          relPath: 'docs/setup-guide.md',
-          mimeType: 'text/markdown',
-          size: 2048,
-          ext: 'md',
-        },
-      });
-    }
 
     // Invitation
     const invExists = await tx.invitation.findFirst({

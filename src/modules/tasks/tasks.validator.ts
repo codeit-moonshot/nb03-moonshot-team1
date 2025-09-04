@@ -57,18 +57,8 @@ const validatePatchTaskBody: RequestHandler = (req, res, next) => {
   }
 };
 
-const validateCommitAttachmentsBody: RequestHandler = (req, res, next) => {
-  try {
-    res.locals.commitBody = commitAttachmentsBodySchema.parse(req.body);
-    next();
-  } catch (err) {
-    return forwardZodError(err, '첨부 커밋', next);
-  }
-};
-
 export default {
   validateTaskId,
   validateMeTasksQuery,
   validatePatchTaskBody,
-  validateCommitAttachmentsBody,
 };
