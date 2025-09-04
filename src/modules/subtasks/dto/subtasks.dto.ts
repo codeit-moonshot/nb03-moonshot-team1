@@ -1,19 +1,24 @@
 import { z } from 'zod';
-import { TaskStatus } from '@prisma/client';
 
 export const subtaskCreateSchema = z.object({
   title: z.string().trim().min(1, '하위 할 일을 작성해 주세요.').trim().max(20, '더는 작성할 수 없습니다.'),
   taskId: z.int().positive(),
 });
 
+/**
+ * PATCH /subtasks/:subtaskId
+ * status만
+ */
 export const subtaskUpdateSchema = z.object({
-  status: z.enum(TaskStatus),
-  taskId: z.int().positive(),
+  status: z.enum(['done', 'todo']),
   subtaskId: z.int().positive(),
 });
 
+/**
+ * DELETE /subtasks/:subtaskId
+ * params만 필요
+ */
 export const subtaskDeleteSchema = z.object({
-  taskId: z.int().positive(),
   subtaskId: z.int().positive(),
 });
 

@@ -83,7 +83,7 @@ export interface PublicTask {
   status: (typeof TASK_STATUS)[number];
   assignee: PublicAssignee | null;
   tags: PublicTag[];
-  attachments: PublicAttachment[];
+  attachments: { id: number; url: string }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -141,4 +141,8 @@ export const patchTaskBodySchema = z
 
 export type PatchTaskBodyDto = z.infer<typeof patchTaskBodySchema> & {
   googleEventId?: string;
+};
+
+export type PublicTaskWithStringAttachments = Omit<PublicTask, 'attachments'> & {
+  attachments: string[];
 };

@@ -1,10 +1,19 @@
 import type { RequestHandler } from 'express';
 import ApiError from '#errors/ApiError';
 import forwardZodError from '#utils/zod';
+import { z } from 'zod';
 
 import { taskIdParamsSchema } from '#modules/tasks/dto/task-id.dto';
 import { meTasksQuerySchema } from '#modules/tasks/dto/me-tasks.dto';
 import { patchTaskBodySchema } from '#modules/tasks/dto/task.dto';
+
+/**
+ * /tasks/:taskId/attachments
+ * body: { urls: string[] }
+ */
+const commitAttachmentsBodySchema = z.object({
+  urls: z.array(z.string().url()).min(1),
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                  GET                                       */
@@ -48,8 +57,18 @@ const validatePatchTaskBody: RequestHandler = (req, res, next) => {
   }
 };
 
+const validateCommitAttachmentsBody: RequestHandler = (req, res, next) => {
+  try {
+    res.locals.commitBody = commitAttachmentsBodySchema.parse(req.body);
+    next();
+  } catch (err) {
+    return forwardZodError(err, '첨부 커밋', next);
+  }
+};
+
 export default {
   validateTaskId,
   validateMeTasksQuery,
   validatePatchTaskBody,
+  validateCommitAttachmentsBody,
 };
