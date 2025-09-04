@@ -2,7 +2,6 @@ import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
 import googleOauthService from '#libs/googleOauth.service';
 import ApiError from '#errors/ApiError';
-import commitTempFile from '#utils/commitTempFile';
 import { RegisterDto } from '#modules/auth/dto/register.dto';
 import { LoginDto } from '#modules/auth/dto/login.dto';
 import type { AuthHeaderDto } from '#modules/auth/dto/token.dto';
@@ -27,17 +26,8 @@ const register: RequestHandler = async (req, res, next) => {
     password: req.body.password,
     profileImage: req.body.profileImage,
   };
+
   const user = await authService.register(registerDto);
-
-  if (req.body.profileImage) {
-    try {
-      registerDto.profileImage = await commitTempFile(req.body.profileImage, 'users/profiles');
-    } catch (err) {
-      console.error('프로필 이미지 커밋 실패:', err);
-      registerDto.profileImage = null; // 처리 실패해도 가입은 진행
-    }
-  }
-
   res.status(201).json(user);
 };
 

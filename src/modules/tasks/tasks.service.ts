@@ -6,10 +6,11 @@ import commitTempFile from '#utils/commitTempFile';
 import type { TaskStatus } from '#constants/taskStatus.constants';
 import toPublicTask from '#modules/tasks/tasks.utils';
 import tasksRepo from '#modules/tasks/tasks.repo';
-import type { PublicTask, PatchTaskBodyDto } from '#modules/tasks/dto/task.dto';
+import type { PublicTask, PatchTaskBodyDto, PublicTaskWithStringAttachments } from '#modules/tasks/dto/task.dto';
 import type { MeTasksQueryDto } from '#modules/tasks/dto/me-tasks.dto';
 import { UpdateGoogleAccessTokenDto, GoogleTokenDto, GoogleEventUpdateDto } from '#modules/tasks/dto/googleEvent.dto';
 import googleCalendarService from '#libs/googleCalendar.service';
+import removeManyByRelPath from '#utils/fileRemover';
 
 /* -------------------------------------------------------------------------- */
 /*                                 helper                                     */
@@ -36,9 +37,14 @@ const ensureTaskAndAccess = async (taskId: number, userId: number) => {
 /**
  * GET /tasks/:taskId
  */
-const getTaskById = async (taskId: number, userId: number): Promise<PublicTask> => {
+const getTaskById = async (taskId: number, userId: number): Promise<PublicTaskWithStringAttachments> => {
   const task = await ensureTaskAndAccess(taskId, userId);
-  return toPublicTask(task);
+  const api = toPublicTask(task);
+
+  return {
+    ...api,
+    attachments: Array.isArray(api.attachments) ? api.attachments.map((a) => a.url) : [],
+  };
 };
 
 /**
@@ -130,6 +136,8 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
   }
 
   if (Array.isArray(body.attachments)) {
+    const oldRelPaths = (task.attachments ?? []).map((a) => a.relPath);
+
     const uniqUrls = Array.from(new Set(body.attachments.filter(Boolean)));
     const committedUrls = await Promise.all(uniqUrls.map((url) => commitTempFile(url, `tasks/${taskId}`)));
     const files = committedUrls.map((finalUrl) => {
@@ -147,6 +155,10 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
       };
     });
     await tasksRepo.updateAttachments(taskId, files);
+
+    const newRelPaths = files.map((f) => f.relPath);
+    const removed = oldRelPaths.filter((p) => !newRelPaths.includes(p));
+    await removeManyByRelPath(removed, { guardUnreferenced: true });
   }
 
   const updated = await tasksRepo.findById(taskId, userId);
@@ -159,12 +171,16 @@ const patchTask = async (taskId: number, userId: number, body: PatchTaskBodyDto)
  */
 const deleteTask = async (taskId: number, userId: number) => {
   const task = await ensureTaskAndAccess(taskId, userId);
+  const oldRelPaths = (task.attachments ?? []).map((a) => a.relPath);
+
   if (task.googleEventId) {
     const tokenDto = await tasksRepo.getGoogleSocialToken(userId);
     if (!tokenDto) throw ApiError.notFound('구글 토큰을 찾을 수 없습니다.');
     await googleCalendarService.deleteEvent(userId, task.googleEventId, tokenDto);
   }
-  return tasksRepo.remove(taskId);
+  await tasksRepo.remove(taskId);
+
+  await removeManyByRelPath(oldRelPaths, { guardUnreferenced: true });
 };
 
 // 구글 엑세스 토큰 업데이트
@@ -181,6 +197,35 @@ const updateGoogleEventId = async (taskId: number, googleEventId: string): Promi
   await tasksRepo.updateGoogleEventId(taskId, googleEventId);
 };
 
+/**
+ * POST /tasks/:taskId/attachments
+ * 전체 교체
+ */
+const commitAttachments = async (taskId: number, userId: number, urls: string[]): Promise<PublicTask> => {
+  const task = await ensureTaskAndAccess(taskId, userId);
+
+  const oldRelPaths = (task.attachments ?? []).map((a) => a.relPath);
+
+  const uniq = Array.from(new Set((urls ?? []).filter(Boolean)));
+  const committed = await Promise.all(uniq.map((u) => commitTempFile(u, `tasks/${taskId}`)));
+  const files = committed.map((finalUrl) => {
+    const relPath = fileRelPathFromUrl(finalUrl);
+    const storedName = path.basename(relPath);
+    const dot = storedName.lastIndexOf('.');
+    const ext = dot > -1 ? storedName.slice(dot + 1) : null;
+    return { originalName: storedName, storedName, relPath, mimeType: null, size: null, ext };
+  });
+  await tasksRepo.updateAttachments(taskId, files);
+
+  const newRelPaths = files.map((f) => f.relPath);
+  const removed = oldRelPaths.filter((p) => !newRelPaths.includes(p));
+  await removeManyByRelPath(removed, { guardUnreferenced: true });
+
+  const updated = await tasksRepo.findById(taskId, userId);
+  if (!updated) throw new ApiError(404, '할 일을 찾을 수 없습니다.');
+  return toPublicTask(updated);
+};
+
 export default {
   getTaskById,
   getMyTasks,
@@ -189,4 +234,5 @@ export default {
   getGoogleSocialToken,
   updateGoogleAccessToken,
   updateGoogleEventId,
+  commitAttachments,
 };

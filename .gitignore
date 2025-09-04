@@ -6,3 +6,4 @@ dist
 src/prisma/migrations
 uploads/files/users/profiles/*
 uploads/temp/files/*
+uploads/files/tasks/*

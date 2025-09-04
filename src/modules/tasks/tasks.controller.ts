@@ -86,9 +86,22 @@ const getMyTaskList: RequestHandler = async (req, res) => {
   res.status(200).json(items);
 };
 
+/**
++ * POST /tasks/:taskId/attachments
++ * 임시 URL들을 실제 경로로 커밋하고 첨부를 전체 교체합니다.
++ */
+const commitAttachments: RequestHandler = async (req, res) => {
+  const taskId: number = res.locals.taskId;
+  const userId: number = req.user.id;
+  const { urls } = res.locals.commitBody as { urls: string[] };
+  const updated = await taskService.commitAttachments(taskId, userId, urls);
+  res.status(200).json(updated);
+};
+
 export default {
   getTaskById,
   patchTask,
   deleteTask,
   getMyTaskList,
+  commitAttachments,
 };

@@ -86,7 +86,6 @@ const getSubtaskId: RequestHandler = async (req, res) => {
 const updateSubtask: RequestHandler = async (req, res) => {
   const dto: UpdateSubtaskDto = {
     status: req.body.status,
-    taskId: Number(req.params.taskId),
     subtaskId: Number(req.params.subtaskId),
   };
   const userId = Number(req.user.id);
@@ -112,7 +111,6 @@ const updateSubtask: RequestHandler = async (req, res) => {
 const deleteSubtask: RequestHandler = async (req, res) => {
   const dto: DeleteSubtaskDto = {
     subtaskId: Number(req.params.subtaskId),
-    taskId: Number(req.params.taskId),
   };
   const userId = Number(req.user.id);
   await subtaskService.deleteSubtask(userId, dto);

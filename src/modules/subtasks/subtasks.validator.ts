@@ -19,7 +19,6 @@ const validateSubtaskUpdate: RequestHandler = (req, _res, next) => {
   try {
     const parsedBody = {
       status: req.body.status,
-      taskId: Number(req.params.taskId),
       subtaskId: Number(req.params.subtaskId),
     };
     subtaskUpdateSchema.parse(parsedBody);
