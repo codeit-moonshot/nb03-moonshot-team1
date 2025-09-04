@@ -1,0 +1,44 @@
+.resultCardCard {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  padding: 32px 24px;
+  margin: 0 auto;
+  max-width: 720px; /* 📌 프로젝트 목록 카드와 유사한 최대 너비 */
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.resultCardIcon {
+  font-size: 40px;
+  color: #f0ad4e;
+  margin-bottom: 16px;
+}
+
+.resultCardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.resultCardDesc {
+  font-size: 15px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.resultCardBtn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.resultCardBtn:hover {
+  background: #f1f1f1;
+}
