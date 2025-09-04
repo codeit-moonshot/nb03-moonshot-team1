@@ -49,6 +49,11 @@ app.use(
 );
 
 /**
+ * Trust Proxy
+ */
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
+
+/**
  * Rate limit
  */
 const limiter = rateLimit({

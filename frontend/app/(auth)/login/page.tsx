@@ -46,23 +46,11 @@ const LoginPage = () => {
       <form className={cx(styles.form)} action={dispatch}>
         <div className={cx(styles.inputContainer)}>
           <Label>이메일</Label>
-          <Input
-            type="email"
-            name="email"
-            defaultValue={state.email}
-            placeholder="example@email.com"
-            required
-          />
+          <Input type="email" name="email" defaultValue={state.email} placeholder="example@email.com" required />
         </div>
         <div className={cx(styles.inputContainer)}>
           <Label>비밀번호</Label>
-          <Input
-            type="password"
-            name="password"
-            defaultValue={state.password}
-            placeholder="비밀 번호"
-            required
-          />
+          <Input type="password" name="password" defaultValue={state.password} placeholder="비밀번호" required />
         </div>
 
         <Button type="submit" disabled={isPending}>
@@ -77,10 +65,7 @@ const LoginPage = () => {
       <div className={cx(styles.socialLoginContainer)}>
         <p className={cx(styles.socialButtonTitle)}>SNS 간편 로그인</p>
         <div className={cx(styles.socialButtonContainer)}>
-          <SocialButton provider={OAuthProvider.NAVER} />
           <SocialButton provider={OAuthProvider.GOOGLE} />
-          <SocialButton provider={OAuthProvider.FACEBOOK} />
-          <SocialButton provider={OAuthProvider.KAKAO} />
         </div>
       </div>
     </div>
