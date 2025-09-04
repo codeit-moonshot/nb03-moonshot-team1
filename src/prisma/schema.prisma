@@ -57,6 +57,8 @@ model User {
   invitationsSent Invitation[]    @relation("ProjectInvitationsByUser")
   socialAccounts  SocialAccount[]
   RefreshToken    RefreshToken?
+
+  attachments Attachments[]
 }
 
 model SocialAccount {
@@ -179,18 +181,21 @@ model Subtask {
 
 model Attachments {
   id           Int      @id @default(autoincrement())
-  taskId       Int
-  originalName String // 원본 파일명 (사용자 업로드 시 이름)
-  storedName   String // 저장 파일명 (충돌 방지용 랜덤/UUID 등)
-  relPath      String // 상대 경로(업로드 루트 기준) 예: "tasks/2025/08/19/uuid.pdf"
+  taskId       Int?
+  userId       Int?
+  originalName String
+  storedName   String
+  relPath      String
   mimeType     String?
   size         Int?
-  ext          String? // 확장자 (예: "pdf", "png")
+  ext          String?
   createdAt    DateTime @default(now())
 
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
+  @@index([userId]) // ⬅ 추가
   @@index([storedName])
 }
 

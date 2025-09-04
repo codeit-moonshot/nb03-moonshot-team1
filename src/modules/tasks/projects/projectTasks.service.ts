@@ -1,8 +1,10 @@
 import path from 'node:path';
+import dayjs from 'dayjs';
 import ApiError from '#errors/ApiError';
 import googleCalendarService from '#libs/googleCalendar.service';
 import tasksService from '#modules/tasks/tasks.service';
 import fileRelPathFromUrl from '#utils/fileRelPathFromUrl';
+import commitTempFile from '#utils/commitTempFile';
 import toPublicTask from '#modules/tasks/tasks.utils';
 import projectTasksRepo from '#modules/tasks/projects/projectTasks.repo';
 import type { PublicTask } from '#modules/tasks/dto/task.dto';
@@ -39,6 +41,8 @@ const createTaskInProject = async (
   const startDate = new Date(Date.UTC(body.startYear, body.startMonth - 1, body.startDay));
   const endDate = new Date(Date.UTC(body.endYear, body.endMonth - 1, body.endDay));
 
+  if (dayjs(startDate).isAfter(endDate)) throw ApiError.badRequest('시작일은 종료일보다 늦을 수 없습니다.');
+
   // 생성
   const created = await projectTasksRepo.createTask({
     projectId,
@@ -71,11 +75,12 @@ const createTaskInProject = async (
     const tagIds = await projectTasksRepo.findOrCreateTagsByNames(body.tags);
     await projectTasksRepo.replaceTaskTags(created.id, tagIds);
   }
-
   // 첨부 연결
-  if (body.attachments?.length) {
-    const files = body.attachments.map((url) => {
-      const relPath = fileRelPathFromUrl(url);
+  if (Array.isArray(body.attachments) && body.attachments.length) {
+    const uniqUrls = Array.from(new Set(body.attachments.filter(Boolean)));
+    const committedUrls = await Promise.all(uniqUrls.map((url) => commitTempFile(url, `tasks/${created.id}`)));
+    const files = committedUrls.map((finalUrl) => {
+      const relPath = fileRelPathFromUrl(finalUrl);
       const storedName = path.basename(relPath);
       const dot = storedName.lastIndexOf('.');
       const ext = dot > -1 ? storedName.slice(dot + 1) : null;

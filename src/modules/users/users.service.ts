@@ -34,14 +34,27 @@ const getMyInfo = async (id: number): Promise<PublicUserDto | null> => {
 const updateMyInfo = async (id: number, data: UpdateUserDto): Promise<PublicUserDto> => {
   const user = await usersRepo.findById(id);
   if (!user) throw ApiError.notFound('유저를 찾을 수 없습니다');
-  if (!(await isPasswordValid(data.currentPassword, user.password as string))) {
-    throw ApiError.badRequest('현재 비밀번호가 일치하지 않습니다.');
+
+  const wantPwChange = !!data.currentPassword && !!data.newPassword;
+
+  if (wantPwChange) {
+    // 소셜 계정
+    if (!user.password) throw ApiError.badRequest('비밀번호를 설정할 수 없는 계정입니다.');
+    const isPassValid = await isPasswordValid(data.currentPassword!, user.password);
+    if (!isPassValid) throw ApiError.badRequest('현재 비밀번호가 일치하지 않습니다.');
+    if (data.newPassword === data.currentPassword)
+      throw ApiError.badRequest('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
   }
-  if (data.newPassword === data.currentPassword) {
-    throw ApiError.badRequest('새 비밀번호는 현재 비밀번호와 달라야 합니다.');
-  }
-  data.newPassword = await hashPassword(data.newPassword);
-  const updatedUser = await usersRepo.update(id, data);
+
+  // 부분 업데이트
+  const toUpdate: UpdateUserDto = {
+    email: data.email,
+    name: data.name,
+    profileImage: 'profileImage' in data ? data.profileImage! : undefined,
+    newPassword: wantPwChange ? await hashPassword(data.newPassword!) : undefined,
+  };
+
+  const updatedUser = await usersRepo.update(id, toUpdate);
   return filterSensitiveUserData(updatedUser);
 };
 

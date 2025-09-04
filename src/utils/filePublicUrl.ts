@@ -16,7 +16,7 @@ const filePublicUrl = (relPath: string) => {
   if (IS_PROD && !FILE_BASE_URL) {
     throw new Error('❌ FILE_BASE_URL is required in production');
   }
-  return FILE_BASE_URL ? `${FILE_BASE_URL}/${clean}` : clean;
+  return FILE_BASE_URL ? `${FILE_BASE_URL}/${clean}` : `/uploads/${clean}`;
 };
 
 export default filePublicUrl;
