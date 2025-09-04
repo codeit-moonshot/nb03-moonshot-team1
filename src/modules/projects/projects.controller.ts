@@ -1,6 +1,12 @@
 import type { RequestHandler } from 'express';
 import projectService from '#modules/projects/projects.service';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto, projectMemberQueryDto } from '#modules/projects/dto/projects.dto';
+import {
+  createProjectDto,
+  InvitationDto,
+  ExcludeMemberDto,
+  updateProjectDto,
+  projectMemberQueryDto,
+} from '#modules/projects/dto/projects.dto';
 import { generateInvitationToken } from '#modules/projects/utils/tokenUtils';
 import { MeProjectQueryDto } from '#modules/projects/dto/me-projects.dto';
 
@@ -10,7 +16,7 @@ import { MeProjectQueryDto } from '#modules/projects/dto/me-projects.dto';
  *
  * @params {Object} req - { body: createProjectDto }
  *                        { headers: { authorization: "Bearer <token>" } }
- * 
+ *
  * @returns {200} 생성된 프로젝트 정보
  * @throws {400} Bad Request
  * @throws {401} Unauthorized
@@ -20,19 +26,19 @@ const createProject: RequestHandler = async (req, res) => {
 
   const createDto: createProjectDto = {
     name: req.body.name,
-    description: req.body.description
+    description: req.body.description,
   };
 
   const project = await projectService.createProject(createDto, userId);
   res.status(200).json(project);
-}
+};
 
 /**
  * @function getProject
  * @description 프로젝트 조회
  *
  * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
- * 
+ *
  * @returns {200} 프로젝트 정보
  * @throws {401} Unauthorized
  * @throws {403} Forbidden
@@ -44,14 +50,14 @@ const getProject: RequestHandler = async (req, res) => {
 
   const project = await projectService.getProject(projectId, userId);
   res.status(200).json(project);
-}
+};
 
 /**
  * @function getProjectMembers
  * @description 프로젝트 멤버 조회
  *
  * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
- * 
+ *
  * @returns {200} 프로젝트 멤버 정보
  * @throws {401} Unauthorized
  * @throws {403} Forbidden
@@ -64,7 +70,7 @@ const getProjectMembers: RequestHandler = async (req, res) => {
 
   const members = await projectService.getProjectMembers(projectId, query);
   res.status(200).json(members);
-}
+};
 
 /**
  * @function updateProject
@@ -72,7 +78,7 @@ const getProjectMembers: RequestHandler = async (req, res) => {
  *
  * @params {Object} req - { body: updateProjectDto }
  *                        { headers: { authorization: "Bearer <token>" } }
- * 
+ *
  * @returns {200} 생성된 프로젝트 정보
  * @throws {400} Bad Request
  * @throws {401} Unauthorized
@@ -83,11 +89,11 @@ const updateProject: RequestHandler = async (req, res) => {
   const projectId = Number(req.params.projectId);
 
   const updateDto: updateProjectDto = {
-    ...req.body
+    ...req.body,
   };
   const project = await projectService.updateProject(updateDto, projectId, userId);
   res.status(200).json(project);
-}
+};
 
 /**
  * @function deleteProject
@@ -107,7 +113,7 @@ const deleteProject: RequestHandler = async (req, res) => {
 
   await projectService.deleteProject(projectId, userId);
   res.sendStatus(204);
-}
+};
 
 /**
  * @function createInvitation
@@ -115,7 +121,7 @@ const deleteProject: RequestHandler = async (req, res) => {
  *
  * @params {Object} req - Express 요청 객체
  * @params {Object} res - Express 응답 객체
- * 
+ *
  * @throws {400} Bad Request
  * @throws {401} Unauthorized
  * @throws {403} Forbidden
@@ -132,19 +138,19 @@ const createInvitation: RequestHandler = async (req, res) => {
     projectId,
     targetEmail: email,
     invitationToken,
-    inviter: userId
-  }
+    inviter: userId,
+  };
 
   const invitation = await projectService.sendInvitation(invitationDto);
   res.status(201).json(invitation);
-}
+};
 
 /**
  * @function excludeMember
  * @description 프로젝트 멤버 제외
  *
  * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
- * 
+ *
  * @throws {400} Bad Request
  * @throws {401} Unauthorized
  * @throws {403} Forbidden
@@ -158,19 +164,19 @@ const excludeMember: RequestHandler = async (req, res) => {
   const targetUserId = Number(req.params.userId);
   const excludeMemberDto: ExcludeMemberDto = {
     projectId,
-    targetUserId
-  }
+    targetUserId,
+  };
 
   await projectService.excludeMember(excludeMemberDto, userId);
   res.sendStatus(204);
-}
+};
 
 /**
  * @function getMyProjects
  * @description 내 프로젝트 조회
  *
- * @params {Object} req - { headers: { authorization: "Bearer <token>" }, 
- *                            params: { meProjectQueryDto } } 
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" },
+ *                            params: { meProjectQueryDto } }
  *
  * @returns {200} 내 프로젝트 목록
  * @throws {400} Bad Request
@@ -182,7 +188,7 @@ const getMyProjects: RequestHandler = async (req, res) => {
 
   const projects = await projectService.getMyProjects(userId, query);
   res.status(200).json(projects);
-}
+};
 
 export default {
   createProject,
@@ -192,5 +198,5 @@ export default {
   deleteProject,
   createInvitation,
   excludeMember,
-  getMyProjects
-}
+  getMyProjects,
+};
