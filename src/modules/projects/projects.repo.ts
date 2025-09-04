@@ -87,45 +87,47 @@ const findMemberById = async (id: { projectId: number; userId: number }) => {
 };
 
 const findMembers = async (projectId: number, query: projectMemberQueryDto) => {
-  const total = await prisma.projectMember.count({
-    where: {
-      projectId,
-      role: { in: ['MEMBER', 'INVITED'] }
-    }
-  });
-  const members = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: {
-      members: {
-        where: {
-          role: { in: ['MEMBER', 'INVITED'] }
-        },
-        select: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profileImage: true,
-              _count: { select: { tasks: { where: { projectId } } } },
+  const findMembersTransaction = await prisma.$transaction(async (tx) => {
+    const total = await prisma.projectMember.count({
+      where: {
+        projectId,
+        role: { in: ['MEMBER', 'INVITED'] }
+      }
+    });
+    const members = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: {
+        members: {
+          where: {
+            role: { in: ['MEMBER', 'INVITED'] }
+          },
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                profileImage: true,
+                _count: { select: { tasks: { where: { projectId } } } },
+              }
             }
+          },
+          take: query.limit,
+          skip: query.limit * (query.page - 1),
+        },
+        invitations: {
+          select: {
+            email: true,
+            status: true,
+            id: true,
           }
         },
-        take: query.limit,
-        skip: query.limit * (query.page - 1),
-      },
-      invitations: {
-        select: {
-          email: true,
-          status: true,
-          id: true,
-        }
-      },
-      _count: { select: { members: true } }
-    }
+        _count: { select: { members: true } }
+      }
+    });
+    return { members, total };
   });
-
-  return { members, total };
+  return findMembersTransaction;
 };
 
 const findDeleteMailInfo = async (id: number) => {
@@ -159,7 +161,7 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
     const total = await tx.project.count({
       where: { members: { some: { userId } } }
     });
-    return { data: projects, total };2
+    return { data: projects, total };
   });
   return findMyProjectsTransaction;
 };
