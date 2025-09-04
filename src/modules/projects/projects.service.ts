@@ -94,16 +94,18 @@ const sendInvitation = async (data: InvitationDto) => {
     const targetUserId = await projectRepo.findUserByEmail(data.targetEmail, tx);
     if (!targetUserId) throw ApiError.notFound('초대할 사용자를 찾을 수 없습니다.');
 
-    const id = await projectRepo.createInvitation(data, targetUserId.id, tx);
-    const mailInfo = {
-      subject: '프로젝트에 초대합니다',
-      html: `
-        <h1> 프로젝트에 초대합니다. </h1>
-        <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
-        <a href="${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}">참여하기</a>
-      `,
-    };
-    await mailUtils.sendMail(data.targetEmail, mailInfo);
+    await prisma.$transaction(async (tx) => {
+      const id = await projectRepo.createInvitation(data, targetUserId.id, tx);
+      const mailInfo = {
+        subject: '프로젝트에 초대합니다',
+        html: `
+          <h1> 프로젝트에 초대합니다. </h1>
+          <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
+          <a href="${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}">참여하기</a>
+        `,
+      };
+      await mailUtils.sendMail(data.targetEmail, mailInfo);
+    });
   });
 };
 
