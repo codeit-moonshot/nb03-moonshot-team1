@@ -1,5 +1,5 @@
 import ApiError from '#errors/ApiError';
-import smtpTransport from './smtp-transport';
+import smtpTransport from '#modules/projects/utils/smtp-transport';
 
 const sendMail = async (targetEmail: string, mailInfo: { subject: string, html: string }) => {
   const mailOptions = {

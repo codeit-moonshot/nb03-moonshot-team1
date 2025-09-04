@@ -1,36 +1,34 @@
 import prisma from '#prisma/prisma';
 import { Prisma } from '@prisma/client';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
-import { MeProjectQueryDto } from './dto/me-projects.dto';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto, projectMemberQueryDto } from '#modules/projects/dto/projects.dto';
+import { MeProjectQueryDto } from '#modules/projects/dto/me-projects.dto';
 
 const select = {
   id: true,
   name: true,
   description: true,
-  members: { select: { userId: true } },
-  tasks: {
-    select: {
-      id: true,
-      status: true
-    }
-  }
+  tasks: { select: { status: true } },
+  _count: { select: { members: true } },
 };
 
-const findById = async (id: number) => {
-  return await prisma.project.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      tasks: { select: { status: true } },
-      _count: { select: { members: true } }
+const findById = async (projectId: number, userId: number) => {
+  const findSelect = {
+    ...select,
+    members: {
+      where: { userId },
+      select: { userId: true }
     }
+  }
+  return await prisma.project.findUnique({
+    where: { 
+      id: projectId,
+    },
+    select: findSelect
   });
 }
 
 const create = async (data: createProjectDto, userId: number) => {
-  const project =  await prisma.project.create({
+  const project = await prisma.project.create({
     data: {
       ...data,
       owner: { connect: { id: userId } }
@@ -63,6 +61,13 @@ const remove = async (id: number) => {
   });
 }
 
+const findUserByEmail = async (email: string, tx: Prisma.TransactionClient) => {
+  return await tx.user.findUnique({
+    where: { email },
+    select: { id: true }
+  });
+}
+
 const findMemberById = async (id: {projectId: number, userId: number}) => {
   return await prisma.projectMember.findUnique({
     where: {
@@ -71,11 +76,54 @@ const findMemberById = async (id: {projectId: number, userId: number}) => {
         userId: id.userId
       }
     },
+    select: { role: true }
   });
 }
 
+const findMembers = async (projectId: number, query: projectMemberQueryDto) => {
+  const total = await prisma.projectMember.count({
+    where: { 
+      projectId,
+      role: { in: ['MEMBER', 'INVITED'] }
+    },
+  });
+  const members = await prisma.project.findUnique({
+    where:{ id: projectId },
+    select: { 
+      members: { 
+        where: {
+          role: { in: ['MEMBER', 'INVITED'] }
+        },
+        select: { 
+          user: { 
+            select: { 
+              id: true,
+              name: true,
+              email: true,
+              profileImage: true,
+              _count: { select: { tasks: { where: { projectId } } } }
+            }
+          }
+        },
+        take: query.limit,
+        skip: query.limit * (query.page - 1)
+      },
+      invitations: {
+        select:{
+          email: true,
+          status: true,
+          id: true
+        },
+      },
+      _count: { select: { members: true } }
+    },
+  })
+
+  return {members, total}
+}
+
 const findDeleteMailInfo = async (id: number) => {
-  return await prisma.project.findUniqueOrThrow({
+  return await prisma.project.findUnique({
     where: { id },
     select: { 
       name: true,
@@ -85,11 +133,12 @@ const findDeleteMailInfo = async (id: number) => {
 }
 
 const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
+  const orderBy = query.order_by === 'created_at' ? {'createdAt': query.order} : { [query.order_by]: query.order };
   const projects = await prisma.project.findMany({
     where: { members: { some: { userId } } },
     skip: query.limit * (query.page - 1),
     take: query.limit,
-    orderBy: { [query.order_by]: query.order },
+    orderBy,
     select: {
       id: true,
       name: true,
@@ -107,8 +156,8 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   return { data: projects, total };
 }
 
-const createInvitation = async (data: InvitationDto, tx: Prisma.TransactionClient) => {
-  return await tx.invitation.create({
+const createInvitation = async (data: InvitationDto, targetUserId: number, tx: Prisma.TransactionClient) => {
+  const invitation = await tx.invitation.create({
     data: {
       project: { connect: { id: data.projectId } },
       inviter: { connect: { id: data.inviter } },
@@ -118,24 +167,51 @@ const createInvitation = async (data: InvitationDto, tx: Prisma.TransactionClien
     },
     select: { id: true }
   });
-}
 
-const removeMember = async(data: ExcludeMemberDto): Promise<void> => {
-  await prisma.projectMember.delete({
-    where: {
-      projectId_userId: {
-        projectId: data.projectId,
-        userId: data.targetUserId
-      }
+  // 프로젝트 멤버에 추가
+  await tx.projectMember.create({
+    data: {
+      projectId: data.projectId,
+      userId: targetUserId,
+      role: 'INVITED'
     }
   });
+
+  return invitation.id
+}
+
+const removeMember = async(data: ExcludeMemberDto) => {
+  prisma.$transaction(async (tx) => {
+    // 프로젝트 멤버에서 제거
+    await tx.projectMember.delete({
+      where: {
+        projectId_userId: {
+          projectId: data.projectId,
+          userId: data.targetUserId
+        }
+      }
+    });
+    const targetEmail = await tx.user.findUnique({
+      where: { id: data.targetUserId },
+      select: { email: true }
+    })
+    // 초대 정보 제거
+    await tx.invitation.deleteMany({
+      where: {
+        projectId: data.projectId,
+        email: targetEmail!.email
+      }
+    })
+  })
 }
 
 export default {
   create,
   update,
   findById,
+  findUserByEmail,
   findMemberById,
+  findMembers,
   findDeleteMailInfo,
   findMyProjects,
   createInvitation,

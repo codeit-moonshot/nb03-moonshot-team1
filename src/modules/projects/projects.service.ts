@@ -1,9 +1,9 @@
 import prisma from "#prisma/prisma";
 import ApiError from "#errors/ApiError";
-import projectRepo from './projects.repo';
-import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto } from './dto/projects.dto';
-import mailUtils from "./utils/mailUtils";
-import { MeProjectQueryDto } from "./dto/me-projects.dto";
+import projectRepo from '#modules/projects/projects.repo';
+import { InvitationDto, ExcludeMemberDto, createProjectDto, updateProjectDto, projectMemberQueryDto } from '#modules/projects/dto/projects.dto';
+import mailUtils from "#modules/projects/utils/mailUtils";
+import { MeProjectQueryDto } from "#modules/projects/dto/me-projects.dto";
 
 const formatProject = (project: any) => {
   return {
@@ -19,13 +19,8 @@ const formatProject = (project: any) => {
 
 const checkRole = async (userId: number, projectId: number) => {
   const member = await projectRepo.findMemberById({ projectId, userId });
-  if (!member) throw ApiError.notFound('사용자를 찾을 수 없습니다.');
-  if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
-}
-
-const checkMember = async (userId: number, projectId: number) => {
-  const member = await projectRepo.findMemberById({ projectId, userId });
   if (!member) throw ApiError.forbidden('프로젝트 멤버가 아닙니다.');
+  if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
 }
 
 const createProject = async (data: createProjectDto, userId: number) => {
@@ -33,20 +28,44 @@ const createProject = async (data: createProjectDto, userId: number) => {
   return formatProject(project);
 }
 
-const getProject = async (projectId: number) => {
-  const project = await projectRepo.findById(projectId);
+const getProject = async (projectId: number, userId: number) => {
+  const project = await projectRepo.findById(projectId, userId);
   if (!project) throw ApiError.notFound('프로젝트를 찾을 수 없습니다.');
+  if (project.members.length === 0) throw ApiError.forbidden('프로젝트 멤버가 아닙니다.');
 
   return formatProject(project);
 }
 
-const updateProject = async (data: updateProjectDto, projectId: number) => {
+const getProjectMembers = async (projectId: number, query: projectMemberQueryDto) => {
+  const { members, total } = await projectRepo.findMembers(projectId, query);
+  if (!members) throw ApiError.notFound('프로젝트를 찾을 수 없습니다.');
+
+  const data = members.members.map((member) => {
+    const invite = members.invitations.find((invitation) => invitation.email === member.user.email);
+    return {
+      id: member.user.id,
+      name: member.user.name,
+      email: member.user.email,
+      profileImage: member.user.profileImage,
+      taskCount: member.user._count.tasks,
+      status: invite?.status,
+      invitationId: invite?.id
+    }
+  })
+
+  return { data, total };
+}
+
+const updateProject = async (data: updateProjectDto, projectId: number, userId: number) => {
+  checkRole(projectId, userId);
   const project = await projectRepo.update(data, projectId);
   return formatProject(project);
 }
 
-const deleteProject = async (projectId: number) => {
+const deleteProject = async (projectId: number, userId: number) => {
+  checkRole(projectId, userId);
   const deleteMailInfo = await projectRepo.findDeleteMailInfo(projectId);
+  if (!deleteMailInfo) throw ApiError.notFound('프로젝트를 찾을 수 없습니다.');
   await projectRepo.remove(projectId);
   
   const mailInfo = {
@@ -63,8 +82,13 @@ const deleteProject = async (projectId: number) => {
 }
 
 const sendInvitation = async (data: InvitationDto) => {
+  checkRole(data.inviter!, data.projectId);
+
   await prisma.$transaction(async (tx) => {
-    const { id } = await projectRepo.createInvitation(data, tx);
+    const targetUserId = await projectRepo.findUserByEmail(data.targetEmail, tx);
+    if (!targetUserId) throw ApiError.notFound('초대할 사용자를 찾을 수 없습니다.');
+  
+    const id = await projectRepo.createInvitation(data, targetUserId.id, tx);
     const mailInfo = {
       subject: "프로젝트에 초대합니다",
       html: `
@@ -77,13 +101,9 @@ const sendInvitation = async (data: InvitationDto) => {
   })
 }
 
-const excludeMember = async (data: ExcludeMemberDto) => {
+const excludeMember = async (data: ExcludeMemberDto, userId: number) => {
   if(data.targetUserId < 1) throw ApiError.badRequest('유효하지 않은 사용자 ID입니다.');
-
-  const member = await projectRepo.findMemberById({ projectId: data.projectId, userId: data.targetUserId });
-  if(!member) throw ApiError.notFound('프로젝트 멤버가 아닙니다.');
-  if(member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
-  
+  checkRole(userId, data.projectId);
   await projectRepo.removeMember(data);
 }
 
@@ -92,13 +112,7 @@ const getMyProjects = async (userId: number, query: MeProjectQueryDto) => {
 
   const formattedProjects = projects.data.map(project => {
     return {
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      memberCount: project._count.members,
-      todoCount: project.tasks.filter(task => task.status === 'todo').length,
-      inProgressCount: project.tasks.filter(task => task.status === 'in_progress').length,
-      doneCount: project.tasks.filter(task => task.status === 'done').length,
+      ...formatProject(project),
       createdAt: project.createdAt,
       updatedAt: project.updatedAt
     }
@@ -111,10 +125,9 @@ const getMyProjects = async (userId: number, query: MeProjectQueryDto) => {
 }
 
 export default {
-  checkRole,
-  checkMember,
   createProject,
   getProject,
+  getProjectMembers,
   updateProject,
   deleteProject,
   sendInvitation,

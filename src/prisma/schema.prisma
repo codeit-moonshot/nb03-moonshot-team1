@@ -21,6 +21,7 @@ enum TaskStatus {
 enum ProjectRole {
   OWNER
   MEMBER
+  INVITED
 }
 
 enum SocialProvider {
