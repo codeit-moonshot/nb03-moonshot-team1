@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import tasksController from '#modules/tasks/tasks.controller';
-import { requireAuth } from '#middlewares/requireAuth';
 import { authMiddleware } from '#middlewares/authMiddleware';
 import tasksValidator from '#modules/tasks/tasks.validator';
 import subtasksController from '#modules/subtasks/subtasks.controller';
@@ -15,9 +14,9 @@ const router = Router();
  */
 router
   .route('/:taskId')
-  .get(requireAuth, tasksValidator.validateTaskId, tasksController.getTaskById)
-  .patch(requireAuth, tasksValidator.validateTaskId, tasksValidator.validatePatchTaskBody, tasksController.patchTask)
-  .delete(requireAuth, tasksValidator.validateTaskId, tasksController.deleteTask);
+  .get(authMiddleware, tasksValidator.validateTaskId, tasksController.getTaskById)
+  .patch(authMiddleware, tasksValidator.validateTaskId, tasksValidator.validatePatchTaskBody, tasksController.patchTask)
+  .delete(authMiddleware, tasksValidator.validateTaskId, tasksController.deleteTask);
 
 /**
  * /tasks/:taskId/subtasks
