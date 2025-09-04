@@ -46,23 +46,11 @@ const LoginPage = () => {
       <form className={cx(styles.form)} action={dispatch}>
         <div className={cx(styles.inputContainer)}>
           <Label>이메일</Label>
-          <Input
-            type="email"
-            name="email"
-            defaultValue={state.email}
-            placeholder="example@email.com"
-            required
-          />
+          <Input type="email" name="email" defaultValue={state.email} placeholder="example@email.com" required />
         </div>
         <div className={cx(styles.inputContainer)}>
           <Label>비밀번호</Label>
-          <Input
-            type="password"
-            name="password"
-            defaultValue={state.password}
-            placeholder="비밀 번호"
-            required
-          />
+          <Input type="password" name="password" defaultValue={state.password} placeholder="비밀번호" required />
         </div>
 
         <Button type="submit" disabled={isPending}>
