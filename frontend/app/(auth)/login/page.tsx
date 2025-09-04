@@ -65,10 +65,7 @@ const LoginPage = () => {
       <div className={cx(styles.socialLoginContainer)}>
         <p className={cx(styles.socialButtonTitle)}>SNS 간편 로그인</p>
         <div className={cx(styles.socialButtonContainer)}>
-          <SocialButton provider={OAuthProvider.NAVER} />
           <SocialButton provider={OAuthProvider.GOOGLE} />
-          <SocialButton provider={OAuthProvider.FACEBOOK} />
-          <SocialButton provider={OAuthProvider.KAKAO} />
         </div>
       </div>
     </div>
