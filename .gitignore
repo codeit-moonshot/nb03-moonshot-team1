@@ -3,3 +3,5 @@ dist
 .env
 .DS_Store
 src/prisma/migrations
+uploads/files/users/profiles/*
+uploads/temp/files/*
