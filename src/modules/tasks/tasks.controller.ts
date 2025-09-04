@@ -67,7 +67,7 @@ const deleteTask: RequestHandler = async (req, res) => {
 };
 
 /**
- * @function getMyTasks
+ * @function getMyTaskList
  * @description 로그인한 사용자의 모든 할 일(Task) 목록을 조회합니다.
  *
  * @route GET /users/me/tasks
@@ -79,7 +79,7 @@ const deleteTask: RequestHandler = async (req, res) => {
  * @throws {400} 잘못된 요청 형식
  * @throws {401} 로그인이 필요합니다
  */
-const getMyTasks: RequestHandler = async (req, res) => {
+const getMyTaskList: RequestHandler = async (req, res) => {
   const userId: number = req.user.id;
   const query: MeTasksQueryDto = res.locals.meTasksQuery;
   const items = await taskService.getMyTasks(userId, query);
@@ -90,5 +90,5 @@ export default {
   getTaskById,
   patchTask,
   deleteTask,
-  getMyTasks,
+  getMyTaskList,
 };

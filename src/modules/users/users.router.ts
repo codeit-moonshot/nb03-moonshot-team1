@@ -14,12 +14,10 @@ router
   .get(authMiddleware, usersController.getMyInfo)
   .patch(authMiddleware, validUsers.validateUpdateMyInfo, usersController.updateMyInfo);
 
-router.route('/me/tasks').get(authMiddleware, tasksValidator.validateMeTasksQuery, tasksController.getMyTasks);
+router.route('/me/tasks').get(authMiddleware, tasksValidator.validateMeTasksQuery, tasksController.getMyTaskList);
 
 router
   .route('/me/projects')
-  .get(authMiddleware, 
-    projectValidator.validateMeProjectQuery, 
-    projectController.getMyProjects);
+  .get(authMiddleware, projectValidator.validateMeProjectQuery, projectController.getMyProjects);
 
 export default router;

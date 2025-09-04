@@ -1,12 +1,12 @@
 import ApiError from '#errors/ApiError';
 import smtpTransport from '#modules/projects/utils/smtp-transport';
 
-const sendMail = async (targetEmail: string, mailInfo: { subject: string, html: string }) => {
+const sendMail = async (targetEmail: string, mailInfo: { subject: string; html: string }) => {
   const mailOptions = {
-  from: process.env.SMTP_USER,
-  to: targetEmail,
-  subject: mailInfo.subject,
-  html: `
+    from: process.env.SMTP_USER,
+    to: targetEmail,
+    subject: mailInfo.subject,
+    html: `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
@@ -16,16 +16,16 @@ const sendMail = async (targetEmail: string, mailInfo: { subject: string, html: 
     </head>
       <body>${mailInfo.html}</body>
     </html>
-  `
+  `,
   };
 
-  try{
+  try {
     await smtpTransport.sendMail(mailOptions);
   } catch (error) {
     throw ApiError.internal('메일 전송 실패', error);
   }
-}
+};
 
 export default {
-  sendMail
-}
+  sendMail,
+};

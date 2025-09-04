@@ -27,12 +27,6 @@ router
   .post(authMiddleware, subtasksValidator.validateSubtaskCreate, subtasksController.createSubtask);
 
 router
-  .route('/:taskId/subtasks/:subtaskId')
-  .get(authMiddleware, subtasksController.getSubtaskId)
-  .patch(authMiddleware, subtasksValidator.validateSubtaskUpdate, subtasksController.updateSubtask)
-  .delete(authMiddleware, subtasksController.deleteSubtask);
-
-router
   .route('/:taskId/comments')
   .get(authMiddleware, commentsValidator.validateCommentQuery, commentsController.getCommentList)
   .post(authMiddleware, commentsValidator.validateCommentCreate, commentsController.createComment);

@@ -19,7 +19,7 @@ const validateUpdateProject: RequestHandler = async (req, res, next) => {
   } catch (err) {
     forwardZodError(err, '프로젝트 수정', next);
   }
-}
+};
 
 const validateProjectMemberQuery: RequestHandler = async (req, res, next) => {
   try {
@@ -43,5 +43,5 @@ export default {
   validateCreateProject,
   validateUpdateProject,
   validateProjectMemberQuery,
-  validateMeProjectQuery
-}
+  validateMeProjectQuery,
+};

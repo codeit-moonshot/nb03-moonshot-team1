@@ -49,8 +49,8 @@ const getCommentList: RequestHandler = async (req, res, next) => {
     taskId: Number(req.params.taskId),
     userId: Number(req.user.id),
   };
-  const comments = await commentsService.getCommentList(dto);
-  res.status(200).json(comments);
+  const { data } = await commentsService.getCommentList(dto);
+  res.status(200).json(data);
 };
 
 /**
