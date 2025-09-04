@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import forwardZodError from '#utils/zod';
-import { createProjectSchema, updateProjectSchema } from './dto/project.dto';
-import { meProjectQuerySchema } from './dto/me-project.dto';
+import { createProjectSchema, updateProjectSchema } from './dto/projects.dto';
+import { meProjectQuerySchema } from './dto/me-projects.dto';
 
 const validateCreateProject: RequestHandler = async (req, res, next) => {
   try {

@@ -1,8 +1,8 @@
 import type { RequestHandler } from 'express';
-import projectService from './project.service';
-import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/project.dto';
+import projectService from './projects.service';
+import { createProjectDto, InvitationDto, ExcludeMemberDto, updateProjectDto } from './dto/projects.dto';
 import { generateInvitationToken } from './utils/tokenUtils';
-import { MeProjectQueryDto } from './dto/me-project.dto';
+import { MeProjectQueryDto } from './dto/me-projects.dto';
 
 /**
  * @function createProject
@@ -24,6 +24,27 @@ const createProject: RequestHandler = async (req, res) => {
   };
 
   const project = await projectService.createProject(createDto, userId);
+  res.status(200).json(project);
+}
+
+/**
+ * @function getProject
+ * @description 프로젝트 조회
+ *
+ * @params {Object} req - { headers: { authorization: "Bearer <token>" } }
+ * 
+ * @returns {200} 프로젝트 정보
+ * @throws {401} Unauthorized
+ * @throws {403} Forbidden
+ * @throws {404} Not Found
+ */
+const getProject: RequestHandler = async (req, res) => {
+  const userId = req.user.id;
+  const projectId = Number(req.params.projectId);
+
+  await projectService.checkMember(userId, projectId);
+
+  const project = await projectService.getProject(projectId);
   res.status(200).json(project);
 }
 
@@ -154,6 +175,7 @@ const getMyProjects: RequestHandler = async (req, res) => {
 
 export default {
   createProject,
+  getProject,
   updateProject,
   deleteProject,
   createInvitation,

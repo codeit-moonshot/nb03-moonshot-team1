@@ -29,8 +29,9 @@ const getMyInfo: RequestHandler = async (req, res) => {
  * @param {Object} res - Express 응답 객체
  *
  * @returns {201} 수정된 내 정보 반환
- * @throws {400} 사용자 찾을 수 없음
- * @throws {404} 비밀번호 불일치
+ * @throws {400} 비밀번호 불일치
+ * @throws {401} 사용자 인증 실패
+ * @throws {404} 사용자를 찾을 수 없음
  */
 
 const updateMyInfo: RequestHandler = async (req, res) => {

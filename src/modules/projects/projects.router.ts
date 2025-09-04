@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import projectController from './project.controller';
-import validateProject from './project.validator';
+import projectController from './projects.controller';
+import validateProject from './projects.validator';
 import { requireAuth } from '#middlewares/requireAuth';
 import projectTasksController from '#modules/tasks/projects/projectTasks.controller';
 import projectTasksValidator from '#modules/tasks/projects/projectTasks.validator';
