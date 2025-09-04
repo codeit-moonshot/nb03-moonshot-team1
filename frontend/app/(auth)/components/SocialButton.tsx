@@ -8,7 +8,6 @@ const cx = classNames.bind(styles);
 const SocialButton = () => {
   const handleClick = () => {
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-    // ✅ 백엔드 API 주소로 리다이렉트
     window.location.href = `${BASE_URL}/auth/google`;
   };
 
