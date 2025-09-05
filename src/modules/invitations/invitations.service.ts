@@ -4,7 +4,7 @@ import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.D
 import invitationRepo from '#modules/invitations/invitations.repo';
 import projectRepo from '#modules/projects/projects.repo';
 
-const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number, userId: number) => {
+const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {
   const accept = await invitationRepo.acceptInvitation(acceptInvitationDto, invitationId);
   if (accept === 'unknown') throw ApiError.internal();
   if (accept === 'not found') throw ApiError.notFound();
