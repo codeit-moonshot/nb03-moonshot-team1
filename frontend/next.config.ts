@@ -39,11 +39,10 @@ const nextConfig: NextConfig = {
 
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb',
+      bodySizeLimit: '1mb',
     },
   },
 
-  //서버 자꾸 죽여서 꺼버림
   eslint: {
     ignoreDuringBuilds: true,
   },
