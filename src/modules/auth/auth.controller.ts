@@ -1,4 +1,4 @@
-import env from '#config/env';
+import env, { FRONT_ORIGIN } from '#config/env';
 import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
 import googleOauthService from '#libs/googleOauth.service';
@@ -112,11 +112,10 @@ const googleCallback: RequestHandler = async (req, res, next) => {
 
   const token = await authService.googleRegisterOrLogin(code);
 
-  // 토큰을 HTTP-only 쿠키로 설정
   const cookieOptions = {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const),
+    secure: env.NODE_ENV === 'production', // 개발: false(HTTP), 운영: true(HTTPS)
+    sameSite: env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const), // 개발: lax, 운영: none(CORS)
     maxAge: 60 * 60 * 24 * 14 * 1000, // 14일
     path: '/',
   };
@@ -125,7 +124,7 @@ const googleCallback: RequestHandler = async (req, res, next) => {
   res.cookie('refresh-token', token.refreshToken, cookieOptions);
 
   // 프론트엔드 메인 페이지로 리다이렉트
-  const frontendUrl = env.FRONT_URL || 'http://localhost:3000';
+  const frontendUrl = FRONT_ORIGIN || 'http://localhost:3000';
   res.redirect(`${frontendUrl}/?google_login_success=true`);
 };
 
