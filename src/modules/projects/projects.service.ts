@@ -1,6 +1,7 @@
 import prisma from '#prisma/prisma';
 import ApiError from '#errors/ApiError';
 import projectRepo from '#modules/projects/projects.repo';
+import { generateInvitationToken } from '#modules/projects/utils/tokenUtils';
 import {
   InvitationDto,
   ExcludeMemberDto,
@@ -93,6 +94,8 @@ const sendInvitation = async (data: InvitationDto) => {
   await prisma.$transaction(async (tx) => {
     const targetUserId = await projectRepo.findUserByEmail(data.targetEmail, tx);
     if (!targetUserId) throw ApiError.notFound('초대할 사용자를 찾을 수 없습니다.');
+    const invitationToken = generateInvitationToken(data.projectId, targetUserId.id, data.targetEmail);
+    data.invitationToken = invitationToken;
 
     await prisma.$transaction(async (tx) => {
       const id = await projectRepo.createInvitation(data, targetUserId.id, tx);

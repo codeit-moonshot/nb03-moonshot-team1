@@ -38,7 +38,7 @@ export type projectMemberQueryDto = z.infer<typeof projectMemberQuerySchema>;
 export const invitationSchema = z.object({
   projectId: z.number().min(1),
   targetEmail: emailWithMX,
-  invitationToken: z.string(),
+  invitationToken: z.string().optional(),
   inviter: z.number().min(1).optional(),
 });
 
