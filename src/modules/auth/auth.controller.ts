@@ -125,7 +125,7 @@ const googleCallback: RequestHandler = async (req, res, next) => {
 
   // 프론트엔드 메인 페이지로 리다이렉트
   const frontendUrl = FRONT_ORIGIN || 'http://localhost:3000';
-  res.redirect(`${frontendUrl}/?google_login_success=true`);
+  res.redirect(`${frontendUrl}/projects`);
 };
 
 export default {
