@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import type { AcceptInvitationDto, CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.Dto';
 import invitationService from '#modules/invitations/invitations.service';
 
 /**

@@ -1,5 +1,5 @@
 import prisma from '#prisma/prisma';
-import type { AcceptInvitationDto, CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.Dto';
 import { Prisma } from '@prisma/client';
 
 const findById = async (id: number) => {
