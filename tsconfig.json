@@ -8,11 +8,22 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
 
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
-    }
+      "#config/*": ["src/config/*"],
+      "#constants/*": ["src/constants/*"],
+      "#crons/*": ["src/crons/*"],
+      "#errors/*": ["src/errors/*"],
+      "#libs/*": ["src/libs/*"],
+      "#modules/*": ["src/modules/*"],
+      "#middlewares/*": ["src/middlewares/*"],
+      "#prisma/*": ["src/prisma/*"],
+      "#routes/*": ["src/routes/*"],
+      "#uploads/*": ["uploads/*"],
+      "#utils/*": ["src/utils/*"]
+    },
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["src", "src/types"],
-  "exclude": ["node_modules", "dist", "src/modules/_example"]
+  "exclude": ["node_modules", "dist"]
 }

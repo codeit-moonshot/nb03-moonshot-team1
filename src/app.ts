@@ -12,15 +12,13 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import csurf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 
-import routes from '@/routes';
-import { errorHandler } from '@/middlewares/errorHandler';
-import ApiError from '@/errors/ApiError';
-import env, { CORS_ORIGINS } from '@/config/env';
+import routes from '#routes/index';
+import { errorHandler } from '#middlewares/errorHandler';
+import ApiError from '#errors/ApiError';
+import env, { CORS_ORIGINS } from '#config/env';
 
 const app: Application = express();
 
@@ -41,7 +39,7 @@ app.use(
         'default-src': ["'self'"],
         'script-src': ["'self'", "'unsafe-inline'"],
         'style-src': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", 'data:', 'https:'],
+        'img-src': ["'self'", 'data:', 'https:', ...(env.NODE_ENV !== 'production' ? ['http:', 'blob:'] : [])],
         'object-src': ["'none'"],
         'frame-ancestors': ["'none'"],
       },
@@ -51,11 +49,16 @@ app.use(
 );
 
 /**
+ * Trust Proxy
+ */
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
+
+/**
  * Rate limit
  */
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -83,42 +86,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 /**
- * Session (쿠키 기반)
+ * 정적 파일 (공개 서빙)
+ * URL → 디스크:
+ * /uploads/temp/:filename  →  uploads/temp/files/:filename
+ * /uploads/:filename       →  uploads/files/:filename
  */
-app.use(
-  session({
-    secret: env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    },
-  })
-);
+const UPLOAD_ROOT = path.isAbsolute(process.env.UPLOAD_ROOT ?? '')
+  ? (process.env.UPLOAD_ROOT as string)
+  : path.join(process.cwd(), process.env.UPLOAD_ROOT ?? 'uploads');
+
+const FINAL_FILES_DIR = path.join(UPLOAD_ROOT, 'files'); // ./uploads/files
+const TEMP_FILES_DIR = path.join(UPLOAD_ROOT, 'temp', 'files'); // ./uploads/temp/files
+/**
+ * 정적 서빙
+ * - 임시: 캐시 금지
+ * - 정식: 캐시 허용
+ */
+app.use('/api/uploads/temp', express.static(TEMP_FILES_DIR, { fallthrough: false, etag: false, maxAge: 0 }));
+app.use('/api/uploads', express.static(FINAL_FILES_DIR, { fallthrough: false, maxAge: '7d' }));
 
 /**
- * CSRF 보호
- */
-app.use(csurf({ cookie: true }));
-
-/**
- * 정적 파일 (MIME 강제)
- */
-app.use(
-  '/uploads',
-  express.static(path.join(process.cwd(), env.UPLOAD_ROOT), {
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith('.html')) {
-        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-      }
-    },
-  })
-);
-
-/**
- * Routes
+ * Routes (API)
  */
 app.use('/api', routes);
 
