@@ -30,8 +30,7 @@ const findById = async (projectId: number, userId: number) => {
       id: projectId,
       members: {
         some: { 
-          userId,
-          role: { in: [ 'OWNER', 'MEMBER' ] }
+          userId
         }
       }
     },
@@ -154,8 +153,7 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
         members: 
         { 
           some: { 
-            userId,
-            role: { in: ['OWNER', 'MEMBER'] }
+            userId
           } 
         } 
       },
