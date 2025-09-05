@@ -27,7 +27,13 @@ const findById = async (projectId: number, userId: number) => {
   };
   return await prisma.project.findUnique({
     where: {
-      id: projectId
+      id: projectId,
+      members: {
+        some: { 
+          userId,
+          role: { in: [ 'OWNER', 'MEMBER' ] }
+        }
+      }
     },
     select: findSelect
   });
