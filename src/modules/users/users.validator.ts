@@ -1,4 +1,3 @@
-// #modules/users/users.validator.ts
 import type { RequestHandler } from 'express';
 import forwardZodError from '#utils/zod';
 import { userUpdateSchema } from '#modules/users/dto/user.dto';
