@@ -1,9 +1,10 @@
+import jwt from 'jsonwebtoken';
 import ApiError from '#errors/ApiError';
 import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.Dto';
 import invitationRepo from '#modules/invitations/invitations.repo';
 import projectRepo from '#modules/projects/projects.repo';
 
-const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {
+const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number, userId: number) => {
   const accept = await invitationRepo.acceptInvitation(acceptInvitationDto, invitationId);
   if (accept === 'unknown') throw ApiError.internal();
   if (accept === 'not found') throw ApiError.notFound();
@@ -22,7 +23,11 @@ const checkInvitation = async (invitationId: number, acceptedToken: string) => {
   if (invitation.expiresAt! < new Date()) throw ApiError.badRequest('만료된 초대입니다.');
   if (invitation.status === 'accepted') throw ApiError.badRequest('이미 수락된 초대입니다.');
 
-  return invitation.projectId;
+  const payload = jwt.verify(acceptedToken, process.env.INVITATION_TOKEN_SECRET!) as { projectId: number; targetId: number; email: string };
+  return { 
+    projectId: payload.projectId, 
+    targetId: payload.targetId 
+  };
 };
 
 const removeInvitation = async (invitationId: number, userId: number) => {
