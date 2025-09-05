@@ -80,12 +80,12 @@ const findUserByEmail = async (email: string, tx: Prisma.TransactionClient) => {
   });
 };
 
-const findMemberById = async (id: { projectId: number; userId: number }) => {
+const findMemberById = async (projectId: number, userId: number ) => {
   return await prisma.projectMember.findUnique({
     where: {
       projectId_userId: {
-        projectId: id.projectId,
-        userId: id.userId
+        projectId,
+        userId
       }
     },
     select: { role: true }

@@ -24,8 +24,8 @@ const formatProject = (project: any) => {
   };
 };
 
-const checkRole = async (userId: number, projectId: number) => {
-  const member = await projectRepo.findMemberById({ projectId, userId });
+const checkRole = async (projectId: number, userId: number) => {
+  const member = await projectRepo.findMemberById(projectId, userId);
   if (!member) throw ApiError.forbidden('프로젝트 멤버가 아닙니다.');
   if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
 };
@@ -64,7 +64,7 @@ const getProjectMembers = async (projectId: number, query: projectMemberQueryDto
 };
 
 const updateProject = async (data: updateProjectDto, projectId: number, userId: number) => {
-  checkRole(projectId, userId);
+  await checkRole(projectId, userId);
   const project = await projectRepo.update(data, projectId);
   return formatProject(project);
 };
