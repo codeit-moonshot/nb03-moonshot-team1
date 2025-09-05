@@ -1,3 +1,4 @@
+import env from '#config/env';
 import type { RequestHandler } from 'express';
 import authService from '#modules/auth/auth.service';
 import googleOauthService from '#libs/googleOauth.service';
@@ -90,12 +91,12 @@ const googleLogin: RequestHandler = (req, res, next) => {
 };
 
 /**
- * 구글 로그인 콜백
+ * 구글 로그인 콜백 (프론트엔드에서 호출)
  *
  * @param {Object} req - Express 요청 객체
  * @param {Object} res - Express 응답 객체
  *
- * @returns {200} 생성된 토큰 반환
+ * @returns {302} 프론트엔드 메인 페이지로 리다이렉트 (토큰은 쿠키로 설정)
  *
  * @throws {400} 유효하지 않은 요청 및 상태 불일치, 구글과 통신 실패
  * @throws {409} 이메일 중복시 회원가입 실패
@@ -110,7 +111,22 @@ const googleCallback: RequestHandler = async (req, res, next) => {
   if (!verifiedState) throw ApiError.badRequest('유효하지 않은 state입니다.');
 
   const token = await authService.googleRegisterOrLogin(code);
-  res.status(200).json(token);
+
+  // 토큰을 HTTP-only 쿠키로 설정
+  const cookieOptions = {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const),
+    maxAge: 60 * 60 * 24 * 14 * 1000, // 14일
+    path: '/',
+  };
+
+  res.cookie('access-token', token.accessToken, cookieOptions);
+  res.cookie('refresh-token', token.refreshToken, cookieOptions);
+
+  // 프론트엔드 메인 페이지로 리다이렉트
+  const frontendUrl = env.FRONT_URL || 'http://localhost:3000';
+  res.redirect(`${frontendUrl}/?google_login_success=true`);
 };
 
 export default {

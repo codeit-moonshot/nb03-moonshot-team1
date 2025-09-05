@@ -63,23 +63,11 @@ const RegisterPage = () => {
         </div>
         <div className={cx(styles.inputContainer)}>
           <Label>이메일</Label>
-          <Input
-            type="email"
-            name="email"
-            defaultValue={state.email}
-            placeholder="example@email.com"
-            required
-          />
+          <Input type="email" name="email" defaultValue={state.email} placeholder="example@email.com" required />
         </div>
         <div className={cx(styles.inputContainer)}>
           <Label>닉네임</Label>
-          <Input
-            type="text"
-            name="name"
-            defaultValue={state.name}
-            placeholder="닉네임"
-            required
-          />
+          <Input type="text" name="name" defaultValue={state.name} placeholder="닉네임" required />
         </div>
         <div className={cx(styles.inputContainer)}>
           <Label>비밀번호</Label>
@@ -117,10 +105,7 @@ const RegisterPage = () => {
       <div className={cx(styles.socialLoginContainer)}>
         <p className={cx(styles.socialButtonTitle)}>SNS 간편 로그인</p>
         <div className={cx(styles.socialButtonContainer)}>
-          <SocialButton provider={OAuthProvider.NAVER} />
           <SocialButton provider={OAuthProvider.GOOGLE} />
-          <SocialButton provider={OAuthProvider.FACEBOOK} />
-          <SocialButton provider={OAuthProvider.KAKAO} />
         </div>
       </div>
     </div>

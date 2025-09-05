@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
         hostname: 'moonshot.mimu.live',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
 
