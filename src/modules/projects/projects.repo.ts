@@ -159,8 +159,6 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
           } 
         } 
       },
-      skip: query.limit * (query.page - 1),
-      take: query.limit,
       orderBy,
       select: {
         id: true,
@@ -179,6 +177,13 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   });
   return findMyProjectsTransaction;
 };
+
+const findProjectCount = async (userId: number) => {
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    select: { ownedProjects: { select: { id: true } } }
+  })
+}
 
 const createInvitation = async (data: InvitationDto, targetUserId: number, tx: Prisma.TransactionClient) => {
   const invitation = await tx.invitation.create({
@@ -238,6 +243,7 @@ export default {
   findMembers,
   findDeleteMailInfo,
   findMyProjects,
+  findProjectCount,
   createInvitation,
   remove,
   removeMember,

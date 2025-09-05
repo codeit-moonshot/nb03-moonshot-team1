@@ -32,6 +32,10 @@ const checkRole = async (projectId: number, userId: number) => {
 };
 
 const createProject = async (data: createProjectDto, userId: number) => {
+  const projectCount = await projectRepo.findProjectCount(userId);
+  if (projectCount!.ownedProjects.length >= 5) {
+    throw ApiError.forbidden('프로젝트는 5개까지 생성할 수 있습니다.');
+  }
   const project = await projectRepo.create(data, userId);
   return formatProject(project);
 };
