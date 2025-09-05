@@ -1,7 +1,7 @@
+import env from '#config/env';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
-import env from '#config/env';
 import ApiError from '#errors/ApiError';
 
 const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;

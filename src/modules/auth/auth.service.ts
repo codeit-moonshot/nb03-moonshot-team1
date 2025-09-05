@@ -95,7 +95,7 @@ const googleRegisterOrLogin = async (code: string): Promise<TokenDto> => {
   const hashAccessToken = tokenCrypto.encryptToken(access_token);
   const hashRefreshToken = tokenCrypto.encryptToken(refresh_token);
 
-  let user = await authRepo.findUserBySocial(id, SocialProvider.GOOGLE);
+  let user = await authRepo.findUserBySocial(SocialProvider.GOOGLE, id);
   if (!user) {
     const existingUser = await usersService.findUserByEmail(email);
     if (existingUser) throw ApiError.conflict('이미 사용 중인 이메일입니다.');

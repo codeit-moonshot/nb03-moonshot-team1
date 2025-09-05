@@ -24,11 +24,7 @@ const Profile = ({ className, user }: { className?: string; user: User }) => {
       onClickOutside={() => setIsOpen(false)}
       content={
         <div className={cx(styles.menu)}>
-          <Link
-            href="/settings"
-            className={cx(styles.menuItem)}
-            onClick={() => setIsOpen(false)}
-          >
+          <Link href="/settings" className={cx(styles.menuItem)} onClick={() => setIsOpen(false)}>
             설정
           </Link>
           <div
@@ -43,18 +39,9 @@ const Profile = ({ className, user }: { className?: string; user: User }) => {
         </div>
       }
     >
-      <div
-        className={cx(styles.profile, className)}
-        onClick={() => setIsOpen(true)}
-      >
+      <div className={cx(styles.profile, className)} onClick={() => setIsOpen(true)}>
         {user.profileImage ? (
-          <Image
-            className={cx(styles.profileImage)}
-            src={user.profileImage}
-            alt="profile"
-            width={32}
-            height={32}
-          />
+          <Image className={cx(styles.profileImage)} src={user.profileImage} alt="profile" width={32} height={32} />
         ) : (
           <BlankProfile className={cx(styles.profileImage)} />
         )}

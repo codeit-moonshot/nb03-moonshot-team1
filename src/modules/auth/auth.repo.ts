@@ -39,7 +39,7 @@ const updateGoogleToken = async (data: UpdateTokenDto) => {
   });
 };
 
-const findUserBySocial = async (providerUid: string, provider: SocialProvider) => {
+const findUserBySocial = async (provider: SocialProvider, providerUid: string) => {
   const account = await prisma.socialAccount.findUnique({
     where: {
       provider_providerUid: {
@@ -47,7 +47,9 @@ const findUserBySocial = async (providerUid: string, provider: SocialProvider) =
         providerUid,
       },
     },
-    include: { user: true },
+    include: {
+      user: true,
+    },
   });
   return account?.user;
 };

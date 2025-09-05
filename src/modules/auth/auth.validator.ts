@@ -11,7 +11,7 @@ const validateAuthRegister: RequestHandler = async (req, res, next) => {
       password: req.body.password,
       profileImage: req.body.profileImage,
     };
-    await authCreateSchema.parseAsync(parsedBody);
+    authCreateSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
     forwardZodError(err, '사용자 등록', next);
@@ -24,7 +24,7 @@ const validateAuthLogin: RequestHandler = async (req, res, next) => {
       email: req.body.email,
       password: req.body.password,
     };
-    await loginSchema.parseAsync(parsedBody);
+    loginSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
     forwardZodError(err, '사용자 로그인', next);

@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
         hostname: 'moonshot.mimu.live',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
 
@@ -38,7 +43,7 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // 서버 자꾸 죽여서 꺼버림
+  //서버 자꾸 죽여서 꺼버림
   eslint: {
     ignoreDuringBuilds: true,
   },
