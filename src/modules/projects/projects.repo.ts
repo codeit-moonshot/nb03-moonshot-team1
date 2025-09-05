@@ -27,7 +27,13 @@ const findById = async (projectId: number, userId: number) => {
   };
   return await prisma.project.findUnique({
     where: {
-      id: projectId
+      id: projectId,
+      members: {
+        some: { 
+          userId,
+          role: { in: [ 'OWNER', 'MEMBER' ] }
+        }
+      }
     },
     select: findSelect
   });
@@ -74,12 +80,12 @@ const findUserByEmail = async (email: string, tx: Prisma.TransactionClient) => {
   });
 };
 
-const findMemberById = async (id: { projectId: number; userId: number }) => {
+const findMemberById = async (projectId: number, userId: number ) => {
   return await prisma.projectMember.findUnique({
     where: {
       projectId_userId: {
-        projectId: id.projectId,
-        userId: id.userId
+        projectId,
+        userId
       }
     },
     select: { role: true }
@@ -144,7 +150,15 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   const orderBy = { [query.order_by]: query.order };
   const findMyProjectsTransaction = await prisma.$transaction(async (tx) => {
     const projects = await tx.project.findMany({
-      where: { members: { some: { userId } } },
+      where: { 
+        members: 
+        { 
+          some: { 
+            userId,
+            role: { in: ['OWNER', 'MEMBER'] }
+          } 
+        } 
+      },
       skip: query.limit * (query.page - 1),
       take: query.limit,
       orderBy,

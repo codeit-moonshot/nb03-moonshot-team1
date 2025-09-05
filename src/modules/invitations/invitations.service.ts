@@ -4,14 +4,14 @@ import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.D
 import invitationRepo from '#modules/invitations/invitations.repo';
 import projectRepo from '#modules/projects/projects.repo';
 
-const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number, userId: number) => {
+const acceptInvitation = async (acceptInvitationDto: AcceptInvitationDto, invitationId: number) => {
   const accept = await invitationRepo.acceptInvitation(acceptInvitationDto, invitationId);
   if (accept === 'unknown') throw ApiError.internal();
   if (accept === 'not found') throw ApiError.notFound();
 };
 
 const checkRole = async (userId: number, projectId: number) => {
-  const member = await projectRepo.findMemberById({ projectId, userId });
+  const member = await projectRepo.findMemberById(projectId, userId);
   if (!member) throw ApiError.notFound('프로젝트 멤버가 아닙니다.');
   if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
 };
