@@ -172,7 +172,7 @@ const createInvitation = async (data: InvitationDto, targetUserId: number, tx: P
       project: { connect: { id: data.projectId } },
       inviter: { connect: { id: data.inviter } },
       email: data.targetEmail,
-      token: data.invitationToken,
+      token: data.invitationToken!,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7) // 1 week expiration
     },
     select: { id: true }

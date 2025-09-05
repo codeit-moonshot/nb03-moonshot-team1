@@ -7,7 +7,6 @@ import {
   updateProjectDto,
   projectMemberQueryDto,
 } from '#modules/projects/dto/projects.dto';
-import { generateInvitationToken } from '#modules/projects/utils/tokenUtils';
 import { MeProjectQueryDto } from '#modules/projects/dto/me-projects.dto';
 
 /**
@@ -133,11 +132,9 @@ const createInvitation: RequestHandler = async (req, res) => {
   const projectId = Number(req.params.projectId);
 
   const email = req.body.email;
-  const invitationToken = generateInvitationToken(projectId, email);
   const invitationDto: InvitationDto = {
     projectId,
     targetEmail: email,
-    invitationToken,
     inviter: userId,
   };
 

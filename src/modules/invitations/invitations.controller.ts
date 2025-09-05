@@ -16,16 +16,16 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
   // 필요한 데이터를 dto에 넣는다
   const invitationId = Number(req.params.invitationId);
   const invitationToken = req.body.token as string;
-  const projectId = await invitationService.checkInvitation(invitationId, invitationToken);
+  const { projectId, targetId } = await invitationService.checkInvitation(invitationId, invitationToken);
   const userId = req.user.id;
 
   const acceptInvitationDto: AcceptInvitationDto = {
     projectId,
-    userId,
+    userId: targetId,
     role: 'MEMBER',
   };
 
-  await invitationService.acceptInvitation(acceptInvitationDto, invitationId);
+  await invitationService.acceptInvitation(acceptInvitationDto, invitationId, userId);
   res.sendStatus(200);
 };
 
