@@ -144,14 +144,7 @@ const findMyProjects = async (userId: number, query: MeProjectQueryDto) => {
   const orderBy = { [query.order_by]: query.order };
   const findMyProjectsTransaction = await prisma.$transaction(async (tx) => {
     const projects = await tx.project.findMany({
-      where: { 
-        members: { 
-          some: { 
-            userId,
-            role: { in: ['OWNER', 'MEMBER'] }
-          } 
-        } 
-      },
+      where: { members: { some: { userId } } },
       skip: query.limit * (query.page - 1),
       take: query.limit,
       orderBy,

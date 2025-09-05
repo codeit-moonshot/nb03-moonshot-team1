@@ -25,7 +25,6 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
     role: 'MEMBER',
   };
 
-  console.log(acceptInvitationDto);
   await invitationService.acceptInvitation(acceptInvitationDto, invitationId, userId);
   res.sendStatus(200);
 };
