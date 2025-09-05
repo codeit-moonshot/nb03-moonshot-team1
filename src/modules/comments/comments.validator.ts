@@ -10,7 +10,7 @@ const validateCommentCreate: RequestHandler = async (req, res, next) => {
       authorId: req.user.id,
       content: req.body.content,
     };
-    commentCreateSchema.parseAsync(parsedBody);
+    await commentCreateSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
     forwardZodError(err, '댓글 생성', next);
@@ -23,7 +23,7 @@ const validateCommentQuery: RequestHandler = async (req, res, next) => {
       page: req.query.page,
       limit: req.query.limit,
     };
-    commentQuerySchema.parseAsync(parsedQuery);
+    await commentQuerySchema.parseAsync(parsedQuery);
     next();
   } catch (err) {
     forwardZodError(err, '댓글 조회', next);
@@ -36,7 +36,7 @@ const validateCommentUpdate: RequestHandler = async (req, res, next) => {
       commentId: req.params.commentId,
       content: req.body.content,
     };
-    updateCommentSchema.parseAsync(parsedBody);
+    await updateCommentSchema.parseAsync(parsedBody);
     next();
   } catch (err) {
     forwardZodError(err, '댓글 수정', next);
