@@ -1,3 +1,4 @@
+import { FRONT_ORIGIN } from '#config/env';
 import prisma from '#prisma/prisma';
 import ApiError from '#errors/ApiError';
 import projectRepo from '#modules/projects/projects.repo';
@@ -24,8 +25,8 @@ const formatProject = (project: any) => {
   };
 };
 
-const checkRole = async (userId: number, projectId: number) => {
-  const member = await projectRepo.findMemberById({ projectId, userId });
+const checkRole = async (projectId: number, userId: number) => {
+  const member = await projectRepo.findMemberById(projectId, userId);
   if (!member) throw ApiError.forbidden('프로젝트 멤버가 아닙니다.');
   if (member.role !== 'OWNER') throw ApiError.forbidden('권한이 없습니다.');
 };
@@ -64,13 +65,13 @@ const getProjectMembers = async (projectId: number, query: projectMemberQueryDto
 };
 
 const updateProject = async (data: updateProjectDto, projectId: number, userId: number) => {
-  checkRole(projectId, userId);
+  await checkRole(projectId, userId);
   const project = await projectRepo.update(data, projectId);
   return formatProject(project);
 };
 
 const deleteProject = async (projectId: number, userId: number) => {
-  checkRole(projectId, userId);
+  await checkRole(projectId, userId);
   const deleteMailInfo = await projectRepo.findDeleteMailInfo(projectId);
   if (!deleteMailInfo) throw ApiError.notFound('프로젝트를 찾을 수 없습니다.');
   await projectRepo.remove(projectId);
@@ -84,37 +85,40 @@ const deleteProject = async (projectId: number, userId: number) => {
   };
   for (const member of deleteMailInfo.members) {
     const targetEmail = member.user.email;
-    await mailUtils.sendMail(targetEmail, mailInfo);
+    void mailUtils.sendMail(targetEmail, mailInfo).catch((e) => console.error('[deleteProject] mail send fail:', e));
   }
 };
 
 const sendInvitation = async (data: InvitationDto) => {
-  checkRole(data.inviter!, data.projectId);
+  await checkRole(data.projectId, data.inviter!);
 
-  await prisma.$transaction(async (tx) => {
-    const targetUserId = await projectRepo.findUserByEmail(data.targetEmail, tx);
-    if (!targetUserId) throw ApiError.notFound('초대할 사용자를 찾을 수 없습니다.');
-    const invitationToken = generateInvitationToken(data.projectId, targetUserId.id, data.targetEmail);
-    data.invitationToken = invitationToken;
+  const { invitationId, targetEmail, invitationToken } = await prisma.$transaction(async (tx) => {
+    const targetUser = await projectRepo.findUserByEmail(data.targetEmail, tx);
+    if (!targetUser) throw ApiError.notFound('초대할 사용자를 찾을 수 없습니다.');
 
-    await prisma.$transaction(async (tx) => {
-      const id = await projectRepo.createInvitation(data, targetUserId.id, tx);
-      const mailInfo = {
-        subject: '프로젝트에 초대합니다',
-        html: `
-          <h1> 프로젝트에 초대합니다. </h1>
-          <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
-          <a href="${process.env.FRONT_URL}/invitations/${id}?token=${data.invitationToken}">참여하기</a>
-        `,
-      };
-      await mailUtils.sendMail(data.targetEmail, mailInfo);
-    });
+    const token = generateInvitationToken(data.projectId, targetUser.id, data.targetEmail);
+
+    const id = await projectRepo.createInvitation({ ...data, invitationToken: token }, targetUser.id, tx);
+
+    return { invitationId: id, targetEmail: data.targetEmail, invitationToken: token };
   });
+
+  // 커밋 처리 후 메일 발송 -- 비동기로 처리하면 네트워크 시간 지연 문제로 단순 처리.
+  const mailInfo = {
+    subject: '프로젝트에 초대합니다',
+    html: `
+      <h1> 프로젝트에 초대합니다. </h1>
+      <p>아래 링크를 클릭하여 프로젝트에 참여하세요:</p>
+      <a href="${FRONT_ORIGIN}/invitations/${invitationId}?token=${encodeURIComponent(invitationToken)}">참여하기</a>
+    `,
+  };
+
+  void mailUtils.sendMail(targetEmail, mailInfo).catch((e) => console.error('[sendInvitation] mail send fail:', e));
 };
 
 const excludeMember = async (data: ExcludeMemberDto, userId: number) => {
   if (data.targetUserId < 1) throw ApiError.badRequest('유효하지 않은 사용자 ID입니다.');
-  checkRole(userId, data.projectId);
+  await checkRole(data.projectId, userId);
   await projectRepo.removeMember(data);
 };
 

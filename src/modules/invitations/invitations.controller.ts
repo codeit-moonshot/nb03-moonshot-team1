@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import type { AcceptInvitationDto, CreateMemberDto } from '#modules/invitations/dto/invitations.Dto';
+import type { AcceptInvitationDto } from '#modules/invitations/dto/invitations.Dto';
 import invitationService from '#modules/invitations/invitations.service';
 
 /**
@@ -17,7 +17,6 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
   const invitationId = Number(req.params.invitationId);
   const invitationToken = req.body.token as string;
   const { projectId, targetId } = await invitationService.checkInvitation(invitationId, invitationToken);
-  const userId = req.user.id;
 
   const acceptInvitationDto: AcceptInvitationDto = {
     projectId,
@@ -25,7 +24,7 @@ export const acceptInvitation: RequestHandler = async (req, res) => {
     role: 'MEMBER',
   };
 
-  await invitationService.acceptInvitation(acceptInvitationDto, invitationId, userId);
+  await invitationService.acceptInvitation(acceptInvitationDto, invitationId);
   res.sendStatus(200);
 };
 
