@@ -22,12 +22,12 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
-        pathname: '/uploads/**',
+        pathname: '/api/uploads/**',
       },
       {
         protocol: 'https',
         hostname: 'moonshot.mimu.live',
-        pathname: '/uploads/**',
+        pathname: '/api/uploads/**',
       },
       {
         protocol: 'https',

@@ -91,16 +91,19 @@ app.use(cookieParser());
  * /uploads/temp/:filename  →  uploads/temp/files/:filename
  * /uploads/:filename       →  uploads/files/:filename
  */
-const TEMP_FILES_DIR = path.join(process.cwd(), env.UPLOAD_ROOT, 'temp', 'files'); // uploads/temp/files
-const FINAL_FILES_DIR = path.join(process.cwd(), env.UPLOAD_ROOT, 'files'); // uploads/files
+const UPLOAD_ROOT = path.isAbsolute(process.env.UPLOAD_ROOT ?? '')
+  ? (process.env.UPLOAD_ROOT as string)
+  : path.join(process.cwd(), process.env.UPLOAD_ROOT ?? 'uploads');
 
+const FINAL_FILES_DIR = path.join(UPLOAD_ROOT, 'files'); // ./uploads/files
+const TEMP_FILES_DIR = path.join(UPLOAD_ROOT, 'temp', 'files'); // ./uploads/temp/files
 /**
  * 정적 서빙
  * - 임시: 캐시 금지
  * - 정식: 캐시 허용
  */
-app.use('/uploads/temp', express.static(TEMP_FILES_DIR, { fallthrough: false, etag: false, maxAge: 0 }));
-app.use('/uploads', express.static(FINAL_FILES_DIR, { fallthrough: false, maxAge: '7d' }));
+app.use('/api/uploads/temp', express.static(TEMP_FILES_DIR, { fallthrough: false, etag: false, maxAge: 0 }));
+app.use('/api/uploads', express.static(FINAL_FILES_DIR, { fallthrough: false, maxAge: '7d' }));
 
 /**
  * Routes (API)

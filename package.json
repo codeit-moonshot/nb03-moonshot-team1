@@ -26,6 +26,7 @@
     "start": "npm run start:be && npm run start:fe",
     "start:be": "cross-env NODE_ENV=production pm2 start dist/server.js --name moonshot-be",
     "start:fe": "cross-env NODE_ENV=production pm2 start npm --name moonshot-fe -- run start --prefix frontend",
+    "stop": "pm2 delete moonshot-be || true && pm2 delete moonshot-fe || true",
     "start:all": "npm run start:be && npm run start:fe"
   },
   "dependencies": {
