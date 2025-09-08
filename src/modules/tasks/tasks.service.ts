@@ -51,7 +51,7 @@ const getTaskById = async (taskId: number, userId: number): Promise<PublicTaskWi
  * GET /users/me/tasks
  */
 const getMyTasks = async (userId: number, query: MeTasksQueryDto): Promise<PublicTask[]> => {
-  const { from, to, project_id, status, assignee, keyword, page, size, sort, order } = query;
+  const { from, to, project_id, status, assignee_id, keyword, page, size, sort, order } = query;
 
   const range =
     from || to
@@ -72,7 +72,7 @@ const getMyTasks = async (userId: number, query: MeTasksQueryDto): Promise<Publi
   const [rows] = await tasksRepo.findMany(userId, {
     range,
     projectId: project_id,
-    assigneeId: assignee,
+    assigneeId: assignee_id,
     keyword,
     statusIn,
     skip,
