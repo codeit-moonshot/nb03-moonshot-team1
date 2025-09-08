@@ -10,13 +10,13 @@ const paginationSchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 });
 
-export const  meTasksQuerySchema = z
+export const meTasksQuerySchema = z
   .object({
     from: dateStr.optional(),
     to: dateStr.optional(),
     project_id: z.coerce.number().int().positive().optional(),
     status: z.enum(TASK_STATUS).optional(),
-    assignee: z.coerce.number().int().positive().optional(),
+    assignee_id: z.coerce.number().int().positive().optional(),
     keyword: z.string().trim().max(100).optional(),
   })
   .merge(paginationSchema);

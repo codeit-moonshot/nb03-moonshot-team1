@@ -23,10 +23,14 @@ const checkInvitation = async (invitationId: number, acceptedToken: string) => {
   if (invitation.expiresAt! < new Date()) throw ApiError.badRequest('만료된 초대입니다.');
   if (invitation.status === 'accepted') throw ApiError.badRequest('이미 수락된 초대입니다.');
 
-  const payload = jwt.verify(acceptedToken, process.env.INVITATION_TOKEN_SECRET!) as { projectId: number; targetId: number; email: string };
-  return { 
-    projectId: payload.projectId, 
-    targetId: payload.targetId 
+  const payload = jwt.verify(acceptedToken, process.env.INVITATION_TOKEN_SECRET!) as {
+    projectId: number;
+    targetId: number;
+    email: string;
+  };
+  return {
+    projectId: payload.projectId,
+    targetId: payload.targetId,
   };
 };
 
