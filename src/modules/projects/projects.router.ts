@@ -21,8 +21,7 @@ router
   .route('/:projectId/users')
   .get(authMiddleware, validateProject.validateProjectMemberQuery, projectController.getProjectMembers);
 
-
-router.route('/:projectId/users/:userId').delete(projectController.excludeMember);
+router.route('/:projectId/users/:userId').delete(authMiddleware, projectController.excludeMember);
 
 /**
  * /projects/:projectId/tasks
