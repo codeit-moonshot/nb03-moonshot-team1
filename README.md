@@ -53,18 +53,22 @@
 
 ```
 src
-├── app.ts                # Express 앱 초기화
-├── server.ts             # 서버 실행 엔트리
-├── config/               # 환경변수/DB 설정
-├── errors/               # ApiError, 에러 핸들러
-├── middlewares/          # 인증/권한 가드, 로깅 등
-├── modules/              # router/controller/service/repository
-├── prisma/               # schema.prisma, seed.ts
-├── routes/               # index.ts, API 라우트 모음
-├── types/                # DTO/Express 확장 등 타입
-├── utils/                # asyncHandler, pagination, 상수 등
-└── ...
-uploads/                  # 파일 업로드 루트
+├── app.ts         # Express 앱 초기화
+├── server.ts      # 서버 실행 엔트리
+│
+├── config         # 환경변수/DB 설정
+├── constants      # 상수 정의
+├── crons          # 주기적 작업
+├── errors         # 에러 정의
+├── libs           # 외부 연동/서비스성 유틸
+├── middlewares    # 인증/권한 가드 등
+├── modules        # 도메인별 router/controller/service/repository/validator/dto 등
+├── prisma         # schema.prisma, seed.ts
+├── routes         # API 라우트 모음
+├── types          # Express 확장 타입
+└── utils          # passwordUtils.ts 등
+uploads            # 파일 업로드 루트
+
 ```
 
 ---
