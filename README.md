@@ -221,3 +221,9 @@ npm run stop
 - 최종 발표 자료: https://docs.google.com/presentation/d/1XBmjeN_Pu0jKqN2lfwSPn85UO00dr5x5II3_vhY7D2M/edit
 - 시연 영상: https://drive.google.com/file/d/1iWrBdx53sti-sYUyihxmG3t_wJocSovF/view
 - 저장소: https://github.com/codeit-moonshot/nb03-moonshot-team1
+- 산출물:
+  - 1. 요구사항 분석: https://docs.google.com/document/d/1hXJrfE2Vwv-PxUfeFRE7J6NRJR-vQaf4JkCYAT7pEFQ/edit?usp=sharing
+  - 2. 설계: https://docs.google.com/document/d/1KYyB9Blx_CLuuIa2q3lczQ5fBuD35tvtn37NGYvVinM/edit?usp=sharing
+  - 3. 구현: https://docs.google.com/document/d/1n4cgdaq_Dju7MyomvfYNkrojQapppLfzLdc8CEnnUCM/edit?usp=sharing
+  - 4. 테스트: https://docs.google.com/document/d/1L5CIWioHWae0RdunxhtA1BndwNc7MLu0Y4lWmrjXmJg/edit?usp=sharing
+  - 5. 배포 및 유지보수: https://docs.google.com/document/d/1MJeAi6CD0kcKbl0vWsFADgSPzZUSCncyE_iOVyA27tE/edit?usp=sharing
